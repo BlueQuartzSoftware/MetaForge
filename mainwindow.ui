@@ -32,6 +32,8 @@
     <addaction name="separator"/>
     <addaction name="actionSave_Package"/>
     <addaction name="actionSave_Package_As"/>
+    <addaction name="separator"/>
+    <addaction name="actionClose"/>
    </widget>
    <widget class="QMenu" name="menuHelp">
     <property name="title">
@@ -83,6 +85,11 @@
   <action name="actionCreate_Template">
    <property name="text">
     <string>Create Template</string>
+   </property>
+  </action>
+  <action name="actionClose">
+   <property name="text">
+    <string>Close </string>
    </property>
   </action>
  </widget>
