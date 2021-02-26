@@ -27,6 +27,7 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.setColumnWidth(7,self.width()*.05)
         self.ui.metadataTableView.setColumnWidth(8,self.width()*.05)
 
+
     def help(self):
         print("Help")
 

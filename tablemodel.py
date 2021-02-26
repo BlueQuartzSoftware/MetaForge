@@ -67,9 +67,19 @@ class TableModel(QAbstractTableModel):
         if role == Qt.EditRole:
             if not index.isValid():
                 return False
-            self.metadataList[index.row()][index.column()] = value
-            self.dataChanged.emit(index,index)
+            if index.column() == 0:
+                print(int(value))
+                print(self.metadataList)
+                self.metadataList.insert(int(value),self.metadataList[index.row()])
+            elif index.column() == 1:
+                self.metadataList[index.row()][0] = value
+            elif index.column() == 2:
+                self.metadataList[index.row()][1] = value
+            elif index.column() == 3:
+                self.metadataList[index.row()][2] = value
             return True
+
+
 
         return False
 
