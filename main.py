@@ -1,4 +1,5 @@
 # This Python file uses the following encoding: utf-8
+#!/usr/bin/env python3
 import sys
 import os
 
