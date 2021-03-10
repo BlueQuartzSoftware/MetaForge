@@ -7,8 +7,9 @@ class TableModel(QAbstractTableModel):
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadataList = []
-        self.metadataList.append(["Date","Tues Aug 22 03:09:35 2017","/States/SEMEColumnState/Date"])
-        self.metadataList.append(["TimeStamp","1503385775.990084","/States/SEMEColumnState/TimeStamp"])
+        self.metadataList.append({"Key":"Date","Value":"Tues Aug 22 03:09:35 2017","Source":"/States/SEMEColumnState/Date"})
+        self.metadataList.append({"Key":"TimeStamp","Value":"1503385775.990084","Source":"/States/SEMEColumnState/TimeStamp"})
+        self.metadataList.append({"Key":"ScanMode","Value":"RESOLUTION","Source":"/States/SEMEColumnState/ScanMode"})
 
 
     def rowCount(self, parent=QModelIndex()):
@@ -22,19 +23,20 @@ class TableModel(QAbstractTableModel):
             if index.column() == 0:
                 return index.row()
             elif index.column() == 1:
-                return self.metadataList[index.row()][0]
+                return self.metadataList[index.row()]["Key"]
             elif index.column() == 2:
-                return self.metadataList[index.row()][1]
+                return self.metadataList[index.row()]["Value"]
             elif index.column() == 3:
-                return self.metadataList[index.row()][2]
+                return self.metadataList[index.row()]["Source"]
             #elif index.column() == 4:
             #    return self.metadataList[index.row()][0]
             #elif index.column() == 5:
             #    if isString
-            #elif index.column() == 6:
-            #    return self.metadataList[index.row()][0]
-            #elif index.column() == 7:
-            #    return self.metadataList[index.row()][0]
+        elif role == Qt.CheckStateRole:
+            if index.column() == 6:
+                return Qt.Unchecked
+            elif index.column() == 7:
+                return Qt.Unchecked
             #elif index.column() == 8:
             #    return self.metadataList[index.row()][0]
 
@@ -87,9 +89,12 @@ class TableModel(QAbstractTableModel):
         if not index.isValid():
 
             return Qt.ItemIsEnabled
-
-        return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
-
+        if index.column() < 5:
+            return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
+        elif index.column() == 6 or index.column() == 7:
+            return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsUserCheckable)
+        else:
+            return
 #    def appendDownload(self, urlValue):
 #        currentDownload = Download(urlValue)
 #        currentDownload.downloadProgress['qint64', 'qint64'].connect(self.handleProgress)
