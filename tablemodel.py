@@ -65,7 +65,7 @@ class TableModel(QAbstractTableModel):
             elif section == 8:
                 return " "
             return None
-    def setData(self,index, value, role=Qt.EditRole):
+    def setData(self,index, value, role):
         if role == Qt.EditRole:
             if not index.isValid():
                 return False
@@ -79,6 +79,13 @@ class TableModel(QAbstractTableModel):
                 self.metadataList[index.row()][1] = value
             elif index.column() == 3:
                 self.metadataList[index.row()][2] = value
+            return True
+        elif role == Qt.CheckStateRole:
+            if index.column() == 6:
+                if self.itemData(index) == Qt.Unchecked:
+                    self.setItemData(index,Qt.CheckStateRole)
+                else:
+                    self.setItemData(index,Qt.CheckStateRole)
             return True
 
 

@@ -223,6 +223,9 @@
      <item row="0" column="1">
       <widget class="QLineEdit" name="hyperthoughtLineEdit">
        <property name="text">
+        <string/>
+       </property>
+       <property name="placeholderText">
         <string>Please select a path to upload to Hyperthought.</string>
        </property>
       </widget>

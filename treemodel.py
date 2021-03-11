@@ -22,17 +22,20 @@ class TreeModel(QAbstractItemModel):
         if not index.isValid():
             return None
 
-        if role != Qt.DisplayRole and role != Qt.EditRole:
-            return None
+        if role == Qt.DisplayRole:
+            item = self.getItem(index)
+            return item.data(index.column())
+        elif role == Qt.CheckStateRole:
+            return Qt.Checked
 
-        item = self.getItem(index)
-        return item.data(index.column())
+        return None
 
-#    def flags(self, index):
-#        if not index.isValid():
-#            return 0
 
-        #return Qt.ItemIsEditable | super(TreeModel, self).flags(index)
+    def flags(self, index):
+        if not index.isValid():
+            return 0
+
+        return Qt.ItemIsUserCheckable | super(TreeModel, self).flags(index)
 
     def getItem(self, index):
         if index.isValid():
@@ -116,6 +119,7 @@ class TreeModel(QAbstractItemModel):
             return False
 
         item = self.getItem(index)
+        print(item)
         result = item.setData(index.column(), value)
 
         if result:
@@ -183,13 +187,12 @@ class TreeModel(QAbstractItemModel):
              while queue:
                  child = queue.pop()
                  parent.insertChildren(parent.childCount(),1,self.rootItem.columnCount())
-                 print(parent.childCount())
                  parent.child(parent.childCount() -1).setData(0,child)
 
                  if child in curDict.keys() and isinstance(curDict[child],dict):
                      curDict = curDict[child]
                      parent=parent.child(parent.childCount() -1)
-                     print(child)
+
 
 
                  if isinstance(curDict, dict):
