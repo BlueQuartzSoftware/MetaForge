@@ -22,11 +22,11 @@ class TreeModel(QAbstractItemModel):
         if not index.isValid():
             return None
 
+        item = self.getItem(index)
         if role == Qt.DisplayRole:
-            item = self.getItem(index)
             return item.data(index.column())
         elif role == Qt.CheckStateRole:
-            return Qt.Checked
+            return item.checked
 
         return None
 
@@ -115,17 +115,19 @@ class TreeModel(QAbstractItemModel):
         return parentItem.childCount()
 
     def setData(self, index, value, role=Qt.EditRole):
-        if role != Qt.EditRole:
-            return False
-
-        item = self.getItem(index)
-        print(item)
-        result = item.setData(index.column(), value)
-
-        if result:
+        if role == Qt.EditRole:
+           item = self.getItem(index)
+           result = item.setData(index.column(), value)
+           if result:
+               self.dataChanged.emit(index, index)
+               return result
+        elif role == Qt.CheckStateRole:
+            item = self.getItem(index)
+            item.switchChecked()
             self.dataChanged.emit(index, index)
+            return True
+        return False
 
-        return result
 
     def setHeaderData(self, section, orientation, value, role=Qt.EditRole):
         if role != Qt.EditRole or orientation != Qt.Horizontal:
@@ -138,45 +140,6 @@ class TreeModel(QAbstractItemModel):
         return result
 
     def setupModelData(self, data, parent):
-#        parents = [parent]
-#        indentations = [0]
-
-#        number = 0
-
-#        while number < len(lines):
-#            position = 0
-#            while position < len(lines[number]):
-#                if lines[number][position] != " ":
-#                    break
-#                position += 1
-
-#            lineData = lines[number][position:].strip()
-
-#            if lineData:
-#                # Read the column data from the rest of the line.
-#                columnData = [s for s in lineData.split('\t') if s]
-
-#                if position > indentations[-1]:
-#                    # The last child of the current parent is now the new
-#                    # parent unless the current parent has no children.
-
-#                    if parents[-1].childCount() > 0:
-#                        parents.append(parents[-1].child(parents[-1].childCount() - 1))
-#                        indentations.append(position)
-
-#                else:
-#                    while position < indentations[-1] and len(parents) > 0:
-#                        parents.pop()
-#                        indentations.pop()
-
-#                # Append a new item to the current parent's list of children.
-#                parent = parents[-1]
-#                parent.insertChildren(parent.childCount(), 1,
-#                        self.rootItem.columnCount())
-#                for column in range(len(columnData)):
-#                    parent.child(parent.childCount() -1).setData(column, columnData[column])
-
-#            number += 1
              visited=[]
              queue=[]
 
@@ -185,7 +148,7 @@ class TreeModel(QAbstractItemModel):
                  queue.append(key)
              curDict = data
              while queue:
-                 child = queue.pop()
+                 child = queue.pop(0)
                  parent.insertChildren(parent.childCount(),1,self.rootItem.columnCount())
                  parent.child(parent.childCount() -1).setData(0,child)
 
@@ -193,13 +156,9 @@ class TreeModel(QAbstractItemModel):
                      curDict = curDict[child]
                      parent=parent.child(parent.childCount() -1)
 
-
-
                  if isinstance(curDict, dict):
                      for key in curDict.keys():
                          if key not in visited:
-
                              visited.append(key)
                              queue.append(key)
-                             #print(key)
 

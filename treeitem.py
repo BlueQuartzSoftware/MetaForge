@@ -6,7 +6,7 @@ class TreeItem(object):
         self.parentItem = parent
         self.itemData = data
         self.childItems = []
-        self.checked = 2
+        self.checked = Qt.Checked
 
     def child(self, row):
         return self.childItems[row]
@@ -79,3 +79,10 @@ class TreeItem(object):
         self.itemData[column] = value
 
         return True
+    def switchChecked(self):
+        if self.checked == Qt.Unchecked:
+            self.checked = Qt.Checked
+        elif self.checked == Qt.Checked:
+            self.checked = Qt.Unchecked
+
+

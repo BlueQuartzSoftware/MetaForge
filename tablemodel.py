@@ -7,9 +7,9 @@ class TableModel(QAbstractTableModel):
     def __init__(self, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadataList = []
-        self.metadataList.append({"Key":"Date","Value":"Tues Aug 22 03:09:35 2017","Source":"/States/SEMEColumnState/Date"})
-        self.metadataList.append({"Key":"TimeStamp","Value":"1503385775.990084","Source":"/States/SEMEColumnState/TimeStamp"})
-        self.metadataList.append({"Key":"ScanMode","Value":"RESOLUTION","Source":"/States/SEMEColumnState/ScanMode"})
+        self.metadataList.append({"Key":"Date","Value":"Tues Aug 22 03:09:35 2017","Source":"/States/SEMEColumnState/Date","Checked":Qt.Unchecked})
+        self.metadataList.append({"Key":"TimeStamp","Value":"1503385775.990084","Source":"/States/SEMEColumnState/TimeStamp","Checked":Qt.Unchecked})
+        self.metadataList.append({"Key":"ScanMode","Value":"RESOLUTION","Source":"/States/SEMEColumnState/ScanMode","Checked":Qt.Unchecked})
 
 
     def rowCount(self, parent=QModelIndex()):
@@ -30,13 +30,16 @@ class TableModel(QAbstractTableModel):
                 return self.metadataList[index.row()]["Source"]
             #elif index.column() == 4:
             #    return self.metadataList[index.row()][0]
-            #elif index.column() == 5:
-            #    if isString
+            elif index.column() == 5:
+                print(self.metadataList[index.row()]["Value"])
+                print(type(self.metadataList[index.row()]["Value"]))
+                print(str(type(self.metadataList[index.row()]["Value"])))
+                return str(type(self.metadataList[index.row()]["Value"])).split("'")[1].upper()
         elif role == Qt.CheckStateRole:
             if index.column() == 6:
-                return Qt.Unchecked
+                return self.metadataList[index.row()]["Checked"]
             elif index.column() == 7:
-                return Qt.Unchecked
+                return self.metadataList[index.row()]["Checked"]
             #elif index.column() == 8:
             #    return self.metadataList[index.row()][0]
 
@@ -81,16 +84,22 @@ class TableModel(QAbstractTableModel):
                 self.metadataList[index.row()][2] = value
             return True
         elif role == Qt.CheckStateRole:
-            if index.column() == 6:
-                if self.itemData(index) == Qt.Unchecked:
-                    self.setItemData(index,Qt.CheckStateRole)
-                else:
-                    self.setItemData(index,Qt.CheckStateRole)
+            if index.column() == 6 or index.column() == 7:
+                self.changeChecked(index)
+            self.dataChanged.emit(index, index)
             return True
 
 
 
         return False
+
+    def changeChecked(self, index):
+        if self.metadataList[index.row()]["Checked"] == Qt.Unchecked:
+            print("Reached Unchecked")
+            self.metadataList[index.row()]["Checked"] = Qt.Checked
+        else:
+            print("Reached Checked")
+            self.metadataList[index.row()]["Checked"] = Qt.Unchecked
 
     def flags(self, index):
         if not index.isValid():
@@ -101,15 +110,4 @@ class TableModel(QAbstractTableModel):
         elif index.column() == 6 or index.column() == 7:
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsUserCheckable)
         else:
-            return
-#    def appendDownload(self, urlValue):
-#        currentDownload = Download(urlValue)
-#        currentDownload.downloadProgress['qint64', 'qint64'].connect(self.handleProgress)
-#        self.beginInsertRows(QModelIndex(), self.rowCount() + 1, self.rowCount() + 1)
-#        self.metadataList.append(currentDownload)
-#        self.endInsertRows()
-
-  #  def handleProgress(self, current, total):
-  #      row = self.metadataList.index(self.sender())
-  #      topleft = self.createIndex(row, 1)
- #       self.dataChanged.emit(topleft, topleft)
+            return Qt.ItemIsEnabled
