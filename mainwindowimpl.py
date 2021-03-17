@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QFileSystemModel, QFileDialog
-from PySide2.QtCore import QFile, QIODevice, Qt
+from PySide2.QtCore import QFile, QIODevice, Qt, QStandardPaths
 from ui_mainwindow import Ui_MainWindow
 from tablemodel	import TableModel
 from treemodel import TreeModel
@@ -61,7 +61,8 @@ class MainWindow(QMainWindow):
         print("Save Package As")
 
     def selectFile(self):
-        linetext=QFileDialog.getOpenFileName(self)[0]
+        linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
+        QStandardPaths.HomeLocation),self.tr("Files (*.ctf *.xml *.ang)"))[0]
         if linetext != "":
             self.ui.datafileLineEdit.setText(linetext)
             self.ui.dataTypeText.setText(linetext.split(".")[1].upper())
