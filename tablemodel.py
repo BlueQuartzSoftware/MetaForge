@@ -4,13 +4,31 @@ from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex
 
 
 class TableModel(QAbstractTableModel):
-    def __init__(self, parent=None):
+    def __init__(self,data ,parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadataList = []
-        self.metadataList.append({"Key":"Date","Value":"Tues Aug 22 03:09:35 2017","Source":"/States/SEMEColumnState/Date","Checked":Qt.Unchecked})
-        self.metadataList.append({"Key":"TimeStamp","Value":"1503385775.990084","Source":"/States/SEMEColumnState/TimeStamp","Checked":Qt.Unchecked})
-        self.metadataList.append({"Key":"ScanMode","Value":"RESOLUTION","Source":"/States/SEMEColumnState/ScanMode","Checked":Qt.Unchecked})
+        visited=[]
+        queue=[]
+        source=""
 
+        for key in data.keys():
+            visited.append(key)
+            queue.append(key)
+        curDict = data
+        while queue:
+
+            child = queue.pop(0)
+            if not isinstance(curDict[child],dict):
+                self.metadataList.append({"Key":child,"Value":curDict[child],"Source":source+child,"Checked":Qt.Unchecked})
+            if child in curDict.keys() and isinstance(curDict[child],dict):
+                curDict = curDict[child]
+                source+= child+"/"
+
+            if isinstance(curDict, dict):
+                for key in curDict.keys():
+                    if key not in visited:
+                        visited.append(key)
+                        queue.append(key)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.metadataList)
@@ -25,15 +43,14 @@ class TableModel(QAbstractTableModel):
             elif index.column() == 1:
                 return self.metadataList[index.row()]["Key"]
             elif index.column() == 2:
-                return self.metadataList[index.row()]["Value"]
+                if self.metadataList[index.row()]["Value"] == "None":
+                    return ""
+                return str(self.metadataList[index.row()]["Value"])
             elif index.column() == 3:
                 return self.metadataList[index.row()]["Source"]
             #elif index.column() == 4:
             #    return self.metadataList[index.row()][0]
             elif index.column() == 5:
-                print(self.metadataList[index.row()]["Value"])
-                print(type(self.metadataList[index.row()]["Value"]))
-                print(str(type(self.metadataList[index.row()]["Value"])))
                 return str(type(self.metadataList[index.row()]["Value"])).split("'")[1].upper()
         elif role == Qt.CheckStateRole:
             if index.column() == 6:
@@ -73,15 +90,14 @@ class TableModel(QAbstractTableModel):
             if not index.isValid():
                 return False
             if index.column() == 0:
-                print(int(value))
-                print(self.metadataList)
                 self.metadataList.insert(int(value),self.metadataList[index.row()])
             elif index.column() == 1:
-                self.metadataList[index.row()][0] = value
+                self.metadataList[index.row()]["Key"] = value
             elif index.column() == 2:
-                self.metadataList[index.row()][1] = value
+                self.metadataList[index.row()]["Value"] = value
             elif index.column() == 3:
-                self.metadataList[index.row()][2] = value
+                print("hi")
+                #self.metadataList[index.row()]["Source"] = value
             return True
         elif role == Qt.CheckStateRole:
             if index.column() == 6 or index.column() == 7:
@@ -95,10 +111,8 @@ class TableModel(QAbstractTableModel):
 
     def changeChecked(self, index):
         if self.metadataList[index.row()]["Checked"] == Qt.Unchecked:
-            print("Reached Unchecked")
             self.metadataList[index.row()]["Checked"] = Qt.Checked
         else:
-            print("Reached Checked")
             self.metadataList[index.row()]["Checked"] = Qt.Unchecked
 
     def flags(self, index):
