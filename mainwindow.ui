@@ -40,7 +40,7 @@
       <item>
        <widget class="QLineEdit" name="datafileLineEdit">
         <property name="text">
-         <string>/home/raheem/Downloads/Slice_001.ang</string>
+         <string>Somefile.xml</string>
         </property>
        </widget>
       </item>
