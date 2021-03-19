@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QFileSystemModel, QFileDialog
+from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame
 from PySide2.QtCore import QFile, QIODevice, Qt, QStandardPaths
 from ui_mainwindow import Ui_MainWindow
 from tablemodel	import TableModel
@@ -21,26 +21,26 @@ class MainWindow(QMainWindow):
         self.ui.actionClose.triggered.connect(self.close)
         self.ui.dataFileSelect.clicked.connect(self.selectFile)
 
-        self.ui.metadataTableView.setModel(TableModel({"Somefile.xml":
+        aTree={"Somefile.xml":
             {"States":
                 {"SEMEColumnState":
-                    {"Date":"Tue Aug 22 03:09:35 2017", "TimeStamp":1503385775.990084,"ScanMode":"Resolution"}}}}))
+                    {"Date":"Tue Aug 22 03:09:35 2017", "TimeStamp":1503385775.990084,"ScanMode":"Resolution"}}}}
+
+        self.ui.metadataTableView.setModel(TableModel(aTree))
         self.ui.metadataTableView.setColumnWidth(0,self.width()*.05)
         self.ui.metadataTableView.setColumnWidth(1,self.width()*.3)
         self.ui.metadataTableView.setColumnWidth(2,self.width()*.3)
         self.ui.metadataTableView.setColumnWidth(3,self.width()*.3)
         self.ui.metadataTableView.setColumnWidth(4,self.width()*.3)
-        #self.ui.metadataTableView.setItemDelegateForColumn(2,QRectangle())
         self.ui.metadataTableView.setColumnWidth(5,self.width()*.2)
         self.ui.metadataTableView.setColumnWidth(6,self.width()*.05)
         self.ui.metadataTableView.setColumnWidth(7,self.width()*.05)
         self.ui.metadataTableView.setColumnWidth(8,self.width()*.05)
 
-        self.tree = {"Somefile.xml":
-            {"States":
-                {"SEMEColumnState":
-                    {"Date":"Tue Aug 22 03:09:35 2017", "TimeStamp":1503385775.990084,"ScanMode":"Resolution"}}}}
-        self.treeModel = TreeModel(["Available File Metadata"],self.tree)
+#        frameOption = QStyleOptionFrame()
+#        self.ui.metadataTableView.setItemDelegateForColumn(2,frameOption)
+
+        self.treeModel = TreeModel(["Available File Metadata"],aTree)
         self.ui.metadataTreeView.setModel(self.treeModel)
 
 

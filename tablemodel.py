@@ -10,6 +10,7 @@ class TableModel(QAbstractTableModel):
         visited=[]
         queue=[]
         source=""
+        self.dict= data
 
         for key in data.keys():
             visited.append(key)
@@ -57,8 +58,7 @@ class TableModel(QAbstractTableModel):
                 return self.metadataList[index.row()]["Checked"]
             elif index.column() == 7:
                 return self.metadataList[index.row()]["Checked"]
-            #elif index.column() == 8:
-            #    return self.metadataList[index.row()][0]
+
 
         return None
 
@@ -91,21 +91,19 @@ class TableModel(QAbstractTableModel):
                 return False
             if index.column() == 0:
                 self.metadataList.insert(int(value),self.metadataList[index.row()])
-            elif index.column() == 1:
-                self.metadataList[index.row()]["Key"] = value
             elif index.column() == 2:
+                treeDict = self.dict
+                sourcePath = self.metadataList[index.row()]["Source"].split("/")
+                for i in range(len(sourcePath)-1):
+                    treeDict = treeDict[sourcePath[i]]
+                treeDict[sourcePath[-1]] = value
                 self.metadataList[index.row()]["Value"] = value
-            elif index.column() == 3:
-                print("hi")
-                #self.metadataList[index.row()]["Source"] = value
             return True
         elif role == Qt.CheckStateRole:
             if index.column() == 6 or index.column() == 7:
                 self.changeChecked(index)
             self.dataChanged.emit(index, index)
             return True
-
-
 
         return False
 
