@@ -8,7 +8,7 @@ How to install
 
 How to run
 1. Cd into the easybake directory in the terminal.
-2. Run make to convert ethe current ui file into py.
+2. Run make to convert the current ui file into py. (If uic does not exist, run where pyside2-uic in the terminal and change the location inside of the makefile).
 3. The code can either be ran using python3 main.py or from Qt Creator after opening the project inside the directory.
 
 Features
@@ -19,7 +19,7 @@ Help
 Create Template
   Treeview - properly shows the heiarchy of the nested dictionary and is able to check and uncheck.
 
-  Tableview - properly shows the order and can navigate through the nested dictionary to show all of the values. Shows source path in the nested dictionary, index     in the list, and the type. Can change value. Can move positions of listitems*. Can check and uncheck Require and Editable.
+  Tableview - properly shows the order and can navigate through the nested dictionary to show all of the values. Shows source path in the nested dictionary, index in the list, and the type. Can change value. Can move positions of listitems*. Can check and uncheck Require and Editable.
 
   Data File Selector - Can press select to open a .ctf, .ang. or .xml file. CTF and ANG files are properly recognized and parsed into the tree and table views. 
 
