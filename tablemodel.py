@@ -10,7 +10,8 @@ class TableModel(QAbstractTableModel):
         visited=[]
         queue=[]
         source=""
-        self.dict= data
+        self.hiddenList=[]
+        self.treeDict= data
 
         for key in data.keys():
             visited.append(key)
@@ -98,6 +99,8 @@ class TableModel(QAbstractTableModel):
                     treeDict = treeDict[sourcePath[i]]
                 treeDict[sourcePath[-1]] = value
                 self.metadataList[index.row()]["Value"] = value
+            elif index.column() == 8:
+                self.metadataList.remove(index.row())
             return True
         elif role == Qt.CheckStateRole:
             if index.column() == 6 or index.column() == 7:
@@ -123,3 +126,6 @@ class TableModel(QAbstractTableModel):
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsUserCheckable)
         else:
             return Qt.ItemIsEnabled
+
+
+

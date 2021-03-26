@@ -1,19 +1,22 @@
 # This Python file uses the following encoding: utf-8
 
 
-from PySide2.QtCore import QAbstractItemModel, QFile, QIODevice, QItemSelectionModel, QModelIndex, Qt
+from PySide2.QtCore import QAbstractItemModel, QFile, QIODevice, QItemSelectionModel, QModelIndex, QObject ,Qt, Signal, Slot
 from PySide2.QtWidgets import QApplication, QMainWindow
 from treeitem import TreeItem
 
 
 class TreeModel(QAbstractItemModel):
-    def __init__(self, headers, data, parent=None):
+    checkChanged = Signal(int, str)
+    def __init__(self, headers, data, tableview, parent=None):
         super(TreeModel, self).__init__(parent)
 
         rootData = [header for header in headers]
         self.rootItem = TreeItem(rootData)
         self.treeDict= data
         self.setupModelData(data, self.rootItem)
+        self.tableview = tableview
+
 
     def columnCount(self, parent=QModelIndex()):
         return self.rootItem.columnCount()
@@ -124,6 +127,15 @@ class TreeModel(QAbstractItemModel):
         elif role == Qt.CheckStateRole:
             item = self.getItem(index)
             item.switchChecked()
+            checked= item.checked
+            source=""
+            sourceList= []
+
+            while item.parentItem:
+                sourceList.insert(0,item.itemData[0]+"/")
+                item = item.parentItem
+
+            self.checkChanged.emit(checked,source.join(sourceList)[:-1])
             self.dataChanged.emit(index, index)
             return True
         return False

@@ -8,6 +8,9 @@ class TreeItem(object):
         self.childItems = []
         self.checked = Qt.Checked
 
+    def checked(self):
+        return self.checked
+
     def child(self, row):
         return self.childItems[row]
 

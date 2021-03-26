@@ -1,10 +1,11 @@
 # This Python file uses the following encoding: utf-8
 
 from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame
-from PySide2.QtCore import QFile, QIODevice, Qt, QStandardPaths
+from PySide2.QtCore import QFile, QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot
 from ui_mainwindow import Ui_MainWindow
 from tablemodel	import TableModel
 from treemodel import TreeModel
+from filterModel import FilterModel
 import ctf
 import ang
 
@@ -25,8 +26,10 @@ class MainWindow(QMainWindow):
             {"States":
                 {"SEMEColumnState":
                     {"Date":"Tue Aug 22 03:09:35 2017", "TimeStamp":1503385775.990084,"ScanMode":"Resolution"}}}}
-
-        self.ui.metadataTableView.setModel(TableModel(aTree))
+        self.tablemodel = TableModel(aTree,self)
+        self.filterModel = FilterModel(self)
+        self.filterModel.setSourceModel(self.tablemodel)
+        self.ui.metadataTableView.setModel(self.filterModel)
         self.ui.metadataTableView.setColumnWidth(0,self.width()*.05)
         self.ui.metadataTableView.setColumnWidth(1,self.width()*.3)
         self.ui.metadataTableView.setColumnWidth(2,self.width()*.3)
@@ -40,11 +43,9 @@ class MainWindow(QMainWindow):
 #        frameOption = QStyleOptionFrame()
 #        self.ui.metadataTableView.setItemDelegateForColumn(2,frameOption)
 
-        self.treeModel = TreeModel(["Available File Metadata"],aTree)
+        self.treeModel = TreeModel(["Available File Metadata"],aTree,self.ui.metadataTableView.model)
         self.ui.metadataTreeView.setModel(self.treeModel)
-
-
-
+        self.treeModel.checkChanged.connect(self.filterModel.checkList)
     def help(self):
         print("Help")
 
