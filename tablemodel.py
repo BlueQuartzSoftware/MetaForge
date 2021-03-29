@@ -1,5 +1,7 @@
 from PySide2.QtNetwork import QNetworkReply
 from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PySide2.QtGui import QIcon, QColor
+from PySide2.QtWidgets import QApplication, QStyle
 
 
 
@@ -59,8 +61,10 @@ class TableModel(QAbstractTableModel):
                 return self.metadataList[index.row()]["Checked"]
             elif index.column() == 7:
                 return self.metadataList[index.row()]["Checked"]
-
-
+        elif role == Qt.DecorationRole:
+           if index.column == 8:
+               return QIcon(QApplication.style().standardIcon(QStyle.SP_TrashIcon))
+               #return QIcon(QApplication.style().standardIcon(QStyle.SP_TrashIcon))
         return None
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
@@ -93,12 +97,13 @@ class TableModel(QAbstractTableModel):
             if index.column() == 0:
                 self.metadataList.insert(int(value),self.metadataList[index.row()])
             elif index.column() == 2:
-                treeDict = self.dict
+                treeDict = self.treeDict
                 sourcePath = self.metadataList[index.row()]["Source"].split("/")
                 for i in range(len(sourcePath)-1):
                     treeDict = treeDict[sourcePath[i]]
                 treeDict[sourcePath[-1]] = value
                 self.metadataList[index.row()]["Value"] = value
+                self.dataChanged.emit(index, index)
             elif index.column() == 8:
                 self.metadataList.remove(index.row())
             return True

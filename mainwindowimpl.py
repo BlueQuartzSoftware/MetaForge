@@ -76,9 +76,12 @@ class MainWindow(QMainWindow):
                 headerDict =ang.parse_header_as_dict(linetext)
             elif linetext.split(".")[1].upper() == "XML":
                 print("XML Parser used")
-            self.treeModel = TreeModel(["Available File Metadata"],headerDict)
+            self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.ui.metadataTableView.model)
             self.ui.metadataTreeView.setModel(self.treeModel)
-            self.ui.metadataTableView.setModel(TableModel(headerDict))
+            self.tablemodel = TableModel(headerDict,self)
+            self.filterModel.setSourceModel(self.tablemodel)
+            self.ui.metadataTableView.setModel(self.filterModel)
+            self.treeModel.checkChanged.connect(self.filterModel.checkList)
 
 
 

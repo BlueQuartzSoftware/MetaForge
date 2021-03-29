@@ -273,11 +273,26 @@
    </property>
   </action>
   <action name="actionUse_Template">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="enabled">
+    <bool>false</bool>
+   </property>
    <property name="text">
     <string>Use Template</string>
    </property>
   </action>
   <action name="actionCreate_Template">
+   <property name="checkable">
+    <bool>false</bool>
+   </property>
+   <property name="checked">
+    <bool>false</bool>
+   </property>
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
    <property name="text">
     <string>Create Template</string>
    </property>

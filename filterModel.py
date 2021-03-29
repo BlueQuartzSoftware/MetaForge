@@ -5,9 +5,6 @@ class FilterModel(QSortFilterProxyModel):
         QSortFilterProxyModel.__init__(self, parent)
         self.displayed=[]
 
-
-
-
     def filterAcceptsRow(self,source_row, source_parent):
         return self.sourceModel().metadataList[source_row] not in self.sourceModel().hiddenList
 
@@ -22,17 +19,15 @@ class FilterModel(QSortFilterProxyModel):
             i+=1
         if checked == Qt.Unchecked:
             for j in range(len(self.sourceModel().metadataList)):
-                if self.sourceModel().metadataList[j]["Source"] == source:
+                if source in self.sourceModel().metadataList[j]["Source"]:
                     self.sourceModel().hiddenList.append(self.sourceModel().metadataList[j])
-                    break
+
         else:
-            for j in range(len(self.sourceModel().hiddenList)):
-                if self.sourceModel().hiddenList[j]["Source"] == source:
-                    row = self.sourceModel().hiddenList[j]
-                    del self.sourceModel().hiddenList[j]
-                    break
+            iteratelist = self.sourceModel().hiddenList[:]
+            newj=0
+            for j in range(len(iteratelist)):
+                if source in iteratelist[j]["Source"]:
+                    del self.sourceModel().hiddenList[j-newj]
+                    newj+=1
 
         self.setFilterRegExp(QRegExp())
-
-        #self.dataChanged.emit(1, 0)
-        #self.invalidate()
