@@ -84,7 +84,7 @@ class MainWindow(QMainWindow):
             self.filterModel.setSourceModel(self.tablemodel)
             self.ui.metadataTableView.setModel(self.filterModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
-
+            self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
 
 
         return True
