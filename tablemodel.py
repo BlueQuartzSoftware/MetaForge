@@ -61,10 +61,7 @@ class TableModel(QAbstractTableModel):
                 return self.metadataList[index.row()]["Checked"]
             elif index.column() == 7:
                 return self.metadataList[index.row()]["Checked"]
-        elif role == Qt.DecorationRole:
-           if index.column == 8:
-               return QIcon(QApplication.style().standardIcon(QStyle.SP_TrashIcon))
-               #return QIcon(QApplication.style().standardIcon(QStyle.SP_TrashIcon))
+
         return None
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
@@ -125,7 +122,7 @@ class TableModel(QAbstractTableModel):
         if not index.isValid():
 
             return Qt.ItemIsEnabled
-        if index.column() < 5:
+        if index.column() == 2 or index.column() == 8:
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
         elif index.column() == 6 or index.column() == 7:
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsUserCheckable)

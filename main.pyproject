@@ -1,3 +1,3 @@
 {
-    "files": ["main.py","mainwindowimpl.py","treemodel.py","ctf.py","ang.py","filterModel.py","mainwindow.ui","treeitem.py","tablemodel.py","_utils.py"]
+    "files": ["main.py","mainwindowimpl.py","treemodel.py","ctf.py","ang.py","filterModel.py","mainwindow.ui","treeitem.py","tablemodel.py","_utils.py","trashdelegate.py"]
 }

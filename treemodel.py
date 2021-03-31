@@ -18,6 +18,24 @@ class TreeModel(QAbstractItemModel):
         self.tableview = tableview
 
 
+    def changeLeafCheck(self, source):
+        #print(source)
+        curNode = self.rootItem.child(0)
+        keyNames = source.split("/")
+
+
+        for key in keyNames:
+            for i in range(curNode.childCount()):
+                print(key,curNode.child(i).itemData)
+                if curNode.child(i).itemData[0] == key:
+                        curNode = curNode.child(i)
+                        break
+        print(curNode.itemData)
+
+        curNode.switchChecked()
+        self.checkChanged.emit(Qt.Unchecked,source)
+        self.dataChanged.emit(0, 0)
+
     def columnCount(self, parent=QModelIndex()):
         return self.rootItem.columnCount()
 

@@ -6,6 +6,7 @@ from ui_mainwindow import Ui_MainWindow
 from tablemodel	import TableModel
 from treemodel import TreeModel
 from filterModel import FilterModel
+from trashdelegate import TrashDelegate
 import ctf
 import ang
 
@@ -34,18 +35,19 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.setColumnWidth(1,self.width()*.3)
         self.ui.metadataTableView.setColumnWidth(2,self.width()*.3)
         self.ui.metadataTableView.setColumnWidth(3,self.width()*.3)
-        self.ui.metadataTableView.setColumnWidth(4,self.width()*.3)
-        self.ui.metadataTableView.setColumnWidth(5,self.width()*.2)
+        self.ui.metadataTableView.setColumnWidth(4,self.width()*.15)
+        self.ui.metadataTableView.setColumnWidth(5,self.width()*.15)
         self.ui.metadataTableView.setColumnWidth(6,self.width()*.05)
         self.ui.metadataTableView.setColumnWidth(7,self.width()*.05)
+        self.trashDelegate = TrashDelegate()
+        self.ui.metadataTableView.setItemDelegateForColumn(8, self.trashDelegate)
         self.ui.metadataTableView.setColumnWidth(8,self.width()*.05)
 
-#        frameOption = QStyleOptionFrame()
-#        self.ui.metadataTableView.setItemDelegateForColumn(2,frameOption)
 
         self.treeModel = TreeModel(["Available File Metadata"],aTree,self.ui.metadataTableView.model)
         self.ui.metadataTreeView.setModel(self.treeModel)
         self.treeModel.checkChanged.connect(self.filterModel.checkList)
+        self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
     def help(self):
         print("Help")
 
