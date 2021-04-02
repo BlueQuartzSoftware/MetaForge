@@ -17,28 +17,25 @@ Help - Only displays help.
 
 Help
 Create Template
-  Treeview - properly shows the heiarchy of the nested dictionary and is able to check and uncheck.
+  Treeview - properly shows the heiarchy of the nested dictionary and is able to check and uncheck. Switching the check now affects the tableview.
 
-  Tableview - properly shows the order and can navigate through the nested dictionary to show all of the values. Shows source path in the nested dictionary, index in the list, and the type. Can change value. Can move positions of listitems*. Can check and uncheck Require and Editable.
+  Tableview - properly shows the order and can navigate through the nested dictionary to show all of the values. Shows source path in the nested dictionary, index in the list, and the type. Can change value. Can move positions of listitems*. Can check and uncheck Require and Editable. Clicking on the trashcan gets rid of the row and unchecks it in the table view.
 
   Data File Selector - Can press select to open a .ctf, .ang. or .xml file. CTF and ANG files are properly recognized and parsed into the tree and table views. 
 
   Data Upload Selector - only displays the place holder. Select and upload do not work.
   
-Use Template - not implemented
+Use Template - not implemented, commented out
 
 
 
 Current Bugs
 insert in the table copies over the current index when inserting forward. Example: Changing index from 0 to 1.
-Tableview cannot delete items in list.
-Treeview not connected to Tableview.
-While tableviews can be edited, the changes will only save on value.
+
 
 
 Next Release
-Connecting tableviews
-Allowing columns to be deleted and reinserted.
+
 Opening packages.
-Highlighting current mode.
+Implementing Use Method
 Authenticating Hyperthought.
