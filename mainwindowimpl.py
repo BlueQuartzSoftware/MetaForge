@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame
+from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView
 from PySide2.QtCore import QFile, QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot
 from ui_mainwindow import Ui_MainWindow
 from tablemodel	import TableModel
@@ -31,14 +31,8 @@ class MainWindow(QMainWindow):
         self.filterModel = FilterModel(self)
         self.filterModel.setSourceModel(self.tablemodel)
         self.ui.metadataTableView.setModel(self.filterModel)
-        self.ui.metadataTableView.setColumnWidth(0,self.width()*.05)
-        self.ui.metadataTableView.setColumnWidth(1,self.width()*.3)
-        self.ui.metadataTableView.setColumnWidth(2,self.width()*.3)
-        self.ui.metadataTableView.setColumnWidth(3,self.width()*.3)
-        self.ui.metadataTableView.setColumnWidth(4,self.width()*.15)
-        self.ui.metadataTableView.setColumnWidth(5,self.width()*.15)
-        self.ui.metadataTableView.setColumnWidth(6,self.width()*.05)
-        self.ui.metadataTableView.setColumnWidth(7,self.width()*.05)
+        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(2,QHeaderView.ResizeToContents)
+        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(3,QHeaderView.ResizeToContents)
         self.trashDelegate = TrashDelegate()
         self.ui.metadataTableView.setItemDelegateForColumn(8, self.trashDelegate)
         self.ui.metadataTableView.setColumnWidth(8,self.width()*.05)
@@ -85,7 +79,6 @@ class MainWindow(QMainWindow):
             self.ui.metadataTableView.setModel(self.filterModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
             self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
-
 
         return True
 
