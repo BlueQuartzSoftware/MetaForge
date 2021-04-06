@@ -170,25 +170,39 @@ class TreeModel(QAbstractItemModel):
         return result
 
     def setupModelData(self, data, parent):
-             visited=[]
+             visited={}
              queue=[]
+             grandParentsQueue = []
+             grandParents = {}
+
 
              for key in data.keys():
-                 visited.append(key)
+                 visited[(parent.itemData[0])]=[key]
                  queue.append(key)
+                 grandParentsQueue.append(parent)
+                 grandParents[key] = (data[key],parent)
              curDict = data
+
              while queue:
                  child = queue.pop(0)
+                 parentOfChild = grandParentsQueue.pop(0)
+                 parent = parentOfChild
                  parent.insertChildren(parent.childCount(),1,self.rootItem.columnCount())
                  parent.child(parent.childCount() -1).setData(0,child)
 
-                 if child in curDict.keys() and isinstance(curDict[child],dict):
-                     curDict = curDict[child]
-                     parent=parent.child(parent.childCount() -1)
+                 if child in grandParents:
+
+                     curDict =  grandParents[child][0]
+                     for curChild in range(grandParents[child][1].childCount()):
+                         if child == grandParents[child][1].child(curChild).itemData[0]:
+                            parent = grandParents[child][1].child(curChild)
+                            visited[(parent.itemData[0])]=[]
 
                  if isinstance(curDict, dict):
                      for key in curDict.keys():
-                         if key not in visited:
-                             visited.append(key)
+                         if key not in visited[(parent.itemData[0])]:
+                             visited[(parent.itemData[0])].append(key)
                              queue.append(key)
-
+                             grandParentsQueue.append(parent)
+                             if (isinstance(curDict[key],dict)):
+                                grandParents[key]= (curDict[key],parent)
