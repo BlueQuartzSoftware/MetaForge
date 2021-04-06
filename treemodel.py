@@ -170,25 +170,36 @@ class TreeModel(QAbstractItemModel):
         return result
 
     def setupModelData(self, data, parent):
-             visited=[]
+             visited={}
              queue=[]
+             parents = {}
 
              for key in data.keys():
-                 visited.append(key)
+                 visited[(parent.itemData[0])]=[key]
                  queue.append(key)
+                 parents[key] = (data[key],parent)
              curDict = data
+
              while queue:
                  child = queue.pop(0)
+                 if child in parents:
+                     parent = parents[child][1]
                  parent.insertChildren(parent.childCount(),1,self.rootItem.columnCount())
                  parent.child(parent.childCount() -1).setData(0,child)
 
-                 if child in curDict.keys() and isinstance(curDict[child],dict):
-                     curDict = curDict[child]
-                     parent=parent.child(parent.childCount() -1)
+                 if child in parents:
+
+                     curDict =  parents[child][0]
+                     for curChild in range(parents[child][1].childCount()):
+                         if child == parents[child][1].child(curChild).itemData[0]:
+                            parent = parents[child][1].child(curChild)
+                            visited[(parent.itemData[0])]=[]
 
                  if isinstance(curDict, dict):
+                     #visited[(parent.itemData[0])]=[]
                      for key in curDict.keys():
-                         if key not in visited:
-                             visited.append(key)
+                         if key not in visited[(parent.itemData[0])]:
+                             visited[(parent.itemData[0])].append(key)
                              queue.append(key)
-
+                             if (isinstance(curDict[key],dict)):
+                                parents[key]= (curDict[key],parent)
