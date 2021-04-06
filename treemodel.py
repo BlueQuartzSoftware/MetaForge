@@ -172,34 +172,37 @@ class TreeModel(QAbstractItemModel):
     def setupModelData(self, data, parent):
              visited={}
              queue=[]
-             parents = {}
+             grandParentsQueue = []
+             grandParents = {}
+
 
              for key in data.keys():
                  visited[(parent.itemData[0])]=[key]
                  queue.append(key)
-                 parents[key] = (data[key],parent)
+                 grandParentsQueue.append(parent)
+                 grandParents[key] = (data[key],parent)
              curDict = data
 
              while queue:
                  child = queue.pop(0)
-                 if child in parents:
-                     parent = parents[child][1]
+                 parentOfChild = grandParentsQueue.pop(0)
+                 parent = parentOfChild
                  parent.insertChildren(parent.childCount(),1,self.rootItem.columnCount())
                  parent.child(parent.childCount() -1).setData(0,child)
 
-                 if child in parents:
+                 if child in grandParents:
 
-                     curDict =  parents[child][0]
-                     for curChild in range(parents[child][1].childCount()):
-                         if child == parents[child][1].child(curChild).itemData[0]:
-                            parent = parents[child][1].child(curChild)
+                     curDict =  grandParents[child][0]
+                     for curChild in range(grandParents[child][1].childCount()):
+                         if child == grandParents[child][1].child(curChild).itemData[0]:
+                            parent = grandParents[child][1].child(curChild)
                             visited[(parent.itemData[0])]=[]
 
                  if isinstance(curDict, dict):
-                     #visited[(parent.itemData[0])]=[]
                      for key in curDict.keys():
                          if key not in visited[(parent.itemData[0])]:
                              visited[(parent.itemData[0])].append(key)
                              queue.append(key)
+                             grandParentsQueue.append(parent)
                              if (isinstance(curDict[key],dict)):
-                                parents[key]= (curDict[key],parent)
+                                grandParents[key]= (curDict[key],parent)
