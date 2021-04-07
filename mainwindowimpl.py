@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.setColumnWidth(8,self.width()*.05)
 
 
-        self.treeModel = TreeModel(["Available File Metadata"],aTree,self.ui.metadataTableView.model)
+        self.treeModel = TreeModel(["Available File Metadata"],aTree,self.tablemodel)
         self.ui.metadataTreeView.setModel(self.treeModel)
         self.treeModel.checkChanged.connect(self.filterModel.checkList)
         self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
@@ -72,11 +72,12 @@ class MainWindow(QMainWindow):
                 headerDict =ang.parse_header_as_dict(linetext)
             elif linetext.split(".")[1].upper() == "XML":
                 print("XML Parser used")
-            self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.ui.metadataTableView.model)
-            self.ui.metadataTreeView.setModel(self.treeModel)
+
             self.tablemodel = TableModel(headerDict,self)
             self.filterModel.setSourceModel(self.tablemodel)
             self.ui.metadataTableView.setModel(self.filterModel)
+            self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.tablemodel)
+            self.ui.metadataTreeView.setModel(self.treeModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
             self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
 

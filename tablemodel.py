@@ -9,30 +9,13 @@ class TableModel(QAbstractTableModel):
     def __init__(self,data ,parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadataList = []
-        visited=[]
+        visited={}
         queue=[]
+        grandParents={}
         source=""
         self.hiddenList=[]
         self.treeDict= data
 
-        for key in data.keys():
-            visited.append(key)
-            queue.append(key)
-        curDict = data
-        while queue:
-
-            child = queue.pop(0)
-            if not isinstance(curDict[child],dict):
-                self.metadataList.append({"Key":child,"Value":curDict[child],"Source":source+child,"Checked":Qt.Unchecked})
-            if child in curDict.keys() and isinstance(curDict[child],dict):
-                curDict = curDict[child]
-                source+= child+"/"
-
-            if isinstance(curDict, dict):
-                for key in curDict.keys():
-                    if key not in visited:
-                        visited.append(key)
-                        queue.append(key)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.metadataList)
@@ -128,6 +111,11 @@ class TableModel(QAbstractTableModel):
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsUserCheckable)
         else:
             return Qt.ItemIsEnabled
+
+    def addRow(self, dataDict, source, value):
+        self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
+        self.metadataList.append({"Key":value,"Value":dataDict[value],"Source":source+value,"Checked":Qt.Unchecked})
+        self.endInsertRows()
 
 
 

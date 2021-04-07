@@ -8,21 +8,20 @@ from treeitem import TreeItem
 
 class TreeModel(QAbstractItemModel):
     checkChanged = Signal(int, str)
-    def __init__(self, headers, data, tableview, parent=None):
+    def __init__(self, headers, data, tablemodel, parent=None):
         super(TreeModel, self).__init__(parent)
 
         rootData = [header for header in headers]
         self.rootItem = TreeItem(rootData)
         self.treeDict= data
+        self.tablemodel = tablemodel
         self.setupModelData(data, self.rootItem)
-        self.tableview = tableview
+
 
 
     def changeLeafCheck(self, source):
-        #print(source)
         curNode = self.rootItem.child(0)
         keyNames = source.split("/")
-
 
         for key in keyNames:
             for i in range(curNode.childCount()):
@@ -30,8 +29,6 @@ class TreeModel(QAbstractItemModel):
                 if curNode.child(i).itemData[0] == key:
                         curNode = curNode.child(i)
                         break
-        print(curNode.itemData)
-
         curNode.switchChecked()
         self.checkChanged.emit(Qt.Unchecked,source)
         self.dataChanged.emit(0, 0)
@@ -172,20 +169,19 @@ class TreeModel(QAbstractItemModel):
     def setupModelData(self, data, parent):
              visited={}
              queue=[]
-             grandParentsQueue = []
              grandParents = {}
-
 
              for key in data.keys():
                  visited[(parent.itemData[0])]=[key]
-                 queue.append(key)
-                 grandParentsQueue.append(parent)
+                 queue.append((key,parent,""))
                  grandParents[key] = (data[key],parent)
              curDict = data
-
+             tempSource= ""
              while queue:
-                 child = queue.pop(0)
-                 parentOfChild = grandParentsQueue.pop(0)
+                 poppedItem = queue.pop(0)
+                 child = poppedItem[0]
+                 parentOfChild = poppedItem[1]
+                 childSource = poppedItem[2]
                  parent = parentOfChild
                  parent.insertChildren(parent.childCount(),1,self.rootItem.columnCount())
                  parent.child(parent.childCount() -1).setData(0,child)
@@ -193,6 +189,7 @@ class TreeModel(QAbstractItemModel):
                  if child in grandParents:
 
                      curDict =  grandParents[child][0]
+                     tempSource = childSource+child+"/"
                      for curChild in range(grandParents[child][1].childCount()):
                          if child == grandParents[child][1].child(curChild).itemData[0]:
                             parent = grandParents[child][1].child(curChild)
@@ -202,7 +199,10 @@ class TreeModel(QAbstractItemModel):
                      for key in curDict.keys():
                          if key not in visited[(parent.itemData[0])]:
                              visited[(parent.itemData[0])].append(key)
-                             queue.append(key)
-                             grandParentsQueue.append(parent)
+                             queue.append((key,parent,tempSource))
                              if (isinstance(curDict[key],dict)):
                                 grandParents[key]= (curDict[key],parent)
+                             else:
+                                self.tablemodel.addRow(curDict,tempSource,key)
+
+
