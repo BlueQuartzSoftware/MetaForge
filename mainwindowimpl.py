@@ -1,6 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide2.QtWidgets import QApplication, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView
+from PySide2.QtWidgets import QApplication, QButtonGroup, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView
 from PySide2.QtCore import QFile, QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot
 from ui_mainwindow import Ui_MainWindow
 from tablemodel	import TableModel
@@ -22,6 +22,9 @@ class MainWindow(QMainWindow):
         self.ui.actionSave_Package_As.triggered.connect(self.savePackageAs)
         self.ui.actionClose.triggered.connect(self.close)
         self.ui.dataFileSelect.clicked.connect(self.selectFile)
+
+#        self.ui.actionUseTemplate.toggle.connect(
+
 
         aTree={"Somefile.xml":
             {"States":
