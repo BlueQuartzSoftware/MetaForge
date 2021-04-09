@@ -64,7 +64,8 @@ class MainWindow(QMainWindow):
         linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
         QStandardPaths.HomeLocation),self.tr("Files (*.ctf *.xml *.ang)"))[0]
         if linetext != "":
-            self.ui.datafileLineEdit.setText(linetext)
+
+            self.ui.dataFileLineEdit.setText(linetext)
             self.ui.dataTypeText.setText(linetext.split(".")[1].upper())
             if self.ui.fileParserCombo.findText(linetext.split(".")[1].upper()+" Parser") != -1:
                 headerDict= {}

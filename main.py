@@ -5,7 +5,7 @@ import os
 
 
 from PySide2.QtWidgets import QApplication, QWidget, QMainWindow
-from PySide2.QtCore import QFile, QIODevice
+from PySide2.QtCore import QFile, QIODevice, QObject
 from ui_mainwindow import Ui_MainWindow
 from mainwindowimpl import MainWindow
 
@@ -14,6 +14,7 @@ from mainwindowimpl import MainWindow
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
+    app.setApplicationDisplayName("EasyBake")
     window = MainWindow()
     window.show()
 
