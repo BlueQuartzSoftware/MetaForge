@@ -56,7 +56,7 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setColumnWidth(2,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(3,self.width()*.25)
 
-        self.uselistmodel = ListModel(self)
+        self.uselistmodel = ListModel(self, self.usetablemodel)
         self.ui.useTemplateListView.setModel(self.uselistmodel)
     def help(self):
         print("Help")
@@ -93,7 +93,7 @@ class MainWindow(QMainWindow):
             self.createtablemodel = TableModelC(headerDict,self)
             self.filterModel.setSourceModel(self.createtablemodel)
             self.ui.metadataTableView.setModel(self.filterModel)
-            self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.usetablemodel)
+            self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.createtablemodel)
             self.ui.metadataTreeView.setModel(self.treeModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
             self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
