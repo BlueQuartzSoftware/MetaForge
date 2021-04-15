@@ -5,7 +5,11 @@ class FilterModel(QSortFilterProxyModel):
         QSortFilterProxyModel.__init__(self, parent)
         self.displayed=[]
 
+
     def filterAcceptsRow(self,source_row, source_parent):
+        if self.sourceModel().metadataList[source_row] not in self.sourceModel().hiddenList and self.sourceModel().metadataList[source_row] not in self.displayed:
+            self.displayed.append(self.sourceModel().metadataList[source_row])
+        print(self.displayed)
         return self.sourceModel().metadataList[source_row] not in self.sourceModel().hiddenList
 
     def checkList(self,checked,source):
@@ -29,5 +33,4 @@ class FilterModel(QSortFilterProxyModel):
                 if source in iteratelist[j]["Source"]:
                     del self.sourceModel().hiddenList[j-newj]
                     newj+=1
-
         self.setFilterRegExp(QRegExp())

@@ -5,7 +5,7 @@ from PySide2.QtWidgets import QApplication, QStyle
 
 
 
-class TableModel(QAbstractTableModel):
+class TableModelC(QAbstractTableModel):
     def __init__(self,data ,parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadataList = []

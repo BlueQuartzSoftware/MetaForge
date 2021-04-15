@@ -25,7 +25,7 @@ class TreeModel(QAbstractItemModel):
 
         for key in keyNames:
             for i in range(curNode.childCount()):
-                print(key,curNode.child(i).itemData)
+                #print(key,curNode.child(i).itemData)
                 if curNode.child(i).itemData[0] == key:
                         curNode = curNode.child(i)
                         break

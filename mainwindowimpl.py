@@ -3,10 +3,13 @@
 from PySide2.QtWidgets import QApplication, QButtonGroup, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView
 from PySide2.QtCore import QFile, QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot
 from ui_mainwindow import Ui_MainWindow
-from tablemodel	import TableModel
+from createtablemodel	import TableModelC
+from usetablemodel import TableModelU
+from uselistmodel import ListModel
 from treemodel import TreeModel
 from filterModel import FilterModel
 from trashdelegate import TrashDelegate
+
 import ctf
 import ang
 
@@ -30,9 +33,9 @@ class MainWindow(QMainWindow):
             {"States":
                 {"SEMEColumnState":
                     {"Date":"Tue Aug 22 03:09:35 2017", "TimeStamp":1503385775.990084,"ScanMode":"Resolution"}}}}
-        self.tablemodel = TableModel(aTree,self)
+        self.createtablemodel = TableModelC(aTree,self)
         self.filterModel = FilterModel(self)
-        self.filterModel.setSourceModel(self.tablemodel)
+        self.filterModel.setSourceModel(self.createtablemodel)
         self.ui.metadataTableView.setModel(self.filterModel)
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(2,QHeaderView.ResizeToContents)
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(3,QHeaderView.ResizeToContents)
@@ -41,10 +44,20 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.setColumnWidth(8,self.width()*.05)
 
 
-        self.treeModel = TreeModel(["Available File Metadata"],aTree,self.tablemodel)
+        self.treeModel = TreeModel(["Available File Metadata"],aTree,self.createtablemodel)
         self.ui.metadataTreeView.setModel(self.treeModel)
         self.treeModel.checkChanged.connect(self.filterModel.checkList)
         self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
+
+        self.usetablemodel = TableModelU(self.filterModel,self)
+        self.ui.useTemplateTableView.setModel(self.usetablemodel)
+        self.ui.useTemplateTableView.setColumnWidth(0,self.width()*.25)
+        self.ui.useTemplateTableView.setColumnWidth(1,self.width()*.25)
+        self.ui.useTemplateTableView.setColumnWidth(2,self.width()*.25)
+        self.ui.useTemplateTableView.setColumnWidth(3,self.width()*.25)
+
+        self.uselistmodel = ListModel(self)
+        self.ui.useTemplateListView.setModel(self.uselistmodel)
     def help(self):
         print("Help")
 
@@ -64,7 +77,7 @@ class MainWindow(QMainWindow):
         linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
         QStandardPaths.HomeLocation),self.tr("Files (*.ctf *.xml *.ang)"))[0]
         if linetext != "":
-
+            self.setWindowTitle(linetext)
             self.ui.dataFileLineEdit.setText(linetext)
             self.ui.dataTypeText.setText(linetext.split(".")[1].upper())
             if self.ui.fileParserCombo.findText(linetext.split(".")[1].upper()+" Parser") != -1:
@@ -77,10 +90,10 @@ class MainWindow(QMainWindow):
             elif linetext.split(".")[1].upper() == "XML":
                 print("XML Parser used")
 
-            self.tablemodel = TableModel(headerDict,self)
-            self.filterModel.setSourceModel(self.tablemodel)
+            self.createtablemodel = TableModelC(headerDict,self)
+            self.filterModel.setSourceModel(self.createtablemodel)
             self.ui.metadataTableView.setModel(self.filterModel)
-            self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.tablemodel)
+            self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.usetablemodel)
             self.ui.metadataTreeView.setModel(self.treeModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
             self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
