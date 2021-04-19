@@ -9,7 +9,7 @@ class FilterModel(QSortFilterProxyModel):
     def filterAcceptsRow(self,source_row, source_parent):
         if self.sourceModel().metadataList[source_row] not in self.sourceModel().hiddenList and self.sourceModel().metadataList[source_row] not in self.displayed:
             self.displayed.append(self.sourceModel().metadataList[source_row])
-        print(self.displayed)
+        #print(self.displayed)
         return self.sourceModel().metadataList[source_row] not in self.sourceModel().hiddenList
 
     def checkList(self,checked,source):

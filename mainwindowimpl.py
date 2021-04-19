@@ -12,6 +12,7 @@ from trashdelegate import TrashDelegate
 
 import ctf
 import ang
+import json
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -24,7 +25,11 @@ class MainWindow(QMainWindow):
         self.ui.actionSave_Package.triggered.connect(self.savePackage)
         self.ui.actionSave_Package_As.triggered.connect(self.savePackageAs)
         self.ui.actionClose.triggered.connect(self.close)
+        self.ui.actionSave_Template.triggered.connect(self.saveTemplate)
         self.ui.dataFileSelect.clicked.connect(self.selectFile)
+        self.ui.hyperthoughtTemplateSelect.clicked.connect(self.selectTemplate)
+        self.ui.saveTemplateButton.clicked.connect(self.saveTemplate)
+        self.setStatusBar(None)
 
 #        self.ui.actionUseTemplate.toggle.connect(
 
@@ -49,14 +54,14 @@ class MainWindow(QMainWindow):
         self.treeModel.checkChanged.connect(self.filterModel.checkList)
         self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
 
-        self.usetablemodel = TableModelU(self.filterModel,self)
+        self.usetablemodel = TableModelU(self,[])
         self.ui.useTemplateTableView.setModel(self.usetablemodel)
         self.ui.useTemplateTableView.setColumnWidth(0,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(1,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(2,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(3,self.width()*.25)
 
-        self.uselistmodel = ListModel(self, self.usetablemodel)
+        self.uselistmodel = ListModel(self, self.usetablemodel,"")
         self.ui.useTemplateListView.setModel(self.uselistmodel)
     def help(self):
         print("Help")
@@ -72,6 +77,14 @@ class MainWindow(QMainWindow):
 
     def savePackageAs(self):
         print("Save Package As")
+
+    def saveTemplate(self):
+        fileName = QFileDialog.getSaveFileName(self, "Save File",
+                                   "",
+                                   "Templates (*.ez)")
+        if fileName != "":
+            with open(fileName[0], 'w') as outfile:
+                json.dump(self.filterModel.displayed, outfile)
 
     def selectFile(self):
         linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
@@ -91,12 +104,45 @@ class MainWindow(QMainWindow):
                 print("XML Parser used")
 
             self.createtablemodel = TableModelC(headerDict,self)
+            self.filterModel.displayed=[]
             self.filterModel.setSourceModel(self.createtablemodel)
             self.ui.metadataTableView.setModel(self.filterModel)
             self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.createtablemodel)
             self.ui.metadataTreeView.setModel(self.treeModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
             self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
+
+        return True
+
+    def selectTemplate(self):
+        print(self.createtablemodel.metadataList)
+        linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
+        QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
+        if linetext != "":
+            self.ui.displayedFileLabel.setText(linetext.split("/")[-1])
+            infile = open(linetext,"r")
+            data= infile.read()
+            self.usetablemodel = TableModelU(self,json.loads(data))
+            self.ui.useTemplateTableView.setModel(self.usetablemodel)
+            self.uselistmodel = ListModel(self, self.usetablemodel, linetext.split("/")[-1])
+            self.ui.useTemplateListView.setModel(self.uselistmodel)
+            infile.close()
+            #print(self.usetablemodel.metadataList)
+            #self.setWindowTitle(linetext)
+            #self.ui.dataFileLineEdit.setText(linetext)
+            #self.ui.dataTypeText.setText(linetext.split(".")[1].upper())
+#            if self.ui.fileParserCombo.findText(linetext.split(".")[1].upper()+" Parser") != -1:
+#                headerDict= {}
+#                self.ui.fileParserCombo.setCurrentIndexnetext)
+#            elif linetext.split(".")[1].upper() == "ANG":(self.ui.fileParserCombo.findText(linetext.split(".")[1].upper()+" Parser"))
+#            if linetext.split(".")[1].upper() == "CTF":
+#                headerDict =ctf.parse_header_as_dict(li
+#                headerDict =ang.parse_header_as_dict(linetext)
+#            elif linetext.split(".")[1].upper() == "XML":
+#                print("XML Parser used")
+
+
+
 
         return True
 

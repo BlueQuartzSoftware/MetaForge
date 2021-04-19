@@ -83,9 +83,9 @@ class TreeItem(object):
 
         return True
     def switchChecked(self):
-        if self.checked == Qt.Unchecked:
-            self.checked = Qt.Checked
-        elif self.checked == Qt.Checked:
-            self.checked = Qt.Unchecked
+        if self.checked == 0:
+            self.checked = 2
+        elif self.checked == 2:
+            self.checked = 0
 
 

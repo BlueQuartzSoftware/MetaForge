@@ -10,142 +10,54 @@
     <height>686</height>
    </rect>
   </property>
+  <property name="minimumSize">
+   <size>
+    <width>0</width>
+    <height>0</height>
+   </size>
+  </property>
   <property name="windowTitle">
    <string>MainWindow</string>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
-    <item row="1" column="2">
+    <item row="1" column="1">
      <widget class="QTabWidget" name="TabWidget">
       <property name="currentIndex">
        <number>0</number>
       </property>
-      <widget class="QWidget" name="UseTemplateTab">
+      <widget class="QWidget" name="CreateTemplateTab">
        <attribute name="title">
-        <string>Use Template</string>
+        <string>Create Template</string>
        </attribute>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0" rowspan="3">
-         <widget class="QListView" name="useTemplateListView">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
+       <layout class="QGridLayout" name="gridLayout">
+        <item row="0" column="0">
+         <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>9</number>
           </property>
-          <property name="minimumSize">
-           <size>
-            <width>325</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="alternatingRowColors">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="0" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QLabel" name="label_4">
+           <widget class="QLabel" name="label_2">
+            <property name="sizePolicy">
+             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+             </sizepolicy>
+            </property>
             <property name="text">
-             <string>Metadata</string>
+             <string>Data File:</string>
             </property>
            </widget>
           </item>
           <item>
-           <layout class="QGridLayout" name="gridLayout_2">
-            <item row="0" column="0">
-             <widget class="QLabel" name="hyperthoughtTemplateLabel">
-              <property name="text">
-               <string>Hyperthought Template File</string>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLineEdit" name="hyperthoughtTemplateLineEdit"/>
-            </item>
-            <item row="0" column="2">
-             <widget class="QPushButton" name="hyperthoughtTemplateSelect">
-              <property name="text">
-               <string>Select</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QCheckBox" name="parseOtherDataCheck">
-              <property name="text">
-               <string>Parse Other Data File</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="otherDataFileLineEdit"/>
-            </item>
-            <item row="1" column="2">
-             <widget class="QPushButton" name="otherDataFileSelect">
-              <property name="text">
-               <string>Select</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-         </layout>
-        </item>
-        <item row="1" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
-          <item>
-           <widget class="QLabel" name="label_5">
+           <widget class="QLineEdit" name="dataFileLineEdit">
             <property name="text">
-             <string>Search Box</string>
+             <string>Somefile.xml</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="displayedFileLabel">
-            <property name="text">
-             <string>No File Selected</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="requiredFieldsCheck">
-            <property name="text">
-             <string>Only Show Required Fields</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="1">
-         <widget class="QTableView" name="useTemplateTableView">
-          <property name="alternatingRowColors">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item row="3" column="0" colspan="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_7">
-          <item>
-           <widget class="QLabel" name="label_3">
-            <property name="text">
-             <string>HyperThought Uploader Folder</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="hyperthoughtLineEdit_2">
-            <property name="text">
-             <string/>
-            </property>
-            <property name="placeholderText">
-             <string>Please select a path to upload to Hyperthought.</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QPushButton" name="hyperthoughtSelectButton_2">
+           <widget class="QPushButton" name="dataFileSelect">
             <property name="text">
              <string>Select</string>
             </property>
@@ -153,37 +65,6 @@
           </item>
          </layout>
         </item>
-        <item row="4" column="0" colspan="2">
-         <layout class="QHBoxLayout" name="horizontalLayout_8">
-          <item>
-           <spacer name="horizontalSpacer_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>40</width>
-              <height>20</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item>
-           <widget class="QPushButton" name="hyperthoughtUploadButton_2">
-            <property name="text">
-             <string>Upload Files</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-       </layout>
-      </widget>
-      <widget class="QWidget" name="CreateTemplateTab">
-       <attribute name="title">
-        <string>Create Template</string>
-       </attribute>
-       <layout class="QGridLayout" name="gridLayout">
         <item row="1" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
@@ -314,33 +195,188 @@
           </item>
          </layout>
         </item>
-        <item row="0" column="0">
-         <layout class="QHBoxLayout" name="horizontalLayout_2">
-          <property name="spacing">
-           <number>9</number>
+        <item row="2" column="0">
+         <widget class="QLabel" name="label">
+          <property name="text">
+           <string>Search Bar</string>
           </property>
+         </widget>
+        </item>
+        <item row="4" column="0">
+         <widget class="QWidget" name="widget" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>0</width>
+            <height>0</height>
+           </size>
+          </property>
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <widget class="QWidget" name="widget_2" native="true">
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>0</height>
+              </size>
+             </property>
+             <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <item>
+               <spacer name="horizontalSpacer_5">
+                <property name="orientation">
+                 <enum>Qt::Horizontal</enum>
+                </property>
+                <property name="sizeHint" stdset="0">
+                 <size>
+                  <width>1227</width>
+                  <height>20</height>
+                 </size>
+                </property>
+               </spacer>
+              </item>
+              <item>
+               <widget class="QPushButton" name="saveTemplateButton">
+                <property name="text">
+                 <string>Save Template</string>
+                </property>
+               </widget>
+              </item>
+             </layout>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+       </layout>
+      </widget>
+      <widget class="QWidget" name="UseTemplateTab">
+       <attribute name="title">
+        <string>Use Template</string>
+       </attribute>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0" rowspan="3">
+         <widget class="QListView" name="useTemplateListView">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>325</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
-           <widget class="QLabel" name="label_2">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
+           <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>Data File:</string>
+             <string>Metadata</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="dataFileLineEdit">
+           <layout class="QGridLayout" name="gridLayout_2">
+            <item row="0" column="0">
+             <widget class="QLabel" name="hyperthoughtTemplateLabel">
+              <property name="text">
+               <string>Hyperthought Template File</string>
+              </property>
+             </widget>
+            </item>
+            <item row="0" column="1">
+             <widget class="QLineEdit" name="hyperthoughtTemplateLineEdit"/>
+            </item>
+            <item row="0" column="2">
+             <widget class="QPushButton" name="hyperthoughtTemplateSelect">
+              <property name="text">
+               <string>Select</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QCheckBox" name="parseOtherDataCheck">
+              <property name="text">
+               <string>Parse Other Data File</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="otherDataFileLineEdit"/>
+            </item>
+            <item row="1" column="2">
+             <widget class="QPushButton" name="otherDataFileSelect">
+              <property name="text">
+               <string>Select</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </item>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLabel" name="label_5">
             <property name="text">
-             <string>Somefile.xml</string>
+             <string>Search Box</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="dataFileSelect">
+           <widget class="QLabel" name="displayedFileLabel">
+            <property name="text">
+             <string>No File Selected</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QCheckBox" name="requiredFieldsCheck">
+            <property name="text">
+             <string>Only Show Required Fields</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="1">
+         <widget class="QTableView" name="useTemplateTableView">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+         </widget>
+        </item>
+        <item row="3" column="0" colspan="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <item>
+           <widget class="QLabel" name="label_3">
+            <property name="text">
+             <string>HyperThought Uploader Folder</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLineEdit" name="hyperthoughtLineEdit_2">
+            <property name="text">
+             <string/>
+            </property>
+            <property name="placeholderText">
+             <string>Please select a path to upload to Hyperthought.</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QPushButton" name="hyperthoughtSelectButton_2">
             <property name="text">
              <string>Select</string>
             </property>
@@ -348,12 +384,29 @@
           </item>
          </layout>
         </item>
-        <item row="2" column="0">
-         <widget class="QLabel" name="label">
-          <property name="text">
-           <string>Search Bar</string>
-          </property>
-         </widget>
+        <item row="4" column="0" colspan="2">
+         <layout class="QHBoxLayout" name="horizontalLayout_8">
+          <item>
+           <spacer name="horizontalSpacer_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
+          </item>
+          <item>
+           <widget class="QPushButton" name="hyperthoughtUploadButton_2">
+            <property name="text">
+             <string>Upload Files</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </item>
        </layout>
       </widget>
@@ -379,6 +432,8 @@
     <addaction name="separator"/>
     <addaction name="actionSave_Package"/>
     <addaction name="actionSave_Package_As"/>
+    <addaction name="separator"/>
+    <addaction name="actionSave_Template"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
@@ -457,6 +512,11 @@
   <action name="actionHelp">
    <property name="text">
     <string>Help</string>
+   </property>
+  </action>
+  <action name="actionSave_Template">
+   <property name="text">
+    <string>Save Template</string>
    </property>
   </action>
  </widget>

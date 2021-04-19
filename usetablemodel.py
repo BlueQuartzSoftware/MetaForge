@@ -6,10 +6,13 @@ from PySide2.QtWidgets import QApplication, QStyle
 
 
 class TableModelU(QAbstractTableModel):
-    def __init__(self,data ,parent=None):
+    def __init__(self,data, metadataList ,parent=None):
         QAbstractTableModel.__init__(self, parent)
-        self.metadataList = [{'Key': 'Date', 'Value': 'Tue Aug 22 03:09:35 2017', 'Source': 'Somefile.xml/States/SEMEColumnState/Date', 'Checked': Qt.Unchecked}, {'Key': 'TimeStamp', 'Value': 1503385775.990084, 'Source': 'Somefile.xml/States/SEMEColumnState/TimeStamp', 'Checked':  Qt.Unchecked},
-        {'Key': 'ScanMode', 'Value': 'Resolution', 'Source': 'Somefile.xml/States/SEMEColumnState/ScanMode', 'Checked': Qt.Unchecked}]
+        self.metadataList = metadataList
+        #print(self.metadataList)
+        if len(self.metadataList) != 0:
+            print(self.metadataList[-1])
+
         self.hiddenList=[]
 
 
@@ -82,7 +85,7 @@ class TableModelU(QAbstractTableModel):
 
     def addRow(self, dataDict, source, value):
         self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
-        self.metadataList.append({"Key":value,"Value":dataDict[value],"Source":source+value,"Checked":Qt.Unchecked})
+        self.metadataList.append({"Key":value,"Value":dataDict[value],"Source":source+value})
         self.endInsertRows()
 
 

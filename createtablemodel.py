@@ -114,7 +114,7 @@ class TableModelC(QAbstractTableModel):
 
     def addRow(self, dataDict, source, value):
         self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
-        self.metadataList.append({"Key":value,"Value":dataDict[value],"Source":source+value,"Checked":Qt.Unchecked})
+        self.metadataList.append({"Key":value,"Value":dataDict[value],"Source":source+value,"Checked":0})
         self.endInsertRows()
 
 
