@@ -25,6 +25,12 @@ class FilterModel(QSortFilterProxyModel):
             for j in range(len(self.sourceModel().metadataList)):
                 if source in self.sourceModel().metadataList[j]["Source"]:
                     self.sourceModel().hiddenList.append(self.sourceModel().metadataList[j])
+                iteratelist = self.displayed[:]
+                newj = 0
+                for j in range(len(iteratelist)):
+                    if source in iteratelist[j]["Source"]:
+                        del self.displayed[j-newj]
+                        newj+=1
 
         else:
             iteratelist = self.sourceModel().hiddenList[:]
@@ -33,4 +39,5 @@ class FilterModel(QSortFilterProxyModel):
                 if source in iteratelist[j]["Source"]:
                     del self.sourceModel().hiddenList[j-newj]
                     newj+=1
+
         self.setFilterRegExp(QRegExp())
