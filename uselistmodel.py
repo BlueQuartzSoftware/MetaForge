@@ -6,10 +6,9 @@ from PySide2.QtWidgets import QApplication, QStyle
 
 
 class ListModel(QAbstractListModel):
-    def __init__(self,data,tablemodel,filename ,parent=None):
+    def __init__(self,data,tablemodel,fileList ,parent=None):
         QAbstractListModel.__init__(self, parent)
-        self.metadataList = []
-        self.metadataList.append(filename)
+        self.metadataList = fileList
         self.tablemodel = tablemodel
 
 
@@ -23,7 +22,7 @@ class ListModel(QAbstractListModel):
     def data(self, index, role):
         if role == Qt.DisplayRole:
             if index.column() == 0:
-                return self.metadataList[index.row()]
+                return self.metadataList[index.row()].split("/")[-1]
 
         return None
 
@@ -39,9 +38,9 @@ class ListModel(QAbstractListModel):
 
 
 
-    def addRow(self, dataDict, source, value):
+    def addRow(self, filename):
         self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
-        self.metadataList.append({"Key":value,"Value":dataDict[value],"Source":source+value,"Checked":0})
+        self.metadataList.append(filename)
         self.endInsertRows()
 
 

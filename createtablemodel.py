@@ -54,9 +54,9 @@ class TableModelC(QAbstractTableModel):
             if section == 0:
                 return "#^"
             elif section == 1:
-                return "Key"
+                return "HT Name"
             elif section == 2:
-                return "Value"
+                return "HT Value"
             elif section == 3:
                 return "Source"
             elif section == 4:

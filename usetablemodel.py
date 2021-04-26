@@ -43,13 +43,13 @@ class TableModelU(QAbstractTableModel):
             return
         if orientation == Qt.Horizontal:
             if section == 0:
-                return "Key"
+                return "HT Name"
             elif section == 1:
                 return "Source"
             elif section == 2:
                 return "Type"
             elif section == 3:
-                return "Value"
+                return "HT Value"
 
             return None
     def setData(self,index, value, role):
@@ -87,6 +87,7 @@ class TableModelU(QAbstractTableModel):
         self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
         self.metadataList.append({"Key":value,"Value":dataDict[value],"Source":source+value})
         self.endInsertRows()
+
 
 
 
