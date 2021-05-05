@@ -88,6 +88,12 @@ class TableModelU(QAbstractTableModel):
         self.metadataList.append({"Key":value,"Value":dataDict[value],"Source":source+value})
         self.endInsertRows()
 
+    def addEmptyRow(self):
+        self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
+        self.metadataList.append({"Key":"","Value":"","Source":"","Checked":0})
+        self.endInsertRows()
+
+
 
 
 

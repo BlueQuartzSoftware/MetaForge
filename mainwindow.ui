@@ -24,7 +24,7 @@
     <item row="1" column="1">
      <widget class="QTabWidget" name="TabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="CreateTemplateTab">
        <attribute name="title">
@@ -253,42 +253,19 @@
         <string>Use Template</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0" rowspan="3">
-         <widget class="QListView" name="useTemplateListView">
-          <property name="sizePolicy">
-           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
-            <horstretch>0</horstretch>
-            <verstretch>0</verstretch>
-           </sizepolicy>
-          </property>
-          <property name="minimumSize">
-           <size>
-            <width>325</width>
-            <height>0</height>
-           </size>
-          </property>
-          <property name="alternatingRowColors">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
         <item row="0" column="1">
          <layout class="QHBoxLayout" name="horizontalLayout_5">
           <item>
            <widget class="QLabel" name="label_4">
             <property name="text">
-             <string>Metadata</string>
+             <string/>
             </property>
            </widget>
           </item>
           <item>
            <layout class="QGridLayout" name="gridLayout_2">
-            <item row="0" column="0">
-             <widget class="QLabel" name="hyperthoughtTemplateLabel">
-              <property name="text">
-               <string>Hyperthought Template File</string>
-              </property>
-             </widget>
+            <item row="1" column="1">
+             <widget class="QLineEdit" name="otherDataFileLineEdit"/>
             </item>
             <item row="0" column="1">
              <widget class="QLineEdit" name="hyperthoughtTemplateLineEdit"/>
@@ -300,16 +277,6 @@
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QCheckBox" name="parseOtherDataCheck">
-              <property name="text">
-               <string>Parse Other Data File</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLineEdit" name="otherDataFileLineEdit"/>
-            </item>
             <item row="1" column="2">
              <widget class="QPushButton" name="otherDataFileSelect">
               <property name="text">
@@ -317,44 +284,23 @@
               </property>
              </widget>
             </item>
+            <item row="0" column="0">
+             <widget class="QLabel" name="hyperthoughtTemplateLabel">
+              <property name="text">
+               <string>Template File: </string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>File To Extract Metadata From: </string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
          </layout>
-        </item>
-        <item row="1" column="1">
-         <layout class="QHBoxLayout" name="horizontalLayout_6">
-          <item>
-           <widget class="QLabel" name="label_5">
-            <property name="text">
-             <string>Search Box</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLabel" name="displayedFileLabel">
-            <property name="text">
-             <string>No File Selected</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QCheckBox" name="requiredFieldsCheck">
-            <property name="text">
-             <string>Only Show Required Fields</string>
-            </property>
-           </widget>
-          </item>
-         </layout>
-        </item>
-        <item row="2" column="1">
-         <widget class="QTableView" name="useTemplateTableView">
-          <property name="alternatingRowColors">
-           <bool>true</bool>
-          </property>
-          <attribute name="horizontalHeaderStretchLastSection">
-           <bool>true</bool>
-          </attribute>
-         </widget>
         </item>
         <item row="3" column="0" colspan="2">
          <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -408,6 +354,53 @@
           </item>
          </layout>
         </item>
+        <item row="0" column="0" rowspan="3">
+         <widget class="QListView" name="useTemplateListView">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>325</width>
+            <height>0</height>
+           </size>
+          </property>
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item row="1" column="1">
+         <layout class="QHBoxLayout" name="horizontalLayout_6">
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="text">
+             <string>Search Box</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="displayedFileLabel">
+            <property name="text">
+             <string>No File Selected</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </item>
+        <item row="2" column="1">
+         <widget class="QTableView" name="useTemplateTableView">
+          <property name="alternatingRowColors">
+           <bool>true</bool>
+          </property>
+          <attribute name="horizontalHeaderStretchLastSection">
+           <bool>true</bool>
+          </attribute>
+         </widget>
+        </item>
        </layout>
       </widget>
      </widget>
@@ -449,7 +442,7 @@
   <widget class="QStatusBar" name="statusbar"/>
   <action name="actionOpenPackage">
    <property name="enabled">
-    <bool>false</bool>
+    <bool>true</bool>
    </property>
    <property name="text">
     <string>Open Package</string>
