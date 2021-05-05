@@ -65,8 +65,8 @@ class MainWindow(QMainWindow):
         self.addAppendButton()
         self.ui.TabWidget.currentChanged.connect(self.movethedamnbutton)
         self.appendSourceFilesButton.clicked.connect(self.addFile)
-        self.appendCreateTableRowButton.clicked.connect(self.addCreateTableRow)
-        self.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
+        yself.ui.appendCreateTableRowButton.clicked.connect(self.addCreateTableRow)
+        self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
 
 
     def addCreateTableRow(self):
@@ -88,15 +88,13 @@ class MainWindow(QMainWindow):
         self.appendSourceFilesButton.setIcon(icon)
         self.appendSourceFilesButton.resize(32,32)
 
-        self.appendUseTableRowButton = QToolButton(self.ui.UseTemplateTab)
-        icon = QApplication.style().standardIcon(QStyle.SP_FileIcon)
-        self.appendUseTableRowButton.setIcon(icon)
-        self.appendUseTableRowButton.resize(24,24)
 
-        self.appendCreateTableRowButton = QToolButton(self.ui.CreateTemplateTab)
         icon = QApplication.style().standardIcon(QStyle.SP_FileIcon)
-        self.appendCreateTableRowButton.setIcon(icon)
-        self.appendCreateTableRowButton.resize(24,24)
+        self.ui.appendUseTableRowButton.setIcon(icon)
+        self.ui.appendUseTableRowButton.resize(24,24)
+
+        self.ui.appendCreateTableRowButton.setIcon(icon)
+        self.ui.appendCreateTableRowButton.resize(24,24)
 
     def addUseTableRow(self):
         self.usetablemodel.addEmptyRow()
@@ -128,8 +126,8 @@ class MainWindow(QMainWindow):
 
     def movethedamnbutton(self):
         self.appendSourceFilesButton.move(self.ui.useTemplateListView.width() - self.appendSourceFilesButton.width(),self.ui.useTemplateListView.height() - self.appendSourceFilesButton.height())
-        self.appendUseTableRowButton.move(self.ui.useTemplateTableView.width() + self.appendUseTableRowButton.width(), self.ui.displayedFileLabel.y() - 2)
-        self.appendCreateTableRowButton.move(self.ui.metadataTableView.width() + self.appendCreateTableRowButton.width(), self.ui.label.y() - 2)
+
+
 
 
     def openRecent(self):
@@ -153,7 +151,6 @@ class MainWindow(QMainWindow):
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
-        print("resizeEvent was called")
         self.movethedamnbutton()
 
 
@@ -170,7 +167,6 @@ class MainWindow(QMainWindow):
                 json.dump(self.usetablemodel.metadataList, outfile)
                 outfile.write("\n")
                 json.dump(self.uselistmodel.metadataList, outfile)
-                print(self.currentTemplate)
 
 
 
@@ -231,8 +227,6 @@ class MainWindow(QMainWindow):
             fileList= json.loads(fileList)
             self.usetablemodel = TableModelU(self,json.loads(data))
             self.ui.useTemplateTableView.setModel(self.usetablemodel)
-#            self.uselistmodel = ListModel(self, self.usetablemodel, fileList)
-            self.ui.useTemplateListView.setModel(self.uselistmodel)
             infile.close()
 
         return True
