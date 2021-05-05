@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
         self.addAppendButton()
         self.ui.TabWidget.currentChanged.connect(self.movethedamnbutton)
         self.appendSourceFilesButton.clicked.connect(self.addFile)
-        yself.ui.appendCreateTableRowButton.clicked.connect(self.addCreateTableRow)
+        self.ui.appendCreateTableRowButton.clicked.connect(self.addCreateTableRow)
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
 
 
