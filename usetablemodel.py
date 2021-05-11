@@ -9,12 +9,22 @@ class TableModelU(QAbstractTableModel):
     def __init__(self,data, metadataList ,parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadataList = metadataList
-        #print(self.metadataList)
-        if len(self.metadataList) != 0:
-            print(self.metadataList[-1])
+        self.treeDict = metadataList
+        self.templatelist = []
+        self.templatesources = []
+        self.newmetadataList = []
+        self.newmetadatasources = []
 
         self.hiddenList=[]
 
+
+    def addTemplateList(self, newList):
+        self.templatelist = []
+        self.templatesources = []
+
+        for i in range(len(newList)):
+            self.templatelist.append(newList[i])
+            self.templatesources.append("/".join(newList[i]['Source'].split("/")[1:]))
 
 
     def rowCount(self, parent=QModelIndex()):
@@ -56,14 +66,22 @@ class TableModelU(QAbstractTableModel):
         if role == Qt.EditRole:
             if not index.isValid():
                 return False
+            elif index.column() == 0:
+                if self.metadataList[index.row()]["Source"] == "Custom Input":
+                    self.metadataList[index.row()]["Key"] = value
+                    self.dataChanged.emit(index, index)
             elif index.column() == 3:
-                treeDict = self.treeDict
-                sourcePath = self.metadataList[index.row()]["Source"].split("/")
-                for i in range(len(sourcePath)-1):
-                    treeDict = treeDict[sourcePath[i]]
-                treeDict[sourcePath[-1]] = value
-                self.metadataList[index.row()]["Value"] = value
-                self.dataChanged.emit(index, index)
+                if self.metadataList[index.row()]["Source"] == "Custom Input":
+                    self.metadataList[index.row()]["Value"] = value
+                    self.dataChanged.emit(index, index)
+                else:
+                    treeDict = self.treeDict
+                    sourcePath = self.metadataList[index.row()]["Source"].split("/")
+                    for i in range(len(sourcePath)-1):
+                        treeDict = treeDict[sourcePath[i]]
+                    treeDict[sourcePath[-1]] = value
+                    self.metadataList[index.row()]["Value"] = value
+                    self.dataChanged.emit(index, index)
 
             return True
         elif role == Qt.CheckStateRole:
@@ -78,19 +96,26 @@ class TableModelU(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemIsEnabled
-        if index.column() == 3 :
+        if index.column() == 3:
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
         else:
-            return Qt.ItemIsEnabled
+            if index.data() == "":
+                return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
+            else:
+                return Qt.ItemIsEnabled
+    def prepRow(self, dataDict, source, value):
+        self.newmetadataList.append({"Key":value,"Value":dataDict[value],"Source":source+value})
+        newsource = source+value
+        self.newmetadatasources.append("/".join(newsource.split("/")[1:]))
 
-    def addRow(self, dataDict, source, value):
+    def addRow(self, key, source, value):
         self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
-        self.metadataList.append({"Key":value,"Value":dataDict[value],"Source":source+value})
+        self.metadataList.append({"Key":key,"Value":value,"Source":source})
         self.endInsertRows()
 
     def addEmptyRow(self):
         self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
-        self.metadataList.append({"Key":"","Value":"","Source":"","Checked":0})
+        self.metadataList.append({"Key":"","Value":"","Source":"Custom Input","Checked":0})
         self.endInsertRows()
 
 

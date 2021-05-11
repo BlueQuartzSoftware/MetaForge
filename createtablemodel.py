@@ -76,6 +76,11 @@ class TableModelC(QAbstractTableModel):
                 return False
             if index.column() == 0:
                 self.metadataList.insert(int(value),self.metadataList[index.row()])
+            elif index.column() == 1:
+                if self.metadataList[index.row()]["Source"] == "Custom Input":
+
+                    self.metadataList[index.row()]["Key"] = value
+                    self.dataChanged.emit(index, index)
             elif index.column() == 2:
                 treeDict = self.treeDict
                 sourcePath = self.metadataList[index.row()]["Source"].split("/")
@@ -86,6 +91,7 @@ class TableModelC(QAbstractTableModel):
                 self.dataChanged.emit(index, index)
             elif index.column() == 8:
                 self.metadataList.remove(index.row())
+
             return True
         elif role == Qt.CheckStateRole:
             if index.column() == 6 or index.column() == 7:
@@ -110,6 +116,8 @@ class TableModelC(QAbstractTableModel):
         elif index.column() == 6 or index.column() == 7:
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsUserCheckable)
         else:
+            if index.data() == "":
+                return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
             return Qt.ItemIsEnabled
 
     def addRow(self, dataDict, source, value):
@@ -119,7 +127,7 @@ class TableModelC(QAbstractTableModel):
 
     def addEmptyRow(self):
         self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
-        self.metadataList.append({"Key":"","Value":"","Source":"","Checked":0})
+        self.metadataList.append({"Key":"","Value":"","Source":"Custom Input","Checked":0})
         self.endInsertRows()
 
 

@@ -1,13 +1,15 @@
 # This Python file uses the following encoding: utf-8
 
 from PySide2.QtWidgets import QApplication, QButtonGroup, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView, QToolButton, QStyle
-from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot
+from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot, QRegExp
 from ui_mainwindow import Ui_MainWindow
 from createtablemodel	import TableModelC
 from usetablemodel import TableModelU
 from uselistmodel import ListModel
 from treemodel import TreeModel
+from usetreemodel import TreeModelU
 from filterModel import FilterModel
+from usefiltermodel import FilterModelU
 from trashdelegate import TrashDelegate
 
 import ctf
@@ -30,13 +32,9 @@ class MainWindow(QMainWindow):
         self.ui.hyperthoughtTemplateSelect.clicked.connect(self.selectTemplate)
         self.ui.saveTemplateButton.clicked.connect(self.saveTemplate)
         self.ui.otherDataFileSelect.clicked.connect(self.extractFile)
-#        self.ui.actionUseTemplate.toggle.connect(
 
 
-        aTree={"Somefile.xml":
-            {"States":
-                {"SEMEColumnState":
-                    {"Date":"Tue Aug 22 03:09:35 2017", "TimeStamp":1503385775.990084,"ScanMode":"Resolution"}}}}
+        aTree={}
         self.createtablemodel = TableModelC(aTree,self)
         self.filterModel = FilterModel(self)
         self.filterModel.setSourceModel(self.createtablemodel)
@@ -53,8 +51,11 @@ class MainWindow(QMainWindow):
         self.treeModel.checkChanged.connect(self.filterModel.checkList)
         self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
 
+
         self.usetablemodel = TableModelU(self,[])
-        self.ui.useTemplateTableView.setModel(self.usetablemodel)
+        self.usefilterModel = FilterModelU(self)
+        self.usefilterModel.setSourceModel(self.usetablemodel)
+        self.ui.useTemplateTableView.setModel(self.usefilterModel)
         self.ui.useTemplateTableView.setColumnWidth(0,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(1,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(2,self.width()*.25)
@@ -96,16 +97,17 @@ class MainWindow(QMainWindow):
         self.ui.appendCreateTableRowButton.setIcon(icon)
         self.ui.appendCreateTableRowButton.resize(24,24)
 
+
     def addUseTableRow(self):
         self.usetablemodel.addEmptyRow()
 
 
     def extractFile(self):
-        linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
-        QStandardPaths.HomeLocation),self.tr("Files (*.ctf *.xml *.ang)"))[0]
+        if self.fileType:
+            linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
+            QStandardPaths.HomeLocation),self.tr("Files (*"+self.fileType+")"))[0]
         if linetext != "":
             self.setWindowTitle(linetext)
-            self.ui.dataFileLineEdit.setText(linetext)
             self.ui.dataTypeText.setText(linetext.split(".")[1].upper())
             self.ui.otherDataFileLineEdit.setText(linetext)
             if self.ui.fileParserCombo.findText(linetext.split(".")[1].upper()+" Parser") != -1:
@@ -117,8 +119,13 @@ class MainWindow(QMainWindow):
                 headerDict =ang.parse_header_as_dict(linetext)
             elif linetext.split(".")[1].upper() == "XML":
                 print("XML Parser used")
-            self.unusedTreeModel = TreeModel(["Available File Metadata"],headerDict,self.usetablemodel)
-                #self.uselistmodel.addRow(linetext)
+
+            if self.templatedata:
+                self.usefilterModel = FilterModelU(self)
+                self.usefilterModel.setSourceModel(self.usetablemodel)
+                self.unusedTreeModel = TreeModelU(["Available File Metadata"],headerDict,self.usetablemodel)
+                self.ui.useTemplateTableView.setModel(self.usefilterModel)
+
 
 
     def help(self):
@@ -218,15 +225,21 @@ class MainWindow(QMainWindow):
         linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
         QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
         if linetext != "":
+            self.usetablemodel.metadataList=[]
             self.currentTemplate= linetext.split("/")[-1]
             self.ui.displayedFileLabel.setText(linetext.split("/")[-1])
             self.ui.hyperthoughtTemplateLineEdit.setText(linetext)
+            self.ui.otherDataFileLineEdit.setText("")
             infile = open(linetext,"r")
             data= infile.readline()
-            fileList = infile.readline()
-            fileList= json.loads(fileList)
-            self.usetablemodel = TableModelU(self,json.loads(data))
-            self.ui.useTemplateTableView.setModel(self.usetablemodel)
+            fileType = infile.readline()
+            fileType= json.loads(fileType)
+            self.fileType = fileType[0][-4:]
+
+            self.toggleButtons()
+            self.templatedata= json.loads(data)
+            self.usetablemodel.addTemplateList(self.templatedata)
+            self.usefilterModel.setFilterRegExp(QRegExp())
             infile.close()
 
         return True
@@ -234,6 +247,9 @@ class MainWindow(QMainWindow):
     def showEvent(self, event):
         super().showEvent(event)
         self.movethedamnbutton()
+
+    def toggleButtons(self):
+        self.ui.otherDataFileSelect.setEnabled(self.fileType!="")
 
 
 

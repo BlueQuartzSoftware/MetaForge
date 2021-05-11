@@ -2,20 +2,21 @@
 
 
 from PySide2.QtCore import QAbstractItemModel, QFile, QIODevice, QItemSelectionModel, QModelIndex, QObject ,Qt, Signal, Slot
-from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
 from treeitem import TreeItem
 
 
-class TreeModel(QAbstractItemModel):
+class TreeModelU(QAbstractItemModel):
     checkChanged = Signal(int, str)
     def __init__(self, headers, data, tablemodel, parent=None):
-        super(TreeModel, self).__init__(parent)
+        super(TreeModelU, self).__init__(parent)
 
         rootData = [header for header in headers]
         self.rootItem = TreeItem(rootData)
         self.treeDict= data
         self.tablemodel = tablemodel
         self.setupModelData(data, self.rootItem)
+        self.checkList()
 
     def changeLeafCheck(self, source):
         curNode = self.rootItem.child(0)
@@ -29,6 +30,20 @@ class TreeModel(QAbstractItemModel):
         self.checkChanged.emit(Qt.Unchecked,source)
         self.dataChanged.emit(0, 0)
 
+    def checkList(self):
+        for i in range(len(self.tablemodel.templatesources)):
+            if self.tablemodel.templatesources[i] != "Custom Input":
+                if self.tablemodel.templatesources[i] not in self.tablemodel.newmetadatasources:
+
+                    QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + "The file extracted is missing "+ self.tablemodel.templatesources[i] + ". Please try a different file")
+                    self.tablemodel.newmetadataList = []
+                    self.tablemodel.newmetadatasources = []
+                    return
+
+        for i in range(len(self.tablemodel.newmetadataList)):
+            self.tablemodel.addRow(self.tablemodel.newmetadataList[i]["Key"], self.tablemodel.newmetadataList[i]["Source"], self.tablemodel.newmetadataList[i]["Value"])
+        self.tablemodel.newmetadataList = []
+        self.tablemodel.newmetadatasources = []
 
     def columnCount(self, parent=QModelIndex()):
         return self.rootItem.columnCount()
@@ -200,6 +215,6 @@ class TreeModel(QAbstractItemModel):
                              if (isinstance(curDict[key],dict)):
                                 grandParents[key]= (curDict[key],parent)
                              else:
-                                self.tablemodel.addRow(curDict,tempSource,key)
+                                self.tablemodel.prepRow(curDict,tempSource,key)
 
 
