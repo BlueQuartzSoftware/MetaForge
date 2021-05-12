@@ -24,17 +24,20 @@ class ItemType(Enum):
     folders_and_files = 2
 
 
-def list_location_contents(auth_control, ht_space='user',
-                           ht_space_id=None, ht_id_path=ID_ROOT_PATH,
-                           item_type=ItemType.folders_and_files):
+def get_item_dict_from_ht_path(auth_control, ht_path = '/',
+                                  ht_space='user', ht_space_id=None):
     """
-    Return file and folder items from a location in HyperThought.
+    Returns a dictionary containing each item's name, UUID, and type at the
+    location indicated by the given `ht_path` in HyperThought.
 
     Parameters
     ----------
     auth_control
         HTAuthorizationController object used to get all the info
         needed to call the HyperThought endpoint.
+    ht_path
+        The path to the file/folder in HyperThought, separated by
+        forward slashes
     ht_space
         The space type that you would like to use in HyperThought.
         This must be set to 'group', 'project', or 'user'.
@@ -42,61 +45,122 @@ def list_location_contents(auth_control, ht_space='user',
         The id of a group or project, or the username for a user.
         If the value is None, it will default to the current user's
         username.
-    ht_id_path
-        The path to the location inside a given space in HyperThought.
-
-        Example: a path for '/folder1/folder2/folder3' would look like
-        ',folder1_uuid,folder2_uuid,folder3_uuid,'
-    item_type
-        An enum value for the type of file system items to return.
-        A None value will default to ItemType.folders_and_files.
 
     Returns
     -------
-    List
-        A list of file system items, represented as dicts, from
-        HyperThought corresponding to files and folders at the given
-        HyperThought path in the given space.
+    Dictionary
+        A dictionary containing each item's name, UUID, and type
+    
+    Example
+    -------
+    ```
+    name_list = ht_reqs.get_item_list_from_ht_path(auth_control, ht_path='/')
+    ```
+    This code returns:
+    ```
+    {
+        'Name': 'TestFolder',
+        'UUID': 'f8b96e46-5e6d-4e3e-a14d-cf1ef6ca4bcf',
+        'Type': 'Folder'
+    }
+    ```
+
+    ```
+    name_list = ht_reqs.get_item_list_from_ht_path(auth_control, ht_path='/TestFolder')
+    ```
+    This code returns:
+    ```
+    {
+        'Name': '011.ang',
+        'UUID': '0a6c3953-cca8-488f-9d57-11bc85961b86',
+        'Type': 'File'
+    }
+    ```
+
     """
 
-    # Set default space_id parameter
-    if ht_space == 'user' and ht_space_id is None:
-        ht_space_id = auth_control.get_username()
+    ht_id_path = get_ht_id_path_from_ht_path(auth_control, ht_path=ht_path,\
+                                             ht_space=ht_space, ht_space_id=ht_space_id)
+    
+    contents = _list_location_contents(auth_control, ht_id_path=ht_id_path)
 
-    # Validate parameters.
-    _validate_parameters(ht_space=ht_space, ht_space_id=ht_space_id,
-                         ht_id_path=ht_id_path, item_type=item_type)
+    name_id_list = []
+    for item in contents:
+        item_content = item['content']
+        ftype = 'Folder'
+        if item_content['ftype'] != 'Folder':
+            ftype = 'File'
+        name_id_list.append({'Name': item_content['name'], 'UUID': item_content['pk'], 'Type': ftype})
+    
+    return name_id_list
 
-    # Build the request URL
-    files_url = f'{auth_control.base_url}/api/files/'
+def get_ht_id_path_from_ht_path(auth_control, ht_path = '/',
+                                  ht_space='user', ht_space_id=None):
+    """
+    Returns the `ht_id_path` to the location indicated by the given `ht_path` in HyperThought.
 
-    # Gather other data needed for the request
-    auth_header = auth_control.get_auth_header()
-    cookies = auth_control.cookies
-    request_data = {'path': ht_id_path}
+    Parameters
+    ----------
+    auth_control
+        HTAuthorizationController object used to get all the info
+        needed to call the HyperThought endpoint.
+    ht_path
+        The path to the file/folder in HyperThought, separated by
+        forward slashes
+    ht_space
+        The space type that you would like to use in HyperThought.
+        This must be set to 'group', 'project', or 'user'.
+    ht_space_id
+        The id of a group or project, or the username for a user.
+        If the value is None, it will default to the current user's
+        username.
 
-    if item_type == ItemType.folders:
-        request_data['type'] = 'Folder'
+    Returns
+    -------
+    ht_id_path
+        The path to the location inside a given space in HyperThought.
+    
+    Example
+    -------
+    ```
+    ht_id_path = ht_reqs.get_ht_id_path_from_ht_path(auth_control, '/TestFolder/TestFolder2')
+    ```
+    Assuming TestFolder's UUID is 31d0c623-250e-47a6-a424-3ecbdf384746 and TestFolder2's
+    UUID is 0a6c3953-cca8-488f-9d57-11bc85961b86, this code returns
+    `,31d0c623-250e-47a6-a424-3ecbdf384746,0a6c3953-cca8-488f-9d57-11bc85961b86,`
 
-    if ht_space == 'user':
-        request_data['method'] = 'user_files'
-    elif ht_space == 'project':
-        request_data['method'] = 'project_files'
-        request_data['project'] = ht_space_id
-    else:
-        request_data['method'] = 'group_files'
-        request_data['group'] = ht_space_id
+    """
 
-    # Send the request to HyperThought
-    r = requests.get(files_url, headers=auth_header, cookies=cookies,
-                     params=request_data, verify=False)
+    # Break the file path down into components
+    normalized_path = os.path.normpath(ht_path)
+    path_components = normalized_path.split(os.sep)
 
-    # Report any errors that are above the max error code
-    if r.status_code >= MAX_ERROR_CODE:
-        ht_rerrors.report_error(r)
+    # Strip first component if empty
+    if path_components[0] == "":
+        path_components.pop(0)
+    
+    # Strip last component if empty
+    if path_components[len(path_components)-1] == "":
+        path_components.pop(len(path_components)-1)
+    
+    if len(path_components) == 0:
+        return ','
 
-    output = r.json()
-    return output
+    current_id = None
+    ht_id_path = ','
+    for comp in path_components:
+        contents = _list_location_contents(auth_control, ht_id_path=ht_id_path)
+        for item in contents:
+            item_content = item['content']
+            if item_content['name'] == comp:
+                current_id = item_content['pk']
+                break
+        if current_id is None:
+            raise FileNotFoundError(f'Could not find file/folder located at {ht_path} in HyperThought: {comp} does not exist!')
+        ht_id_path += current_id + ','
+        current_id = None
+
+    return ht_id_path
 
 
 def list_projects(auth_control):
@@ -627,3 +691,78 @@ def _get_active_path(path):
     windows_path_prefix = '//?/'
     path = path.lstrip(windows_path_prefix)
     return f'{windows_path_prefix}{path}'.replace(PATH_SEPERATOR, os.path.sep)
+
+
+def _list_location_contents(auth_control, ht_space='user',
+                           ht_space_id=None, ht_id_path=ID_ROOT_PATH,
+                           item_type=ItemType.folders_and_files):
+    """
+    Return file and folder items from a location in HyperThought.
+
+    Parameters
+    ----------
+    auth_control
+        HTAuthorizationController object used to get all the info
+        needed to call the HyperThought endpoint.
+    ht_space
+        The space type that you would like to use in HyperThought.
+        This must be set to 'group', 'project', or 'user'.
+    ht_space_id
+        The id of a group or project, or the username for a user.
+        If the value is None, it will default to the current user's
+        username.
+    ht_id_path
+        The path to the location inside a given space in HyperThought.
+
+        Example: a path for '/folder1/folder2/folder3' would look like
+        ',folder1_uuid,folder2_uuid,folder3_uuid,'
+    item_type
+        An enum value for the type of file system items to return.
+        A None value will default to ItemType.folders_and_files.
+
+    Returns
+    -------
+    List
+        A list of file system items, represented as dicts, from
+        HyperThought corresponding to files and folders at the given
+        HyperThought path in the given space.
+    """
+
+    # Set default space_id parameter
+    if ht_space == 'user' and ht_space_id is None:
+        ht_space_id = auth_control.get_username()
+
+    # Validate parameters.
+    _validate_parameters(ht_space=ht_space, ht_space_id=ht_space_id,
+                         ht_id_path=ht_id_path, item_type=item_type)
+
+    # Build the request URL
+    files_url = f'{auth_control.base_url}/api/files/'
+
+    # Gather other data needed for the request
+    auth_header = auth_control.get_auth_header()
+    cookies = auth_control.cookies
+    request_data = {'path': ht_id_path}
+
+    if item_type == ItemType.folders:
+        request_data['type'] = 'Folder'
+
+    if ht_space == 'user':
+        request_data['method'] = 'user_files'
+    elif ht_space == 'project':
+        request_data['method'] = 'project_files'
+        request_data['project'] = ht_space_id
+    else:
+        request_data['method'] = 'group_files'
+        request_data['group'] = ht_space_id
+
+    # Send the request to HyperThought
+    r = requests.get(files_url, headers=auth_header, cookies=cookies,
+                     params=request_data, verify=False)
+
+    # Report any errors that are above the max error code
+    if r.status_code >= MAX_ERROR_CODE:
+        ht_rerrors.report_error(r)
+
+    output = r.json()
+    return output
