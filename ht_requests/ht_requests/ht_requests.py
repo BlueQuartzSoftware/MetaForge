@@ -82,7 +82,7 @@ def get_item_dict_from_ht_path(auth_control, ht_path = '/',
     ht_id_path = get_ht_id_path_from_ht_path(auth_control, ht_path=ht_path,\
                                              ht_space=ht_space, ht_space_id=ht_space_id)
     
-    contents = _list_location_contents(auth_control, ht_id_path=ht_id_path)
+    contents = _list_location_contents(auth_control, ht_id_path=ht_id_path, ht_space=ht_space, ht_space_id=ht_space_id)
 
     name_id_list = []
     for item in contents:
@@ -149,7 +149,7 @@ def get_ht_id_path_from_ht_path(auth_control, ht_path = '/',
     current_id = None
     ht_id_path = ','
     for comp in path_components:
-        contents = _list_location_contents(auth_control, ht_id_path=ht_id_path)
+        contents = _list_location_contents(auth_control, ht_id_path=ht_id_path, ht_space=ht_space, ht_space_id=ht_space_id)
         for item in contents:
             item_content = item['content']
             if item_content['name'] == comp:
