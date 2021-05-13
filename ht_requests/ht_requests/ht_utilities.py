@@ -18,8 +18,6 @@ def dict_to_ht_metadata(metadata_dict):
         The list of metadata json objects usable by HyperThought endpoints.
     """
 
-    # This method still needs to be written!
-
     # The dictionary of metadata table entries needs to be converted into json that HyperThought can use.
 
     # Example HyperThought metadata list:
@@ -44,4 +42,8 @@ def dict_to_ht_metadata(metadata_dict):
     #     }
     # ]
 
-    pass
+    metadataJson = []
+    for i in range(len(metadata_dict)):
+      metadataJson.append({ 'keyName': metadata_dict[i]['Key'], 'value': {'type': 'string', 'link': metadata_dict[i]['Value']}, 'unit': None, 'annotation': "No annotation"})
+    return metadataJson
+

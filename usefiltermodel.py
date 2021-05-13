@@ -10,7 +10,12 @@ class FilterModelU(QSortFilterProxyModel):
         curSource = self.sourceModel().metadataList[source_row]['Source']
         if curSource != "Custom Input":
             splitSource= "/".join(curSource.split("/")[1:])
-            return splitSource in self.sourceModel().templatesources
+            if splitSource in self.sourceModel().templatesources:
+                if self.sourceModel().metadataList[source_row] not in self.displayed:
+                    self.displayed.append(self.sourceModel().metadataList[source_row])
+                return True
+            else:
+                return False
         else:
             return self.sourceModel().metadataList[source_row]['Source'] == "Custom Input"
 

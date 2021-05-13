@@ -8,7 +8,7 @@ from PySide2.QtWidgets import QApplication, QStyle
 class ListModel(QAbstractListModel):
     def __init__(self,data,tablemodel,fileList ,parent=None):
         QAbstractListModel.__init__(self, parent)
-        self.metadataList = []
+        self.metadataList = fileList
         self.tablemodel = tablemodel
 
 

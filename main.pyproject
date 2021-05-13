@@ -1,3 +1,3 @@
 {
-    "files": ["ctf.py","_utils.py","ang.py","filterModel.py","mainwindow.ui","uselistmodel.py","createtablemodel.py","trashdelegate.py","treeitem.py","treemodel.py","main.py","mainwindowimpl.py","usetablemodel.py","usefiltermodel.py","usetreemodel.py"]
+    "files": ["ctf.py","_utils.py","ang.py","filterModel.py","mainwindow.ui","uselistmodel.py","createtablemodel.py","trashdelegate.py","treeitem.py","treemodel.py","usetreemodel.py","main.py","mainwindowimpl.py","usetablemodel.py","usefiltermodel.py","ht_requests/ht_requests/htauthcontroller.py","ht_requests/ht_requests/ht_requests.py","ht_requests/ht_requests/ht_requests_errors.py","ht_requests/ht_requests/ht_utilities.py"]
 }

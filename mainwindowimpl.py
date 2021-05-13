@@ -11,6 +11,9 @@ from usetreemodel import TreeModelU
 from filterModel import FilterModel
 from usefiltermodel import FilterModelU
 from trashdelegate import TrashDelegate
+from ht_requests.ht_requests import ht_utilities
+from ht_requests.ht_requests import htauthcontroller
+from ht_requests.ht_requests import ht_requests
 
 import ctf
 import ang
@@ -32,6 +35,7 @@ class MainWindow(QMainWindow):
         self.ui.hyperthoughtTemplateSelect.clicked.connect(self.selectTemplate)
         self.ui.saveTemplateButton.clicked.connect(self.saveTemplate)
         self.ui.otherDataFileSelect.clicked.connect(self.extractFile)
+        self.ui.hyperthoughtUploadButton.clicked.connect(self.uploadToHyperthought)
 
 
         aTree={}
@@ -61,13 +65,16 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setColumnWidth(2,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(3,self.width()*.25)
 
-        self.uselistmodel = ListModel(self, self.usetablemodel,"")
+        self.uselistmodel = ListModel(self, self.usetablemodel,[])
         self.ui.useTemplateListView.setModel(self.uselistmodel)
         self.addAppendButton()
         self.ui.TabWidget.currentChanged.connect(self.movethedamnbutton)
         self.appendSourceFilesButton.clicked.connect(self.addFile)
         self.ui.appendCreateTableRowButton.clicked.connect(self.addCreateTableRow)
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
+
+        self.fileType = ""
+        self.accessKey = ""
 
 
     def addCreateTableRow(self):
@@ -80,6 +87,7 @@ class MainWindow(QMainWindow):
         if linetext != "":
             self.setWindowTitle(linetext)
             self.uselistmodel.addRow(linetext)
+            self.toggleButtons()
 
 
     def addAppendButton(self):
@@ -147,13 +155,20 @@ class MainWindow(QMainWindow):
             self.currentTemplate= linetext.split("/")[-1]
             self.ui.displayedFileLabel.setText(linetext.split("/")[-1])
             infile = open(linetext,"r")
-            data= infile.readline()
+            self.templatedata = infile.readline()
+            self.templatedata = json.loads(self.templatedata)
+            templatesources = json.loads(infile.readline())
+            self.fileType = json.loads(infile.readline())
             fileList = infile.readline()
-            fileList= json.loads(fileList)
-            self.usetablemodel = TableModelU(self,json.loads(data))
+            fileList = json.loads(fileList)
+            self.usetablemodel = TableModelU(self,[])
+            self.usetablemodel.templatelist = self.templatedata
+            self.usetablemodel.templatesources = templatesources
+            self.ui.hyperthoughtTemplateLineEdit.setText(linetext)
             self.ui.useTemplateTableView.setModel(self.usetablemodel)
             self.uselistmodel = ListModel(self, self.usetablemodel, fileList)
             self.ui.useTemplateListView.setModel(self.uselistmodel)
+            self.toggleButtons()
             infile.close()
 
     def resizeEvent(self, event):
@@ -164,23 +179,46 @@ class MainWindow(QMainWindow):
     def savePackage(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
                                    "/Packages/",
-                                   "Packages (*)")
+                                   "Packages (*.ez)")
         if fileName != "":
             myDir= QDir()
             myDir.mkpath(fileName[0])
             for file in self.uselistmodel.metadataList:
-                print(QFile.copy( file, fileName[0]+"/"+file.split("/")[-1]))
+                QFile.copy( file, fileName[0]+"/"+file.split("/")[-1])
             with open(fileName[0]+"/"+self.currentTemplate, 'w') as outfile:
-                json.dump(self.usetablemodel.metadataList, outfile)
+                json.dump(self.usetablemodel.templatelist, outfile)
+                outfile.write("\n")
+                json.dump(self.usetablemodel.templatesources, outfile)
+                outfile.write("\n")
+                json.dump(self.fileType, outfile)
                 outfile.write("\n")
                 json.dump(self.uselistmodel.metadataList, outfile)
+                outfile.write("\n")
+
+
 
 
 
     def savePackageAs(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
                                    "/Packages/",
-                                   "Packages (*.ez)")
+                                   "Packages (*)")
+        if fileName != "":
+            myDir= QDir()
+            myDir.mkpath(fileName[0])
+            for file in self.uselistmodel.metadataList:
+                QFile.copy( file, fileName[0]+"/"+file.split("/")[-1])
+            with open(fileName[0]+"/"+self.currentTemplate, 'w') as outfile:
+                json.dump(self.usetablemodel.templatelist, outfile)
+                outfile.write("\n")
+                json.dump(self.usetablemodel.templatesources, outfile)
+                outfile.write("\n")
+                json.dump(self.fileType, outfile)
+                outfile.write("\n")
+                json.dump(self.uselistmodel.metadataList, outfile)
+                outfile.write("\n")
+
+
     def saveTemplate(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
                                    "",
@@ -225,7 +263,8 @@ class MainWindow(QMainWindow):
         linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
         QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
         if linetext != "":
-            self.usetablemodel.metadataList=[]
+            self.usetablemodel.metadataList = []
+            self.usefilterModel.displayed = []
             self.currentTemplate= linetext.split("/")[-1]
             self.ui.displayedFileLabel.setText(linetext.split("/")[-1])
             self.ui.hyperthoughtTemplateLineEdit.setText(linetext)
@@ -237,7 +276,8 @@ class MainWindow(QMainWindow):
             self.fileType = fileType[0][-4:]
 
             self.toggleButtons()
-            self.templatedata= json.loads(data)
+            self.templatedata = json.loads(data)
+            print(self.templatedata[0])
             self.usetablemodel.addTemplateList(self.templatedata)
             self.usefilterModel.setFilterRegExp(QRegExp())
             infile.close()
@@ -249,7 +289,17 @@ class MainWindow(QMainWindow):
         self.movethedamnbutton()
 
     def toggleButtons(self):
-        self.ui.otherDataFileSelect.setEnabled(self.fileType!="")
+        self.ui.otherDataFileSelect.setEnabled(self.fileType != "")
+        self.ui.hyperthoughtUploadButton.setEnabled(self.uselistmodel.metadataList != [])
+
+    def uploadToHyperthought(self):
+        auth_control = htauthcontroller.HTAuthorizationController("eyJhY2Nlc3NUb2tlbiI6ICIzZDUzZWRiYWNlZTU0YjMzODkzYzg0OGI4OTkyMDJiNiIsICJyZWZyZXNoVG9rZW4iOiAiN2JlNzhjYTFlNzZiNDkwMGE0MjZmNGFlYjM0YzJiZGMiLCAiZXhwaXJlc0luIjogMjk0MCwgImV4cGlyZXNBdCI6ICIyMDIxLTA1LTEyVDE1OjUwOjU0LTA0OjAwIiwgImJhc2VVcmwiOiAiaHR0cHM6Ly9odC5ibHVlcXVhcnR6Lm5ldCIsICJjbGllbnRJZCI6ICIwODc3NjAiLCAiY2xpZW50U2VjcmV0IjogIjJjMzJhYmYyMDBlZGE3MTkxNDQxM2YyYTEwNTE5YmI0YzAzMWZmYjgxOTYwNDQ5OTVlODgxOWVjIn0=")
+        metadataJson = ht_utilities.dict_to_ht_metadata(self.usefilterModel.displayed)
+        for i in range(len(self.uselistmodel.metadataList)):
+            ht_requests.upload_file(auth_control, self.uselistmodel.metadataList[i],
+            ht_id_path = ',2f9ef118-e411-4238-82f6-900df852d8b6,', metadata = metadataJson)
+
+
 
 
 
