@@ -35,7 +35,7 @@ class TreeModelU(QAbstractItemModel):
             if self.tablemodel.templatesources[i] != "Custom Input":
                 if self.tablemodel.templatesources[i] not in self.tablemodel.newmetadatasources:
 
-                    QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + "The file extracted is missing "+ self.tablemodel.templatesources[i] + ". Please try a different file")
+                    QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + "The file extracted is missing Source: \n\n"+ self.tablemodel.templatesources[i] + "\n\nPlease try a different file")
                     self.tablemodel.newmetadataList = []
                     self.tablemodel.newmetadatasources = []
                     return

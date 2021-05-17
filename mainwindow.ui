@@ -342,7 +342,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="hyperthoughtLineEdit_2">
+           <widget class="QLineEdit" name="hyperthoughtLocationLineEdit">
             <property name="text">
              <string/>
             </property>
@@ -352,7 +352,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="hyperthoughtSelectButton_2">
+           <widget class="QPushButton" name="hyperthoughtLocationButton">
             <property name="text">
              <string>Select</string>
             </property>

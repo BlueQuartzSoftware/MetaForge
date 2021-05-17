@@ -1,8 +1,10 @@
 # This Python file uses the following encoding: utf-8
 
-from PySide2.QtWidgets import QApplication, QButtonGroup, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView, QToolButton, QStyle
-from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot, QRegExp
+from PySide2.QtWidgets import QApplication, QButtonGroup, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView, QToolButton, QStyle, QProgressDialog, QDialog
+from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot, QRegExp, QThread
+from PySide2.QtGui import QCloseEvent
 from ui_mainwindow import Ui_MainWindow
+from hyperthoughtdialogimpl import HyperthoughtDialogImpl
 from createtablemodel	import TableModelC
 from usetablemodel import TableModelU
 from uselistmodel import ListModel
@@ -14,14 +16,18 @@ from trashdelegate import TrashDelegate
 from ht_requests.ht_requests import ht_utilities
 from ht_requests.ht_requests import htauthcontroller
 from ht_requests.ht_requests import ht_requests
+from tqdm import tqdm
+from uploader import Uploader
 
 import ctf
 import ang
 import json
 
 class MainWindow(QMainWindow):
+    createUpload = Signal(list,htauthcontroller.HTAuthorizationController, str, list)
     def __init__(self):
         super(MainWindow, self).__init__()
+        self.hyperthoughtui = HyperthoughtDialogImpl()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.actionHelp.triggered.connect(self.help)
@@ -36,6 +42,8 @@ class MainWindow(QMainWindow):
         self.ui.saveTemplateButton.clicked.connect(self.saveTemplate)
         self.ui.otherDataFileSelect.clicked.connect(self.extractFile)
         self.ui.hyperthoughtUploadButton.clicked.connect(self.uploadToHyperthought)
+
+
 
 
         aTree={}
@@ -72,9 +80,21 @@ class MainWindow(QMainWindow):
         self.appendSourceFilesButton.clicked.connect(self.addFile)
         self.ui.appendCreateTableRowButton.clicked.connect(self.addCreateTableRow)
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
+        self.ui.hyperthoughtLocationButton.clicked.connect(self.hyperthoughtui.exec)
 
         self.fileType = ""
         self.accessKey = ""
+        self.mThread = QThread()
+        self.uploader = Uploader()
+        self.uploader.moveToThread(self.mThread)
+        self.mThread.start()
+
+        self.createUpload.connect(self.uploader.performUpload)
+        self.hyperthoughtui.apiSubmitted.connect(self.acceptKey)
+
+
+    def acceptKey(self, apikey):
+        self.accessKey = apikey
 
 
     def addCreateTableRow(self):
@@ -109,6 +129,10 @@ class MainWindow(QMainWindow):
     def addUseTableRow(self):
         self.usetablemodel.addEmptyRow()
 
+    def closeEvent(self, event):
+        self.mThread.quit()
+        self.mThread.wait(250)
+
 
     def extractFile(self):
         if self.fileType:
@@ -142,9 +166,6 @@ class MainWindow(QMainWindow):
     def movethedamnbutton(self):
         self.appendSourceFilesButton.move(self.ui.useTemplateListView.width() - self.appendSourceFilesButton.width(),self.ui.useTemplateListView.height() - self.appendSourceFilesButton.height())
 
-
-
-
     def openRecent(self):
         print("Clicked Open Recent.")
 
@@ -171,6 +192,7 @@ class MainWindow(QMainWindow):
             self.toggleButtons()
             infile.close()
 
+
     def resizeEvent(self, event):
         super().resizeEvent(event)
         self.movethedamnbutton()
@@ -194,10 +216,6 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 json.dump(self.uselistmodel.metadataList, outfile)
                 outfile.write("\n")
-
-
-
-
 
     def savePackageAs(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
@@ -277,7 +295,6 @@ class MainWindow(QMainWindow):
 
             self.toggleButtons()
             self.templatedata = json.loads(data)
-            print(self.templatedata[0])
             self.usetablemodel.addTemplateList(self.templatedata)
             self.usefilterModel.setFilterRegExp(QRegExp())
             infile.close()
@@ -293,11 +310,15 @@ class MainWindow(QMainWindow):
         self.ui.hyperthoughtUploadButton.setEnabled(self.uselistmodel.metadataList != [])
 
     def uploadToHyperthought(self):
-        auth_control = htauthcontroller.HTAuthorizationController("eyJhY2Nlc3NUb2tlbiI6ICIzZDUzZWRiYWNlZTU0YjMzODkzYzg0OGI4OTkyMDJiNiIsICJyZWZyZXNoVG9rZW4iOiAiN2JlNzhjYTFlNzZiNDkwMGE0MjZmNGFlYjM0YzJiZGMiLCAiZXhwaXJlc0luIjogMjk0MCwgImV4cGlyZXNBdCI6ICIyMDIxLTA1LTEyVDE1OjUwOjU0LTA0OjAwIiwgImJhc2VVcmwiOiAiaHR0cHM6Ly9odC5ibHVlcXVhcnR6Lm5ldCIsICJjbGllbnRJZCI6ICIwODc3NjAiLCAiY2xpZW50U2VjcmV0IjogIjJjMzJhYmYyMDBlZGE3MTkxNDQxM2YyYTEwNTE5YmI0YzAzMWZmYjgxOTYwNDQ5OTVlODgxOWVjIn0=")
+        auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)
         metadataJson = ht_utilities.dict_to_ht_metadata(self.usefilterModel.displayed)
-        for i in range(len(self.uselistmodel.metadataList)):
-            ht_requests.upload_file(auth_control, self.uselistmodel.metadataList[i],
-            ht_id_path = ',2f9ef118-e411-4238-82f6-900df852d8b6,', metadata = metadataJson)
+        progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(self.uselistmodel.metadataList), self)
+        self.createUpload.emit(self.uselistmodel.metadataList, auth_control, ',2f9ef118-e411-4238-82f6-900df852d8b6,', metadataJson)
+        self.uploader.currentUploadDone.connect(progress.setValue)
+        self.uploader.allUploadsDone.connect(progress.accept)
+        progress.exec()
+
+
 
 
 
