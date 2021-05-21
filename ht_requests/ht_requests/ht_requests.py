@@ -25,7 +25,8 @@ class ItemType(Enum):
 
 
 def get_item_dict_from_ht_path(auth_control, ht_path = '/',
-                                  ht_space='user', ht_space_id=None):
+                               ht_space='user', ht_space_id=None,
+                               item_type=ItemType.folders_and_files):
     """
     Returns a dictionary containing each item's name, UUID, and type at the
     location indicated by the given `ht_path` in HyperThought.
@@ -45,6 +46,9 @@ def get_item_dict_from_ht_path(auth_control, ht_path = '/',
         The id of a group or project, or the username for a user.
         If the value is None, it will default to the current user's
         username.
+    item_type
+        An enum value for the type of file system items to return.
+        A None value will default to ItemType.folders_and_files.
 
     Returns
     -------
@@ -82,7 +86,7 @@ def get_item_dict_from_ht_path(auth_control, ht_path = '/',
     ht_id_path = get_ht_id_path_from_ht_path(auth_control, ht_path=ht_path,\
                                              ht_space=ht_space, ht_space_id=ht_space_id)
     
-    contents = _list_location_contents(auth_control, ht_id_path=ht_id_path, ht_space=ht_space, ht_space_id=ht_space_id)
+    contents = _list_location_contents(auth_control, ht_id_path=ht_id_path, ht_space=ht_space, ht_space_id=ht_space_id, item_type=item_type)
 
     name_id_list = []
     for item in contents:
