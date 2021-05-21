@@ -30,6 +30,7 @@ class MainWindow(QMainWindow):
         self.hyperthoughtui = HyperthoughtDialogImpl()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.TabWidget.setCurrentWidget(self.ui.CreateTemplateTab)
         self.ui.actionHelp.triggered.connect(self.help)
         self.ui.actionOpen_Recent.triggered.connect(self.openRecent)
         self.ui.actionOpenPackage.triggered.connect(self.openPackage)
@@ -82,8 +83,10 @@ class MainWindow(QMainWindow):
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
         self.ui.hyperthoughtLocationButton.clicked.connect(self.hyperthoughtui.exec)
 
+
         self.fileType = ""
         self.accessKey = ""
+        self.folderuuid = ""
         self.mThread = QThread()
         self.uploader = Uploader()
         self.uploader.moveToThread(self.mThread)
@@ -91,6 +94,7 @@ class MainWindow(QMainWindow):
 
         self.createUpload.connect(self.uploader.performUpload)
         self.hyperthoughtui.apiSubmitted.connect(self.acceptKey)
+        self.hyperthoughtui.finished.connect(self.getLocation)
 
 
     def acceptKey(self, apikey):
@@ -158,7 +162,12 @@ class MainWindow(QMainWindow):
                 self.unusedTreeModel = TreeModelU(["Available File Metadata"],headerDict,self.usetablemodel)
                 self.ui.useTemplateTableView.setModel(self.usefilterModel)
 
+    def getLocation(self):
+        location = self.hyperthoughtui.promptui.locationLineEdit.text()
+        locationindex = self.hyperthoughtui.stringlistmodel.directoryList.index(location)
+        self.ui.hyperthoughtLocationLineEdit.setText(location)
 
+        self.folderuuid = self.hyperthoughtui.path + self.hyperthoughtui.stringlistmodel.uuidList[locationindex] + ","
 
     def help(self):
         print("Help")
@@ -313,7 +322,7 @@ class MainWindow(QMainWindow):
         auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)
         metadataJson = ht_utilities.dict_to_ht_metadata(self.usefilterModel.displayed)
         progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(self.uselistmodel.metadataList), self)
-        self.createUpload.emit(self.uselistmodel.metadataList, auth_control, ',2f9ef118-e411-4238-82f6-900df852d8b6,', metadataJson)
+        self.createUpload.emit(self.uselistmodel.metadataList, auth_control, self.folderuuid, metadataJson)
         self.uploader.currentUploadDone.connect(progress.setValue)
         self.uploader.allUploadsDone.connect(progress.accept)
         progress.exec()

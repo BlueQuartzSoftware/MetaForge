@@ -695,7 +695,7 @@ def _get_active_path(path):
 
 def _list_location_contents(auth_control, ht_space='user',
                            ht_space_id=None, ht_id_path=ID_ROOT_PATH,
-                           item_type=ItemType.folders_and_files):
+                           item_type=ItemType.folders):
     """
     Return file and folder items from a location in HyperThought.
 

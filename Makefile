@@ -9,7 +9,7 @@ RCC =  $(HOME)/.local/bin/pyside2-rcc
 UIC =  $(HOME)/.local/bin/pyside2-uic
 
 
-ui_mainwindow.py: mainwindow.ui hyperthoughtdialog.py
+ui_mainwindow.py: mainwindow.ui hyperthoughtdialog.py newfolderdialog.py
 	$(UIC) mainwindow.ui -o  ui_mainwindow.py
 	
  
@@ -17,7 +17,12 @@ hyperthoughtdialog.py:  hyperthoughtdialog.ui
 	$(UIC) hyperthoughtdialog.ui -o  hyperthoughtdialog.py
 
 
+newfolderdialog.py: newfolderdialog.ui
+	$(UIC) newfolderdialog.ui -o newfolderdialog.py
+
+
 clean:
 	$(RM) ui_mainwindow.py
 	$(RM) hyperthoughtdialog.py
+	$(RM) newfolderdialog.py
 	$(RM) -rf __pycache__
