@@ -310,6 +310,8 @@ class MainWindow(QMainWindow):
 
         return True
 
+
+
     def showEvent(self, event):
         super().showEvent(event)
         self.movethedamnbutton()
@@ -324,6 +326,7 @@ class MainWindow(QMainWindow):
         progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(self.uselistmodel.metadataList), self)
         self.createUpload.emit(self.uselistmodel.metadataList, auth_control, self.folderuuid, metadataJson)
         self.uploader.currentUploadDone.connect(progress.setValue)
+        self.uploader.currentlyUploading.connect(progress.setLabelText)
         self.uploader.allUploadsDone.connect(progress.accept)
         progress.exec()
 

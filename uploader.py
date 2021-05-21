@@ -8,6 +8,7 @@ from tqdm import tqdm
 class Uploader(QObject):
     currentUploadDone = Signal(int)
     allUploadsDone = Signal()
+    currentlyUploading = Signal(str)
     def __init__(self, parent = None):
         super(Uploader, self).__init__(parent)
 
@@ -16,10 +17,9 @@ class Uploader(QObject):
 
     def performUpload(self,metadataList ,authControl, ht_id_path, metadata):
 
-        for i in tqdm(range(len(metadataList)), desc= "Uploading Files"):
-            print("started uploading")
+        for i in tqdm(range(len(metadataList)), desc = "Uploading Files"):
+            self.currentlyUploading.emit("Currently uploading: "+ metadataList[i].split("/")[-1])
             ht_requests.upload_file(authControl, metadataList[i], 'user', None, ht_id_path, metadata)
-            print("finished uploading")
             self.currentUploadDone.emit(i+1)
         self.allUploadsDone.emit()
 
