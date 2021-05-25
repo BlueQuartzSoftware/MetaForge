@@ -19,6 +19,7 @@ class TableModelU(QAbstractTableModel):
 
 
     def addTemplateList(self, newList):
+        self.metadataList = []
         self.templatelist = []
         self.templatesources = []
 

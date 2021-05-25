@@ -82,10 +82,6 @@ class TreeItem(object):
         self.itemData[column] = value
 
         return True
-    def switchChecked(self):
-        if self.checked == 0:
-            self.checked = 2
-        elif self.checked == 2:
-            self.checked = 0
+
 
 

@@ -157,9 +157,10 @@ class MainWindow(QMainWindow):
                 print("XML Parser used")
 
             if self.templatedata:
+                self.usetablemodel.metadataList = []
                 self.usefilterModel = FilterModelU(self)
                 self.usefilterModel.setSourceModel(self.usetablemodel)
-                self.unusedTreeModel = TreeModelU(["Available File Metadata"],headerDict,self.usetablemodel)
+                self.unusedTreeModel = TreeModelU(["Available File Metadata"],headerDict,self.usetablemodel,self.requireds)
                 self.ui.useTemplateTableView.setModel(self.usefilterModel)
 
     def getLocation(self):
@@ -191,6 +192,8 @@ class MainWindow(QMainWindow):
             self.fileType = json.loads(infile.readline())
             fileList = infile.readline()
             fileList = json.loads(fileList)
+            requireds = infile.readline()
+            self.requireds = json.loads(requireds)
             self.usetablemodel = TableModelU(self,[])
             self.usetablemodel.templatelist = self.templatedata
             self.usetablemodel.templatesources = templatesources
@@ -225,6 +228,7 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 json.dump(self.uselistmodel.metadataList, outfile)
                 outfile.write("\n")
+                json.dump(self.createtablemodel.requiredList, outfile)
 
     def savePackageAs(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
@@ -255,6 +259,9 @@ class MainWindow(QMainWindow):
                 json.dump(self.filterModel.displayed, outfile)
                 outfile.write("\n")
                 json.dump(self.filterModel.fileList, outfile)
+                outfile.write("\n")
+                json.dump(self.createtablemodel.requiredList, outfile)
+
 
 
     def selectFile(self):
@@ -301,7 +308,8 @@ class MainWindow(QMainWindow):
             fileType = infile.readline()
             fileType= json.loads(fileType)
             self.fileType = fileType[0][-4:]
-
+            requireds = infile.readline()
+            self.requireds = json.loads(requireds)
             self.toggleButtons()
             self.templatedata = json.loads(data)
             self.usetablemodel.addTemplateList(self.templatedata)
@@ -309,8 +317,6 @@ class MainWindow(QMainWindow):
             infile.close()
 
         return True
-
-
 
     def showEvent(self, event):
         super().showEvent(event)
@@ -328,6 +334,7 @@ class MainWindow(QMainWindow):
         self.uploader.currentUploadDone.connect(progress.setValue)
         self.uploader.currentlyUploading.connect(progress.setLabelText)
         self.uploader.allUploadsDone.connect(progress.accept)
+        progress.canceled.connect(lambda: self.uploader.interruptUpload())
         progress.exec()
 
 

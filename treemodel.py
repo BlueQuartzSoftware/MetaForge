@@ -138,8 +138,8 @@ class TreeModel(QAbstractItemModel):
                return result
         elif role == Qt.CheckStateRole:
             item = self.getItem(index)
-            item.switchChecked()
-            checked= item.checked
+            item.checked = value
+            checked = item.checked
             source=""
             sourceList= []
 
@@ -148,6 +148,7 @@ class TreeModel(QAbstractItemModel):
                 item = item.parentItem
 
             self.checkChanged.emit(checked,source.join(sourceList)[:-1])
+            self.uncheckChildren(index,value)
             self.dataChanged.emit(index, index)
             return True
         return False
@@ -201,5 +202,16 @@ class TreeModel(QAbstractItemModel):
                                 grandParents[key]= (curDict[key],parent)
                              else:
                                 self.tablemodel.addRow(curDict,tempSource,key)
+
+    def uncheckChildren(self,index,value):
+        if not index.isValid():
+            return
+        else:
+            childCount = self.rowCount(index)
+            for i in range(childCount):
+                child = index.child(i, 0)
+                self.setData(child, value, Qt.CheckStateRole)
+                self.uncheckChildren(child,value)
+
 
 
