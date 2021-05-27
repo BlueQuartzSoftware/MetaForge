@@ -1,21 +1,50 @@
-# EasyBake
+# EasyBake #
+
 HyperThought Data/MetaData Uploading program
 
-How to install
+## How to install ##
+
+Best practice would be to create a virtual environment for python.
+  ```lang-console
+  conda create -n easybake python=3.8 tqdm pyside2 requests
+  ```
+  or
+
+  ```lang-console
+  python3 -m venv easybake tqdm pyside2 requests
+  source easybake/bin/activate
+  pip install tqdm pyside2 requests
+  ```
+
 
 1. git clone into the directory.
-2. Open up terminal and pip install PySide2
 
-How to run
-1. Cd into the easybake directory in the terminal.
-2. Run make to convert the current ui file into py. (If uic does not exist, run where pyside2-uic in the terminal and change the location inside of the makefile).
-3. The code can either be ran using python3 main.py or from Qt Creator after opening the project inside the directory.
+  ```lang-console
+  git clone https://www.github.com/bluequartzsoftware/EasyBake
+  ```
 
-Features
-File - Only close works.
-Help - Only displays help.
+2. Open up terminal and execute (if you already have not installed the dependencies from above)
 
-Help
+```lang-console
+pip install PySide2 tqdm requests
+```
+
+## How to Run ##
+
+From a command prompt within the EasyBake directory (shown using an Anaconda prompt on a Unix Terminal)
+
+```lang-console
+(easybake) [user@host.com:EasyBake]% python main.py
+```
+
+
+## Features ##
+
++ File - Only close works.
++ Help - Only displays help.
+
+## Help ##
+
 Create Template
   Treeview - properly shows the heiarchy of the nested dictionary and is able to check and uncheck. Switching the check now affects the tableview.
 
