@@ -1,0 +1,3 @@
+tqdm
+pyside2
+requests
