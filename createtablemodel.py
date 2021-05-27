@@ -76,8 +76,11 @@ class TableModelC(QAbstractTableModel):
             if not index.isValid():
                 return False
             if index.column() == 0:
-                self.metadataList.insert(int(value),self.metadataList[index.row()])
-            elif index.column() == 1:
+                if int(value) > -1 and int(value) < len(self.metadataList):
+                    temp = self.metadataList[int(value)]
+                    self.metadataList[int(value)] = self.metadataList[index.row()]
+                    self.metadataList[index.row()] = temp
+            if index.column() == 1:
                 if self.metadataList[index.row()]["Source"] == "Custom Input":
 
                     self.metadataList[index.row()]["Key"] = value
@@ -121,7 +124,10 @@ class TableModelC(QAbstractTableModel):
         if not index.isValid():
 
             return Qt.ItemIsEnabled
-        if index.column() == 2 or index.column() == 8:
+        if index.column() == 2:
+            if self.metadataList[index.row()]["Editable"] == 2:
+                return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
+        elif index.column() == 8 or index.column() == 0:
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
         elif index.column() == 6 or index.column() == 7:
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsUserCheckable)

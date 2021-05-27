@@ -17,7 +17,6 @@ class StringListModel(QAbstractListModel):
 
     def getLists(self, folderlist):
         if self.directoryList != []:
-            print(self.directoryList)
             self.beginRemoveRows(self.index(len(self.directoryList),0), len(self.directoryList),len(self.directoryList))
             self.directoryList = []
             self.uuidList = []

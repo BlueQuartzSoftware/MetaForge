@@ -71,8 +71,8 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setModel(self.usefilterModel)
         self.ui.useTemplateTableView.setColumnWidth(0,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(1,self.width()*.25)
-        self.ui.useTemplateTableView.setColumnWidth(2,self.width()*.25)
-        self.ui.useTemplateTableView.setColumnWidth(3,self.width()*.25)
+        #self.ui.useTemplateTableView.setColumnWidth(3,self.width()*.25)
+        self.ui.useTemplateTableView.setColumnWidth(4,self.width()*.25)
 
         self.uselistmodel = ListModel(self, self.usetablemodel,[])
         self.ui.useTemplateListView.setModel(self.uselistmodel)
@@ -167,6 +167,7 @@ class MainWindow(QMainWindow):
         location = self.hyperthoughtui.promptui.locationLineEdit.text()
         locationindex = self.hyperthoughtui.stringlistmodel.directoryList.index(location)
         self.ui.hyperthoughtLocationLineEdit.setText(location)
+        self.toggleButtons()
 
         self.folderuuid = self.hyperthoughtui.path + self.hyperthoughtui.stringlistmodel.uuidList[locationindex] + ","
 
@@ -228,7 +229,7 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 json.dump(self.uselistmodel.metadataList, outfile)
                 outfile.write("\n")
-                json.dump(self.createtablemodel.requiredList, outfile)
+                json.dump(self.requireds, outfile)
 
     def savePackageAs(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
@@ -244,11 +245,13 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 json.dump(self.usetablemodel.templatesources, outfile)
                 outfile.write("\n")
+                son.dump(self.createtablemodel.requiredList, outfile)
+                outfile.write("\n")
                 json.dump(self.fileType, outfile)
                 outfile.write("\n")
                 json.dump(self.uselistmodel.metadataList, outfile)
                 outfile.write("\n")
-
+                json.dump(self.requireds, outfile)
 
     def saveTemplate(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
@@ -324,7 +327,8 @@ class MainWindow(QMainWindow):
 
     def toggleButtons(self):
         self.ui.otherDataFileSelect.setEnabled(self.fileType != "")
-        self.ui.hyperthoughtUploadButton.setEnabled(self.uselistmodel.metadataList != [])
+        self.ui.hyperthoughtLocationButton.setEnabled(self.uselistmodel.metadataList != [])
+        self.ui.hyperthoughtUploadButton.setEnabled(self.ui.hyperthoughtLocationLineEdit.text() != "")
 
     def uploadToHyperthought(self):
         auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)

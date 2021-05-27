@@ -32,20 +32,22 @@ class TableModelU(QAbstractTableModel):
         return len(self.metadataList)
 
     def columnCount(self, parent=QModelIndex()):
-        return 4
+        return 6
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
             if index.column() == 0:
                 return self.metadataList[index.row()]["Key"]
             elif index.column() == 1:
-                return self.metadataList[index.row()]["Source"]
+                return self.metadataList[index.row()]["Value"]
             elif index.column() == 2:
-                return str(type(self.metadataList[index.row()]["Value"])).split("'")[1].upper()
+                return self.metadataList[index.row()]["Annotation"]
             elif index.column() == 3:
-                if self.metadataList[index.row()]["Value"] == "NONE":
-                    return ""
-                return str(self.metadataList[index.row()]["Value"])
+                return str(type(self.metadataList[index.row()]["Value"])).split("'")[1].upper()
+            elif index.column() == 4:
+                return self.metadataList[index.row()]["Source"]
+            elif index.column() == 5:
+               return ""
 
         return None
 
@@ -54,13 +56,17 @@ class TableModelU(QAbstractTableModel):
             return
         if orientation == Qt.Horizontal:
             if section == 0:
-                return "HT Name"
+                return "HT Key"
             elif section == 1:
-                return "Source"
+                return "Ht Value"
             elif section == 2:
-                return "Type"
+                return "Ht Annotation"
             elif section == 3:
-                return "HT Value"
+                return "HT Units"
+            elif section == 4:
+                return "Source"
+            elif section == 5:
+                return "UUID"
 
             return None
     def setData(self,index, value, role):
@@ -71,7 +77,7 @@ class TableModelU(QAbstractTableModel):
                 if self.metadataList[index.row()]["Source"] == "Custom Input":
                     self.metadataList[index.row()]["Key"] = value
                     self.dataChanged.emit(index, index)
-            elif index.column() == 3:
+            elif index.column() == 1:
                 if self.metadataList[index.row()]["Source"] == "Custom Input":
                     self.metadataList[index.row()]["Value"] = value
                     self.dataChanged.emit(index, index)
@@ -83,6 +89,14 @@ class TableModelU(QAbstractTableModel):
                     treeDict[sourcePath[-1]] = value
                     self.metadataList[index.row()]["Value"] = value
                     self.dataChanged.emit(index, index)
+            elif index.column() == 2:
+                self.metadataList[index.row()]["Annotation"] = value
+                self.dataChanged.emit(index, index)
+            elif index.column() == 3:
+                self.metadataList[index.row()]["Units"] = value
+                self.dataChanged.emit(index, index)
+            elif index.column() == 5:
+                pass
 
             return True
         elif role == Qt.CheckStateRole:
@@ -111,12 +125,12 @@ class TableModelU(QAbstractTableModel):
 
     def addRow(self, key, source, value):
         self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
-        self.metadataList.append({"Key":key,"Value":value,"Source":source})
+        self.metadataList.append({"Key":key,"Value":value,"Source":source, "Units": "", "Annotation":""})
         self.endInsertRows()
 
     def addEmptyRow(self):
         self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
-        self.metadataList.append({"Key":"","Value":"","Source":"Custom Input","Checked":0})
+        self.metadataList.append({"Key":"","Value":"","Source":"Custom Input", "Units": "", "Annotation":""})
         self.endInsertRows()
 
 

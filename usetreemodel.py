@@ -16,7 +16,6 @@ class TreeModelU(QAbstractItemModel):
         self.treeDict= data
         self.tablemodel = tablemodel
         self.required = required
-        print(self.required)
         self.setupModelData(data, self.rootItem)
         self.checkList()
 

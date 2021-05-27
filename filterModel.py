@@ -5,6 +5,8 @@ class FilterModel(QSortFilterProxyModel):
         QSortFilterProxyModel.__init__(self, parent)
         self.displayed=[]
         self.fileList=[]
+        self.setDynamicSortFilter(True)
+        self.sort(0)
 
 
     def filterAcceptsRow(self,source_row, source_parent):
