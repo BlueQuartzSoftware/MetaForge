@@ -59,6 +59,7 @@ class HyperthoughtDialogImpl(QDialog):
     def createNewFolder(self, name):
         try:
             ht_requests.create_folder(self.authcontrol, folder_name = name, ht_id_path= self.path)
+            folderlist = ht_requests._list_location_contents(self.authcontrol, ht_id_path = self.path)
         except Exception as e:
             QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + str(e))
 

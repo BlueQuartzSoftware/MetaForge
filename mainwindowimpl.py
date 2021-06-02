@@ -106,12 +106,11 @@ class MainWindow(QMainWindow):
 
 
     def addFile(self):
-        linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
+        linetexts = QFileDialog.getOpenFileNames(self,self.tr("Select File"),QStandardPaths.displayName(
         QStandardPaths.HomeLocation),self.tr("Files (*.ctf *.xml *.ang)"))[0]
-        if linetext != "":
-            self.setWindowTitle(linetext)
-            self.uselistmodel.addRow(linetext)
-            self.toggleButtons()
+        for line in linetexts:
+            self.uselistmodel.addRow(line)
+        self.toggleButtons()
 
 
     def addAppendButton(self):
