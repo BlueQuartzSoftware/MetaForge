@@ -55,8 +55,8 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(2,QHeaderView.ResizeToContents)
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(3,QHeaderView.ResizeToContents)
         self.trashDelegate = TrashDelegate()
-        self.ui.metadataTableView.setItemDelegateForColumn(8, self.trashDelegate)
-        self.ui.metadataTableView.setColumnWidth(8,self.width()*.05)
+        self.ui.metadataTableView.setItemDelegateForColumn(7, self.trashDelegate)
+        self.ui.metadataTableView.setColumnWidth(7,self.width()*.05)
 
 
         self.treeModel = TreeModel(["Available File Metadata"],aTree,self.createtablemodel)

@@ -22,7 +22,7 @@ class TableModelC(QAbstractTableModel):
         return len(self.metadataList)
 
     def columnCount(self, parent=QModelIndex()):
-        return 9
+        return 8
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
@@ -38,12 +38,10 @@ class TableModelC(QAbstractTableModel):
                 return self.metadataList[index.row()]["Source"]
             #elif index.column() == 4:
             #    return self.metadataList[index.row()][0]
-            elif index.column() == 5:
-                return str(type(self.metadataList[index.row()]["Value"])).split("'")[1].upper()
         elif role == Qt.CheckStateRole:
-            if index.column() == 6:
+            if index.column() == 5:
                 return self.metadataList[index.row()]["Required"]
-            elif index.column() == 7:
+            elif index.column() == 6:
                 return self.metadataList[index.row()]["Editable"]
 
         return None
@@ -63,12 +61,10 @@ class TableModelC(QAbstractTableModel):
             elif section == 4:
                 return "Default Value"
             elif section == 5:
-                return "Type"
-            elif section == 6:
                 return "Require"
-            elif section == 7:
+            elif section == 6:
                 return "Editable"
-            elif section == 8:
+            elif section == 7:
                 return " "
             return None
     def setData(self,index, value, role):
@@ -98,7 +94,7 @@ class TableModelC(QAbstractTableModel):
 
             return True
         elif role == Qt.CheckStateRole:
-            if index.column() == 6 or index.column() == 7:
+            if index.column() == 5 or index.column() == 6:
                 self.changeChecked(index)
                 self.dataChanged.emit(index, index)
             return True
@@ -106,7 +102,7 @@ class TableModelC(QAbstractTableModel):
         return False
 
     def changeChecked(self, index):
-        if index.column() == 6:
+        if index.column() == 5:
             if self.metadataList[index.row()]["Required"] == 0:
                 self.metadataList[index.row()]["Required"] = 2
                 self.requiredList.append(self.metadataList[index.row()]["Key"])
@@ -114,7 +110,7 @@ class TableModelC(QAbstractTableModel):
                 self.metadataList[index.row()]["Required"] = 0
                 self.requiredList.remove(self.metadataList[index.row()]["Key"])
             print(self.requiredList)
-        elif index.column() == 7:
+        elif index.column() == 6:
             if self.metadataList[index.row()]["Editable"] == 0:
                 self.metadataList[index.row()]["Editable"] = 2
             else:
@@ -122,14 +118,12 @@ class TableModelC(QAbstractTableModel):
 
     def flags(self, index):
         if not index.isValid():
-
             return Qt.ItemIsEnabled
         if index.column() == 2:
-            if self.metadataList[index.row()]["Editable"] == 2:
-                return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
+            return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
         elif index.column() == 8 or index.column() == 0:
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsEditable)
-        elif index.column() == 6 or index.column() == 7:
+        elif index.column() == 5 or index.column() == 6:
             return Qt.ItemFlags(QAbstractTableModel.flags(self,index) | Qt.ItemIsUserCheckable)
         else:
             if index.data() == "":
