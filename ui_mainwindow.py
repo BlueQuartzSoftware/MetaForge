@@ -222,19 +222,18 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.hyperthoughtTemplateLabel = QLabel(self.UseTemplateTab)
         self.hyperthoughtTemplateLabel.setObjectName(u"hyperthoughtTemplateLabel")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Preferred)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
         sizePolicy4.setHorizontalStretch(1)
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.hyperthoughtTemplateLabel.sizePolicy().hasHeightForWidth())
         self.hyperthoughtTemplateLabel.setSizePolicy(sizePolicy4)
-        self.hyperthoughtTemplateLabel.setAlignment(Qt.AlignCenter)
 
         self.horizontalLayout_5.addWidget(self.hyperthoughtTemplateLabel)
 
         self.hyperthoughtTemplateLineEdit = QLineEdit(self.UseTemplateTab)
         self.hyperthoughtTemplateLineEdit.setObjectName(u"hyperthoughtTemplateLineEdit")
         sizePolicy5 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy5.setHorizontalStretch(3)
+        sizePolicy5.setHorizontalStretch(2)
         sizePolicy5.setVerticalStretch(0)
         sizePolicy5.setHeightForWidth(self.hyperthoughtTemplateLineEdit.sizePolicy().hasHeightForWidth())
         self.hyperthoughtTemplateLineEdit.setSizePolicy(sizePolicy5)
@@ -255,7 +254,6 @@ class Ui_MainWindow(object):
         self.label_6.setObjectName(u"label_6")
         sizePolicy4.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
         self.label_6.setSizePolicy(sizePolicy4)
-        self.label_6.setAlignment(Qt.AlignCenter)
 
         self.horizontalLayout_6.addWidget(self.label_6)
 
@@ -277,18 +275,19 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_12 = QHBoxLayout()
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
-        self.lineEdit = QLineEdit(self.UseTemplateTab)
-        self.lineEdit.setObjectName(u"lineEdit")
+        self.usetableSearchBar = QLineEdit(self.UseTemplateTab)
+        self.usetableSearchBar.setObjectName(u"usetableSearchBar")
         sizePolicy6 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         sizePolicy6.setHorizontalStretch(0)
         sizePolicy6.setVerticalStretch(0)
-        sizePolicy6.setHeightForWidth(self.lineEdit.sizePolicy().hasHeightForWidth())
-        self.lineEdit.setSizePolicy(sizePolicy6)
+        sizePolicy6.setHeightForWidth(self.usetableSearchBar.sizePolicy().hasHeightForWidth())
+        self.usetableSearchBar.setSizePolicy(sizePolicy6)
 
-        self.horizontalLayout_12.addWidget(self.lineEdit)
+        self.horizontalLayout_12.addWidget(self.usetableSearchBar)
 
         self.displayedFileLabel = QLabel(self.UseTemplateTab)
         self.displayedFileLabel.setObjectName(u"displayedFileLabel")
+        self.displayedFileLabel.setAlignment(Qt.AlignCenter)
 
         self.horizontalLayout_12.addWidget(self.displayedFileLabel)
 

@@ -82,6 +82,8 @@ class MainWindow(QMainWindow):
         self.ui.appendCreateTableRowButton.clicked.connect(self.addCreateTableRow)
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
         self.ui.hyperthoughtLocationButton.clicked.connect(self.hyperthoughtui.exec)
+        self.ui.usetableSearchBar.textChanged.connect(self.filterUseTable)
+
 
 
         self.fileType = ""
@@ -160,7 +162,18 @@ class MainWindow(QMainWindow):
                 self.usefilterModel = FilterModelU(self)
                 self.usefilterModel.setSourceModel(self.usetablemodel)
                 self.unusedTreeModel = TreeModelU(["Available File Metadata"],headerDict,self.usetablemodel,self.requireds)
-                self.ui.useTemplateTableView.setModel(self.usefilterModel)
+
+                self.usesearchFilterModel = QSortFilterProxyModel(self)
+                self.usesearchFilterModel.setSourceModel(self.usefilterModel)
+                self.usesearchFilterModel.setFilterKeyColumn(0)
+                self.usesearchFilterModel.setDynamicSortFilter(True)
+                self.ui.useTemplateTableView.setModel(self.usesearchFilterModel)
+
+    def filterUseTable(self):
+        self.usesearchFilterModel.invalidate()
+        self.usesearchFilterModel.setFilterWildcard("*"+self.ui.usetableSearchBar.text()+"*")
+        #print(self.ui.usetableSearchBar.text())
+
 
     def getLocation(self):
         location = self.hyperthoughtui.promptui.locationLineEdit.text()

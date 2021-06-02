@@ -306,7 +306,7 @@
               <item>
                <widget class="QLabel" name="hyperthoughtTemplateLabel">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                   <horstretch>1</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -314,16 +314,13 @@
                 <property name="text">
                  <string>Template File: </string>
                 </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
                </widget>
               </item>
               <item>
                <widget class="QLineEdit" name="hyperthoughtTemplateLineEdit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>3</horstretch>
+                  <horstretch>2</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
@@ -343,7 +340,7 @@
               <item>
                <widget class="QLabel" name="label_6">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Preferred">
                   <horstretch>1</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
@@ -351,16 +348,13 @@
                 <property name="text">
                  <string>File To Extract Metadata From: </string>
                 </property>
-                <property name="alignment">
-                 <set>Qt::AlignCenter</set>
-                </property>
                </widget>
               </item>
               <item>
                <widget class="QLineEdit" name="otherDataFileLineEdit">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-                  <horstretch>3</horstretch>
+                  <horstretch>2</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
@@ -381,7 +375,7 @@
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_12">
               <item>
-               <widget class="QLineEdit" name="lineEdit">
+               <widget class="QLineEdit" name="usetableSearchBar">
                 <property name="sizePolicy">
                  <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
                   <horstretch>0</horstretch>
@@ -394,6 +388,9 @@
                <widget class="QLabel" name="displayedFileLabel">
                 <property name="text">
                  <string>No File Selected</string>
+                </property>
+                <property name="alignment">
+                 <set>Qt::AlignCenter</set>
                 </property>
                </widget>
               </item>
