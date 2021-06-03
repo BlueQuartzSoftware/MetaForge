@@ -14,12 +14,12 @@ set(CMAKE_CXX_EXTENSIONS False)
 # Always write out the compile_commands.json file to help out things like QtCreator and VS Code
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-project(EasyBake VERSION 1.0.0 LANGUAGES NONE)
+project(MetaForge VERSION 1.0.0 LANGUAGES NONE)
 
 
 find_program(RCC_EXE NAMES pyside2-rcc DOC "Pyside2 RCC Executable")
 find_program(UIC_EXE NAMES pyside2-uic DOC "Pyside2 UIC Executable")
 
-add_custom_target(MainWindow_UIC ALL COMMAND "${UIC_EXE}" ${EasyBake_SOURCE_DIR}/mainwindow.ui -o ${EasyBake_SOURCE_DIR}/ui_mainwindow.py)
-add_custom_target(HyperThoughtDialog_UIC ALL COMMAND "${UIC_EXE}" ${EasyBake_SOURCE_DIR}/hyperthoughtdialog.ui -o ${EasyBake_SOURCE_DIR}/hyperthoughtdialog.py)
-add_custom_target(NewFolderDialog_UIC ALL COMMAND "${UIC_EXE}" ${EasyBake_SOURCE_DIR}/newfolderdialog.ui  -o ${EasyBake_SOURCE_DIR}/newfolderdialog.py)
+add_custom_target(MainWindow_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/mainwindow.ui -o ${MetaForge_SOURCE_DIR}/ui_mainwindow.py)
+add_custom_target(HyperThoughtDialog_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/hyperthoughtdialog.ui -o ${MetaForge_SOURCE_DIR}/hyperthoughtdialog.py)
+add_custom_target(NewFolderDialog_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/newfolderdialog.ui  -o ${MetaForge_SOURCE_DIR}/newfolderdialog.py)

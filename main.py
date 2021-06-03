@@ -15,7 +15,7 @@ from mainwindowimpl import MainWindow
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
-    app.setApplicationDisplayName("EasyBake")
+    app.setApplicationDisplayName("MetaForge")
     app.setWindowIcon(QIcon('applicationIcon.png'));
     window = MainWindow()
     window.show()
