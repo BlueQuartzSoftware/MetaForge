@@ -24,7 +24,7 @@
     <item row="0" column="1">
      <widget class="QTabWidget" name="TabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="CreateTemplateTab">
        <attribute name="title">
@@ -123,7 +123,7 @@
             </item>
             <item>
              <widget class="QComboBox" name="fileParserCombo">
-              <property name="currentText">
+              <property name="currentText" stdset="0">
                <string>CTF Parser</string>
               </property>
               <item>
@@ -179,16 +179,7 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
           </layout>

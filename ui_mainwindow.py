@@ -142,8 +142,8 @@ class Ui_MainWindow(object):
         self.widget_3.setMinimumSize(QSize(0, 0))
         self.horizontalLayout_9 = QHBoxLayout(self.widget_3)
         self.horizontalLayout_9.setSpacing(0)
-        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
         self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
 
         self.gridLayout_5.addWidget(self.widget_3, 2, 0, 1, 1)
 
@@ -397,7 +397,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(0)
+        self.TabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -424,7 +424,7 @@ class Ui_MainWindow(object):
         self.fileParserCombo.setItemText(1, QCoreApplication.translate("MainWindow", u"ANG Parser", None))
         self.fileParserCombo.setItemText(2, QCoreApplication.translate("MainWindow", u"Custom Parser", None))
 
-        self.fileParserCombo.setCurrentText(QCoreApplication.translate("MainWindow", u"CTF Parser", None))
+        self.fileParserCombo.setProperty("currentText", QCoreApplication.translate("MainWindow", u"CTF Parser", None))
         self.appendCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"...", None))
         self.saveTemplateButton.setText(QCoreApplication.translate("MainWindow", u"Save Template", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.CreateTemplateTab), QCoreApplication.translate("MainWindow", u"Create Template", None))
