@@ -277,18 +277,18 @@ class MainWindow(QMainWindow):
                 json.dump(self.requireds, outfile)
 
     def saveTemplate(self):
-        fileName = QFileDialog.getSaveFileName(self, "Save File",
-                                   "",
-                                   "Templates (*.ez)")
+        dialog = QFileDialog(self, "Save File","", "Templates (*.ez)")
+        dialog.setDefaultSuffix(".ez");
+        dialog.setAcceptMode(QFileDialog.AcceptSave)
+        if  dialog.exec():
+            fileName  = dialog.selectedFiles()[0]
         if fileName != "":
-            with open(fileName[0]+".ez", 'w') as outfile:
+            with open(fileName, 'w') as outfile:
                 json.dump(self.filterModel.displayed, outfile)
                 outfile.write("\n")
                 json.dump(self.filterModel.fileList, outfile)
                 outfile.write("\n")
                 json.dump(self.createtablemodel.requiredList, outfile)
-
-
 
     def selectFile(self):
         linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
