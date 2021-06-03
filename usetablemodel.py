@@ -43,7 +43,7 @@ class TableModelU(QAbstractTableModel):
             elif index.column() == 2:
                 return self.metadataList[index.row()]["Annotation"]
             elif index.column() == 3:
-                return str(type(self.metadataList[index.row()]["Value"])).split("'")[1].upper()
+                return ""
             elif index.column() == 4:
                 return self.metadataList[index.row()]["Source"]
             elif index.column() == 5:

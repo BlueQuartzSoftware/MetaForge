@@ -83,6 +83,8 @@ class MainWindow(QMainWindow):
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
         self.ui.hyperthoughtLocationButton.clicked.connect(self.hyperthoughtui.exec)
         self.ui.usetableSearchBar.textChanged.connect(self.filterUseTable)
+        self.ui.createTemplateListSearchBar.textChanged.connect(self.filterCreateTable)
+        self.ui.createTemplateTreeSearchBar.textChanged.connect(self.filterCreateTree)
 
 
 
@@ -169,11 +171,20 @@ class MainWindow(QMainWindow):
                 self.usesearchFilterModel.setDynamicSortFilter(True)
                 self.ui.useTemplateTableView.setModel(self.usesearchFilterModel)
 
+    def filterCreateTable(self):
+        self.createTableSearchFilterModel.invalidate()
+        self.createTableSearchFilterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.createTableSearchFilterModel.setFilterWildcard("*"+self.ui.createTemplateListSearchBar.text()+"*")
+
+    def filterCreateTree(self):
+        self.createTreeSearchFilterModel.invalidate()
+        self.createTreeSearchFilterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.createTreeSearchFilterModel.setFilterWildcard("*"+self.ui.createTemplateTreeSearchBar.text()+"*")
+
     def filterUseTable(self):
         self.usesearchFilterModel.invalidate()
+        self.usesearchFilterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
         self.usesearchFilterModel.setFilterWildcard("*"+self.ui.usetableSearchBar.text()+"*")
-        #print(self.ui.usetableSearchBar.text())
-
 
     def getLocation(self):
         location = self.hyperthoughtui.promptui.locationLineEdit.text()
@@ -300,9 +311,18 @@ class MainWindow(QMainWindow):
             self.filterModel.displayed=[]
             self.filterModel.setSourceModel(self.createtablemodel)
             self.filterModel.fileList.append(linetext)
-            self.ui.metadataTableView.setModel(self.filterModel)
+            self.createTableSearchFilterModel = QSortFilterProxyModel(self)
+            self.createTableSearchFilterModel.setSourceModel(self.filterModel)
+            self.createTableSearchFilterModel.setFilterKeyColumn(1)
+            self.createTableSearchFilterModel.setDynamicSortFilter(True)
+            self.ui.metadataTableView.setModel(self.createTableSearchFilterModel)
             self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.createtablemodel)
-            self.ui.metadataTreeView.setModel(self.treeModel)
+            self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
+            self.createTreeSearchFilterModel.setSourceModel(self.treeModel)
+            self.createTreeSearchFilterModel.setFilterKeyColumn(0)
+            self.createTreeSearchFilterModel.setDynamicSortFilter(True)
+            self.createTreeSearchFilterModel.setRecursiveFilteringEnabled(True)
+            self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
             self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
 
