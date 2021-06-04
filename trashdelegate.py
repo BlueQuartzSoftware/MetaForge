@@ -11,17 +11,18 @@ class TrashDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
 
     def createEditor(self, parent, option, index):
-        if index.column() != 7:
+        if index.column() != 9:
             QStyledItemDelegate.createEditor(self,parent,option,index)
         else:
 
-            sourceModelIndex = (index.model().mapToSource(index)).row()
+            sourceModelIndex = (index.model().mapToSource(index))
+            realSourceModelIndex = sourceModelIndex.model().mapToSource(sourceModelIndex).row()
             #The index goes from the Proxy Model to the Table Model to look into the masterlist.
-            self.pressed.emit(index.model().sourceModel().metadataList[sourceModelIndex]["Source"])
+            self.pressed.emit(index.model().sourceModel().sourceModel().metadataList[realSourceModelIndex]["Source"])
 
 
     def paint(self, painter, option, index):
-        if index.column() == 7:
+        if index.column() == 9:
             icon = QApplication.style().standardIcon(QStyle.SP_TrashIcon)
             painter.save()
             line_1x = icon.pixmap(16,16)
