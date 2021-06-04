@@ -23,7 +23,7 @@ class TrashDelegate(QItemDelegate):
 
     def paint(self, painter, option, index):
         if index.column() == 9:
-            icon = QApplication.style().standardIcon(QStyle.SP_TrashIcon)
+            icon = QApplication.style().standardIcon(QStyle.SP_DialogCancelButton)
             painter.save()
             line_1x = icon.pixmap(16,16)
             painter.drawPixmap(option.rect.x()+option.rect.width()/2 - 8 ,
