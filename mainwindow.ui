@@ -21,16 +21,43 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout_4">
+    <property name="leftMargin">
+     <number>2</number>
+    </property>
+    <property name="topMargin">
+     <number>2</number>
+    </property>
+    <property name="rightMargin">
+     <number>2</number>
+    </property>
+    <property name="bottomMargin">
+     <number>2</number>
+    </property>
+    <property name="spacing">
+     <number>4</number>
+    </property>
     <item row="0" column="1">
      <widget class="QTabWidget" name="TabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="CreateTemplateTab">
        <attribute name="title">
         <string>Create Template</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_5">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
+        <property name="spacing">
+         <number>2</number>
+        </property>
         <item row="0" column="0" colspan="2">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
           <property name="spacing">
@@ -68,7 +95,7 @@
         <item row="1" column="0" colspan="2">
          <layout class="QHBoxLayout" name="horizontalLayout_3">
           <property name="spacing">
-           <number>9</number>
+           <number>6</number>
           </property>
           <item>
            <widget class="QLabel" name="dataTypeLabel">
@@ -123,7 +150,7 @@
             </item>
             <item>
              <widget class="QComboBox" name="fileParserCombo">
-              <property name="currentText" stdset="0">
+              <property name="currentText">
                <string>CTF Parser</string>
               </property>
               <item>
@@ -179,7 +206,16 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="margin">
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
             <number>0</number>
            </property>
           </layout>
@@ -188,7 +224,11 @@
         <item row="3" column="1">
          <layout class="QGridLayout" name="gridLayout">
           <item row="0" column="0">
-           <widget class="QLineEdit" name="createTemplateTreeSearchBar"/>
+           <widget class="QLineEdit" name="createTemplateTreeSearchBar">
+            <property name="placeholderText">
+             <string>Type to search for key</string>
+            </property>
+           </widget>
           </item>
           <item row="0" column="1">
            <widget class="QLineEdit" name="createTemplateListSearchBar">
@@ -197,6 +237,9 @@
               <horstretch>1</horstretch>
               <verstretch>0</verstretch>
              </sizepolicy>
+            </property>
+            <property name="placeholderText">
+             <string>Type to search for key</string>
             </property>
            </widget>
           </item>
@@ -246,6 +289,21 @@
            </size>
           </property>
           <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <property name="spacing">
+            <number>2</number>
+           </property>
+           <property name="leftMargin">
+            <number>2</number>
+           </property>
+           <property name="topMargin">
+            <number>2</number>
+           </property>
+           <property name="rightMargin">
+            <number>2</number>
+           </property>
+           <property name="bottomMargin">
+            <number>2</number>
+           </property>
            <item>
             <widget class="QWidget" name="widget_2" native="true">
              <property name="minimumSize">
@@ -255,6 +313,18 @@
               </size>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_10">
+              <property name="leftMargin">
+               <number>4</number>
+              </property>
+              <property name="topMargin">
+               <number>4</number>
+              </property>
+              <property name="rightMargin">
+               <number>4</number>
+              </property>
+              <property name="bottomMargin">
+               <number>4</number>
+              </property>
               <item>
                <spacer name="horizontalSpacer_5">
                 <property name="orientation">
@@ -288,6 +358,21 @@
         <string>Use Template</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
+        <property name="leftMargin">
+         <number>4</number>
+        </property>
+        <property name="topMargin">
+         <number>4</number>
+        </property>
+        <property name="rightMargin">
+         <number>4</number>
+        </property>
+        <property name="bottomMargin">
+         <number>4</number>
+        </property>
+        <property name="spacing">
+         <number>2</number>
+        </property>
         <item row="0" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
@@ -333,6 +418,9 @@
                   <horstretch>2</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
+                </property>
+                <property name="placeholderText">
+                 <string>example.ez</string>
                 </property>
                </widget>
               </item>
@@ -391,6 +479,9 @@
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
+                </property>
+                <property name="placeholderText">
+                 <string>Search For HT Key</string>
                 </property>
                </widget>
               </item>
