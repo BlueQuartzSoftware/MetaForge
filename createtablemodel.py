@@ -10,7 +10,7 @@ class TableModelC(QAbstractTableModel):
     in this section. This will make it easier to move columns around and rename items.
     """
     # Total Number of Columns
-    K_COL_COUNT = 8
+    K_COL_COUNT = 10
 
     # These are some misc strings that are used.
     K_CUSTOM_INPUT = "Custom Input"
@@ -40,14 +40,20 @@ class TableModelC(QAbstractTableModel):
     K_HTVALUE_COL_NAME = "HT Value"
     K_HTVALUE_COL_INDEX = 4
 
+    K_HTANNOTATION_COL_NAME = "HT Annotation"
+    K_HTANNOTATION_COL_INDEX = 5
+
+    K_HTUNITS_COL_NAME = "HT Units"
+    K_HTUNITS_COL_INDEX = 6
+
     K_REQUIRE_COL_NAME = "Required"
-    K_REQUIRE_COL_INDEX = 5
+    K_REQUIRE_COL_INDEX = 7
 
     K_EDITABLE_COL_NAME = "Editable"
-    K_EDITABLE_COL_INDEX = 6
+    K_EDITABLE_COL_INDEX = 8
 
     K_REMOVE_COL_NAME = "Remove Row"
-    K_REMOVE_COL_INDEX = 7
+    K_REMOVE_COL_INDEX = 9
 
     def __init__(self, data, parent=None):
         QAbstractTableModel.__init__(self, parent)
@@ -110,6 +116,10 @@ class TableModelC(QAbstractTableModel):
                 return self.K_EDITABLE_COL_NAME
             elif section == self.K_REMOVE_COL_INDEX:
                 return self.K_REMOVE_COL_NAME
+            elif section == self.K_HTANNOTATION_COL_INDEX:
+                return self.K_HTANNOTATION_COL_NAME
+            elif section == self.K_HTUNITS_COL_INDEX:
+                return self.K_HTUNITS_COL_NAME
             return None
 
     def setData(self, index, value, role):
