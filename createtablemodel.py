@@ -70,7 +70,7 @@ class TableModelC(QAbstractTableModel):
         return len(self.metadataList)
 
     def columnCount(self, parent=QModelIndex()):
-        return 8
+        return self.K_COL_COUNT
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
@@ -153,8 +153,8 @@ class TableModelC(QAbstractTableModel):
                     self.metadataList[index.row(
                     )][self.K_HTVALUE_COL_NAME] = value
                     self.dataChanged.emit(index, index)
-            elif index.column() == self.K_REMOVE_COL_INDEX:
-                self.metadataList.remove(index.row())
+            #elif index.column() == self.K_REMOVE_COL_INDEX:
+#                self.metadataList.remove(index.row())
 
             return True
         elif role == Qt.CheckStateRole:
@@ -186,6 +186,8 @@ class TableModelC(QAbstractTableModel):
         if not index.isValid():
             return Qt.ItemIsEnabled
         if index.column() == self.K_HTVALUE_COL_INDEX:
+            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+        elif index.column() == self.K_REMOVE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
         elif index.column() == self.K_SORT_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)

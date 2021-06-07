@@ -13,21 +13,24 @@ class TreeModel(QAbstractItemModel):
 
         rootData = [header for header in headers]
         self.rootItem = TreeItem(rootData)
-        self.treeDict= data
+        self.treeDict = data
         self.tablemodel = tablemodel
         self.setupModelData(data, self.rootItem)
 
     def changeLeafCheck(self, source):
+        print(source)
         curNode = self.rootItem.child(0)
         keyNames = source.split("/")
+        curRow = 0
         for key in keyNames:
             for i in range(curNode.childCount()):
                 if curNode.child(i).itemData[0] == key:
                         curNode = curNode.child(i)
+                        curRow = i
                         break
-        curNode.switchChecked()
-        self.checkChanged.emit(Qt.Unchecked,source)
-        self.dataChanged.emit(0, 0)
+        anIndex = self.createIndex(curRow, curNode.columnCount(), curNode)
+        self.setData(anIndex, 0, Qt.CheckStateRole)
+
 
 
     def columnCount(self, parent=QModelIndex()):
