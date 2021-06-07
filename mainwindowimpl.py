@@ -43,9 +43,7 @@ class MainWindow(QMainWindow):
         self.ui.saveTemplateButton.clicked.connect(self.saveTemplate)
         self.ui.otherDataFileSelect.clicked.connect(self.extractFile)
         self.ui.hyperthoughtUploadButton.clicked.connect(self.uploadToHyperthought)
-
-
-
+        self.setAcceptDrops(True)
 
         aTree={}
         self.createtablemodel = TableModelC(aTree,self)
@@ -374,7 +372,18 @@ class MainWindow(QMainWindow):
         progress.exec()
 
 
+    def dragEnterEven(event):
+        print("YES I GET HERE TOO 2")
+        event.acceptProposedAction()
 
+    def dragMoveEvent(event):
+        print("YES I GET HERE TOO 3")
+        self.event.setDropAction(Qt.MoveAction);
+        event.accept()
+
+    def dropEvent(event):
+        print("YES I GET HERE TOO")
+        event.accept()
 
 
 
