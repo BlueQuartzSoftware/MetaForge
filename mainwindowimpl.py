@@ -44,6 +44,7 @@ class MainWindow(QMainWindow):
         self.ui.otherDataFileSelect.clicked.connect(self.extractFile)
         self.ui.hyperthoughtUploadButton.clicked.connect(self.uploadToHyperthought)
         self.setAcceptDrops(True)
+        self.numCustoms = 0
 
         aTree={}
         self.createtablemodel = TableModelC(aTree,self)
@@ -57,8 +58,8 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_USESOURCE_COL_INDEX, self.width() * .1)
 
         self.trashDelegate = TrashDelegate()
-        self.ui.metadataTableView.setItemDelegateForColumn(10, self.trashDelegate)
-        self.ui.metadataTableView.setColumnWidth(10,self.width()*.05)
+        self.ui.metadataTableView.setItemDelegateForColumn(self.createtablemodel.K_REMOVE_COL_INDEX, self.trashDelegate)
+        self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_REMOVE_COL_INDEX,self.width()*.05)
 
 
         self.treeModel = TreeModel(["Available File Metadata"],aTree,self.createtablemodel)
@@ -71,9 +72,9 @@ class MainWindow(QMainWindow):
         self.usefilterModel = FilterModelU(self)
         self.usefilterModel.setSourceModel(self.usetablemodel)
         self.ui.useTemplateTableView.setModel(self.usefilterModel)
-        self.ui.useTemplateTableView.setColumnWidth(0,self.width()*.25)
-        self.ui.useTemplateTableView.setColumnWidth(1,self.width()*.25)
-        self.ui.useTemplateTableView.setColumnWidth(4,self.width()*.25)
+        self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTKEY_COL_INDEX,self.width()*.25)
+        self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTVALUE_COL_INDEX,self.width()*.25)
+        self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_SOURCE_COL_INDEX,self.width()*.25)
 
 
         self.uselistmodel = ListModel(self, self.usetablemodel,[])
@@ -108,7 +109,11 @@ class MainWindow(QMainWindow):
 
 
     def addCreateTableRow(self):
-        self.createtablemodel.addEmptyRow()
+        print(self.treeModel.rootItem.itemData)
+        self.treeModel.rootItem.insertChildren(self.treeModel.rootItem.childCount(),1,self.treeModel.rootItem.columnCount())
+        self.treeModel.rootItem.child(self.treeModel.rootItem.childCount() -1).setData(0,"Custom Input " +str(self.numCustoms))
+        self.createtablemodel.addEmptyRow(self.numCustoms)
+        self.numCustoms+=1
 
 
     def addFile(self):

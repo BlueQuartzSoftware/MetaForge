@@ -18,7 +18,6 @@ class TreeModel(QAbstractItemModel):
         self.setupModelData(data, self.rootItem)
 
     def changeLeafCheck(self, source):
-        print(source)
         curNode = self.rootItem.child(0)
         keyNames = source.split("/")
         curRow = 0

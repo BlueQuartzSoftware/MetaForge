@@ -25,7 +25,7 @@ class TableModelU(QAbstractTableModel):
     K_UNITS_META_KEY = "Units"
 
     # These are the user facing header and the index of each column in the table.
-    K_HTKEY_COL_NAME = "HT Key"
+    K_HTKEY_COL_NAME = "HT Name"
     K_HTKEY_COL_INDEX = 0
 
     K_HTVALUE_COL_NAME = "HT Value"
@@ -69,6 +69,7 @@ class TableModelU(QAbstractTableModel):
             self.templatelist.append(newList[i])
             self.templatesources.append(
                 "/".join(newList[i]['Source'].split("/")[1:]))
+            print(self.templatelist)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.metadataList)

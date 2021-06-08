@@ -33,7 +33,8 @@ class TreeModelU(QAbstractItemModel):
 
     def checkList(self):
         for i in range(len(self.tablemodel.templatesources)):
-            if self.tablemodel.templatesources[i] != "Custom Input":
+            if "Custom Input" in self.tablemodel.templatesources[i]:
+                print(self.tablemodel.templatesources[i])
                 if self.tablemodel.templatesources[i] not in self.tablemodel.newmetadatasources:
                     QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + "The file extracted is missing Source: \n\n"+ self.tablemodel.templatesources[i] + "\n\nPlease try a different file")
                     self.tablemodel.metadataList = []
