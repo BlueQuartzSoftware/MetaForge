@@ -54,9 +54,11 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.createtablemodel.K_HTNAME_COL_INDEX,QHeaderView.ResizeToContents)
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.createtablemodel.K_SOURCEVAL_COL_INDEX,QHeaderView.ResizeToContents)
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.createtablemodel.K_HTVALUE_COL_INDEX,QHeaderView.ResizeToContents)
+        self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_USESOURCE_COL_INDEX, self.width() * .1)
+
         self.trashDelegate = TrashDelegate()
-        self.ui.metadataTableView.setItemDelegateForColumn(9, self.trashDelegate)
-        self.ui.metadataTableView.setColumnWidth(9,self.width()*.05)
+        self.ui.metadataTableView.setItemDelegateForColumn(10, self.trashDelegate)
+        self.ui.metadataTableView.setColumnWidth(10,self.width()*.05)
 
 
         self.treeModel = TreeModel(["Available File Metadata"],aTree,self.createtablemodel)
@@ -71,8 +73,8 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setModel(self.usefilterModel)
         self.ui.useTemplateTableView.setColumnWidth(0,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(1,self.width()*.25)
-        #self.ui.useTemplateTableView.setColumnWidth(3,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(4,self.width()*.25)
+
 
         self.uselistmodel = ListModel(self, self.usetablemodel,[])
         self.ui.useTemplateListView.setModel(self.uselistmodel)

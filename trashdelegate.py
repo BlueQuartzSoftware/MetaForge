@@ -11,7 +11,7 @@ class TrashDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
 
     def createEditor(self, parent, option, index):
-        if index.column() != 9:
+        if index.column() != index.model().sourceModel().sourceModel().K_REMOVE_COL_INDEX:
             QStyledItemDelegate.createEditor(self,parent,option,index)
         else:
 
@@ -22,7 +22,7 @@ class TrashDelegate(QItemDelegate):
 
 
     def paint(self, painter, option, index):
-        if index.column() == 9:
+        if index.column() == index.model().sourceModel().sourceModel().K_REMOVE_COL_INDEX:
             icon = QApplication.style().standardIcon(QStyle.SP_DialogCancelButton)
             painter.save()
             line_1x = icon.pixmap(16,16)
@@ -33,6 +33,6 @@ class TrashDelegate(QItemDelegate):
             line_1x)
             painter.restore()
         else:
-            QStyledItemDelegate.paint(self, painter, option, index)
+            QItemDelegate.paint(self, painter, option, index)
 
 

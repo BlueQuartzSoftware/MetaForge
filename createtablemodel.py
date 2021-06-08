@@ -10,7 +10,7 @@ class TableModelC(QAbstractTableModel):
     in this section. This will make it easier to move columns around and rename items.
     """
     # Total Number of Columns
-    K_COL_COUNT = 10
+    K_COL_COUNT = 11
 
     # These are some misc strings that are used.
     K_CUSTOM_INPUT = "Custom Input"
@@ -46,14 +46,17 @@ class TableModelC(QAbstractTableModel):
     K_HTUNITS_COL_NAME = "HT Units"
     K_HTUNITS_COL_INDEX = 6
 
+    K_USESOURCE_COL_NAME = "Use Source Value"
+    K_USESOURCE_COL_INDEX = 7
+
     K_REQUIRE_COL_NAME = "Required"
-    K_REQUIRE_COL_INDEX = 7
+    K_REQUIRE_COL_INDEX = 8
 
     K_EDITABLE_COL_NAME = "Editable"
-    K_EDITABLE_COL_INDEX = 8
+    K_EDITABLE_COL_INDEX = 9
 
     K_REMOVE_COL_NAME = "Remove Row"
-    K_REMOVE_COL_INDEX = 9
+    K_REMOVE_COL_INDEX = 10
 
     def __init__(self, data, parent=None):
         QAbstractTableModel.__init__(self, parent)
@@ -93,6 +96,8 @@ class TableModelC(QAbstractTableModel):
                 return self.metadataList[index.row()][self.K_REQUIRE_COL_NAME]
             elif index.column() == self.K_EDITABLE_COL_INDEX:
                 return self.metadataList[index.row()][self.K_EDITABLE_COL_NAME]
+            elif index.column() == self.K_USESOURCE_COL_INDEX:
+                return 0
 
         return None
 
@@ -110,6 +115,8 @@ class TableModelC(QAbstractTableModel):
                 return self.K_SOURCE_COL_NAME
             elif section == self.K_HTVALUE_COL_INDEX:
                 return self.K_HTVALUE_COL_NAME
+            elif section == self.K_USESOURCE_COL_INDEX:
+                return self.K_USESOURCE_COL_NAME
             elif section == self.K_REQUIRE_COL_INDEX:
                 return self.K_REQUIRE_COL_NAME
             elif section == self.K_EDITABLE_COL_INDEX:
@@ -158,7 +165,7 @@ class TableModelC(QAbstractTableModel):
 
             return True
         elif role == Qt.CheckStateRole:
-            if index.column() == self.K_REQUIRE_COL_INDEX or index.column() == self.K_EDITABLE_COL_INDEX:
+            if index.column() == self.K_REQUIRE_COL_INDEX or index.column() == self.K_EDITABLE_COL_INDEX or index.column() == K_USESOURCE_COL_INDEX:
                 self.changeChecked(index)
                 self.dataChanged.emit(index, index)
             return True
@@ -191,7 +198,7 @@ class TableModelC(QAbstractTableModel):
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
         elif index.column() == self.K_SORT_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-        elif index.column() == self.K_REQUIRE_COL_INDEX or index.column() == self.K_EDITABLE_COL_INDEX:
+        elif index.column() == self.K_REQUIRE_COL_INDEX or index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable)
         else:
             if index.data() == "":
