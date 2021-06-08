@@ -18,9 +18,9 @@ class ListModel(QAbstractListModel):
     def canDropMimeData(self, data, action, row, column, parent):
         return data.hasUrls()
 
-    def dropMimeData(sef, data, action, row, column, parent):
-        #this is where to add the files
-        print( data.urls() )
+    def dropMimeData(self, data, action, row, column, parent):
+        for file in data.urls():
+            self.addRow(file.path())
         return True
 
 
