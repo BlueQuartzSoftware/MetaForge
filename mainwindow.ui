@@ -81,6 +81,9 @@
             <property name="text">
              <string/>
             </property>
+            <property name="readOnly">
+             <bool>true</bool>
+            </property>
            </widget>
           </item>
           <item>
@@ -151,7 +154,7 @@
             <item>
              <widget class="QComboBox" name="fileParserCombo">
               <property name="currentText">
-               <string>CTF Parser</string>
+               <string>ANG Parser</string>
               </property>
               <item>
                <property name="text">
@@ -422,6 +425,9 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
                 <property name="placeholderText">
                  <string>example.ez</string>
                 </property>
@@ -459,6 +465,9 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="readOnly">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>
@@ -482,6 +491,9 @@
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
+                </property>
+                <property name="readOnly">
+                 <bool>false</bool>
                 </property>
                 <property name="placeholderText">
                  <string>Search For HT Key</string>

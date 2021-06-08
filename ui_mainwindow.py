@@ -75,6 +75,7 @@ class Ui_MainWindow(object):
 
         self.dataFileLineEdit = QLineEdit(self.CreateTemplateTab)
         self.dataFileLineEdit.setObjectName(u"dataFileLineEdit")
+        self.dataFileLineEdit.setReadOnly(True)
 
         self.horizontalLayout_2.addWidget(self.dataFileLineEdit)
 
@@ -264,6 +265,7 @@ class Ui_MainWindow(object):
         sizePolicy6.setVerticalStretch(0)
         sizePolicy6.setHeightForWidth(self.hyperthoughtTemplateLineEdit.sizePolicy().hasHeightForWidth())
         self.hyperthoughtTemplateLineEdit.setSizePolicy(sizePolicy6)
+        self.hyperthoughtTemplateLineEdit.setReadOnly(True)
 
         self.horizontalLayout_5.addWidget(self.hyperthoughtTemplateLineEdit)
 
@@ -288,6 +290,7 @@ class Ui_MainWindow(object):
         self.otherDataFileLineEdit.setObjectName(u"otherDataFileLineEdit")
         sizePolicy6.setHeightForWidth(self.otherDataFileLineEdit.sizePolicy().hasHeightForWidth())
         self.otherDataFileLineEdit.setSizePolicy(sizePolicy6)
+        self.otherDataFileLineEdit.setReadOnly(True)
 
         self.horizontalLayout_6.addWidget(self.otherDataFileLineEdit)
 
@@ -309,6 +312,7 @@ class Ui_MainWindow(object):
         sizePolicy7.setVerticalStretch(0)
         sizePolicy7.setHeightForWidth(self.usetableSearchBar.sizePolicy().hasHeightForWidth())
         self.usetableSearchBar.setSizePolicy(sizePolicy7)
+        self.usetableSearchBar.setReadOnly(False)
 
         self.horizontalLayout_12.addWidget(self.usetableSearchBar)
 
@@ -434,7 +438,7 @@ class Ui_MainWindow(object):
         self.fileParserCombo.setItemText(1, QCoreApplication.translate("MainWindow", u"ANG Parser", None))
         self.fileParserCombo.setItemText(2, QCoreApplication.translate("MainWindow", u"Custom Parser", None))
 
-        self.fileParserCombo.setCurrentText(QCoreApplication.translate("MainWindow", u"CTF Parser", None))
+        self.fileParserCombo.setCurrentText(QCoreApplication.translate("MainWindow", u"ANG Parser", None))
         self.appendCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"...", None))
         self.createTemplateTreeSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.createTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))

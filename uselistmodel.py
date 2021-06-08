@@ -1,5 +1,5 @@
 from PySide2.QtNetwork import QNetworkReply
-from PySide2.QtCore import QAbstractListModel, QMimeData, Qt, QModelIndex
+from PySide2.QtCore import QAbstractListModel, QMimeData, Qt, QModelIndex, QFileInfo
 from PySide2.QtGui import QIcon, QColor
 from PySide2.QtWidgets import QApplication, QStyle
 
@@ -16,10 +16,15 @@ class ListModel(QAbstractListModel):
         return Qt.ItemIsDropEnabled | defaultFlags;
 
     def canDropMimeData(self, data, action, row, column, parent):
+        for file in data.urls():
+            aFile = QFileInfo(file.path())
+            if not aFile.isFile():
+                return False
         return data.hasUrls()
 
     def dropMimeData(self, data, action, row, column, parent):
         for file in data.urls():
+            #if file.isLocalDirectory():
             self.addRow(file.path())
         return True
 
