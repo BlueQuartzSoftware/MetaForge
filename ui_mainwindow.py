@@ -12,8 +12,6 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
-from easyfilelistview import EasyFileListView
-
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
@@ -235,7 +233,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setContentsMargins(4, 4, 4, 4)
         self.horizontalLayout_13 = QHBoxLayout()
         self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
-        self.useTemplateListView = EasyFileListView(self.UseTemplateTab)
+        self.useTemplateListView = QListView(self.UseTemplateTab)
         self.useTemplateListView.setObjectName(u"useTemplateListView")
         sizePolicy3.setHeightForWidth(self.useTemplateListView.sizePolicy().hasHeightForWidth())
         self.useTemplateListView.setSizePolicy(sizePolicy3)

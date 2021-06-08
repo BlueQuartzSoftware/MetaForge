@@ -19,8 +19,6 @@ if __name__ == "__main__":
     app.setWindowIcon(QIcon('applicationIcon.png'));
     window = MainWindow()
     window.show()
-#    window.resize(800,800)
-#    app.processEvents()
 
     sys.exit(app.exec_())
 

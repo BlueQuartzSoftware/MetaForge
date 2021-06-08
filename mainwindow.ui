@@ -376,7 +376,7 @@
         <item row="0" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_13">
           <item>
-           <widget class="EasyFileListView" name="useTemplateListView">
+           <widget class="QListView" name="useTemplateListView">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
               <horstretch>0</horstretch>
@@ -691,13 +691,6 @@
    </property>
   </action>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>EasyFileListView</class>
-   <extends>QListView</extends>
-   <header>easyfilelistview.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections/>
 </ui>
