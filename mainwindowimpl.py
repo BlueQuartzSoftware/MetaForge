@@ -2,7 +2,7 @@
 
 from PySide2.QtWidgets import QApplication, QButtonGroup, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView, QToolButton, QStyle, QProgressDialog, QDialog
 from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot, QRegExp, QThread
-from PySide2.QtGui import QCloseEvent
+from PySide2.QtGui import QCloseEvent, QCursor
 from ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
 from createtablemodel	import TableModelC
@@ -12,6 +12,7 @@ from treemodel import TreeModel
 from usetreemodel import TreeModelU
 from filterModel import FilterModel
 from usefiltermodel import FilterModelU
+from usefiledelegate import UseFileDelegate
 from trashdelegate import TrashDelegate
 from ht_requests.ht_requests import ht_utilities
 from ht_requests.ht_requests import htauthcontroller
@@ -61,12 +62,10 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.setItemDelegateForColumn(self.createtablemodel.K_REMOVE_COL_INDEX, self.trashDelegate)
         self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_REMOVE_COL_INDEX,self.width()*.05)
 
-
         self.treeModel = TreeModel(["Available File Metadata"],aTree,self.createtablemodel)
         self.ui.metadataTreeView.setModel(self.treeModel)
         self.treeModel.checkChanged.connect(self.filterModel.checkList)
         self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
-
 
         self.usetablemodel = TableModelU(self,[])
         self.usefilterModel = FilterModelU(self)
@@ -76,9 +75,14 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTVALUE_COL_INDEX,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_SOURCE_COL_INDEX,self.width()*.25)
 
-
         self.uselistmodel = ListModel(self, self.usetablemodel,[])
         self.ui.useTemplateListView.setModel(self.uselistmodel)
+
+        self.useFileDelegate = UseFileDelegate(self)
+        self.ui.useTemplateListView.setItemDelegate(self.useFileDelegate)
+
+        self.ui.useTemplateListView.clicked.connect(self.removeRowfromUseFileList)
+
         self.addAppendButton()
         self.ui.TabWidget.currentChanged.connect(self.movethedamnbutton)
         self.appendSourceFilesButton.clicked.connect(self.addFile)
@@ -88,7 +92,6 @@ class MainWindow(QMainWindow):
         self.ui.usetableSearchBar.textChanged.connect(self.filterUseTable)
         self.ui.createTemplateListSearchBar.textChanged.connect(self.filterCreateTable)
         self.ui.createTemplateTreeSearchBar.textChanged.connect(self.filterCreateTree)
-
 
 
         self.fileType = ""
@@ -235,6 +238,10 @@ class MainWindow(QMainWindow):
             self.toggleButtons()
             infile.close()
 
+    def removeRowfromUseFileList(self, index):
+        if self.ui.useTemplateListView.width() - 32 < self.ui.useTemplateListView.mapFromGlobal(QCursor.pos()).x():
+            #this is where to remove the row
+            print(" ouch " + str(index.row()) )
 
     def resizeEvent(self, event):
         super().resizeEvent(event)
@@ -379,21 +386,6 @@ class MainWindow(QMainWindow):
         self.uploader.allUploadsDone.connect(progress.accept)
         progress.canceled.connect(lambda: self.uploader.interruptUpload())
         progress.exec()
-
-
-    def dragEnterEven(event):
-        print("YES I GET HERE TOO 2")
-        event.acceptProposedAction()
-
-    def dragMoveEvent(event):
-        print("YES I GET HERE TOO 3")
-        self.event.setDropAction(Qt.MoveAction);
-        event.accept()
-
-    def dropEvent(event):
-        print("YES I GET HERE TOO")
-        event.accept()
-
 
 
 
