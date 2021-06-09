@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 from PySide2.QtWidgets import QApplication, QButtonGroup, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView, QToolButton, QStyle, QProgressDialog, QDialog
-from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot, QRegExp, QThread
+from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot, QRegExp, QThread,QModelIndex
 from PySide2.QtGui import QCloseEvent, QCursor
 from ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
@@ -65,7 +65,7 @@ class MainWindow(QMainWindow):
         self.treeModel = TreeModel(["Available File Metadata"],aTree,self.createtablemodel)
         self.ui.metadataTreeView.setModel(self.treeModel)
         self.treeModel.checkChanged.connect(self.filterModel.checkList)
-        self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
+        self.trashDelegate.pressed.connect(self.handleRemove)
 
         self.usetablemodel = TableModelU(self,[])
         self.usefilterModel = FilterModelU(self)
@@ -112,9 +112,6 @@ class MainWindow(QMainWindow):
 
 
     def addCreateTableRow(self):
-        print(self.treeModel.rootItem.itemData)
-        self.treeModel.rootItem.insertChildren(self.treeModel.rootItem.childCount(),1,self.treeModel.rootItem.columnCount())
-        self.treeModel.rootItem.child(self.treeModel.rootItem.childCount() -1).setData(0,"Custom Input " +str(self.numCustoms))
         self.createtablemodel.addEmptyRow(self.numCustoms)
         self.numCustoms+=1
 
@@ -203,6 +200,17 @@ class MainWindow(QMainWindow):
         self.toggleButtons()
 
         self.folderuuid = self.hyperthoughtui.path + self.hyperthoughtui.stringlistmodel.uuidList[locationindex] + ","
+
+    def handleRemove(self, source):
+        if "Custom Input" in source:
+            for i in range(len(self.createtablemodel.metadataList)):
+                if self.createtablemodel.metadataList[i]["Source"] == source:
+                    self.createtablemodel.beginRemoveRows(QModelIndex(),i,i)
+                    del self.createtablemodel.metadataList[i]
+                    self.createtablemodel.endRemoveRows()
+                    break
+        else:
+            self.treeModel.changeLeafCheck(source)
 
     def help(self):
         print("Help")
@@ -338,7 +346,7 @@ class MainWindow(QMainWindow):
             self.createTreeSearchFilterModel.setRecursiveFilteringEnabled(True)
             self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
-            self.trashDelegate.pressed.connect(self.treeModel.changeLeafCheck)
+            self.trashDelegate.pressed.connect(self.handleRemove)
 
         return True
 
