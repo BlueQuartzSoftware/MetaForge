@@ -241,7 +241,7 @@ class MainWindow(QMainWindow):
     def removeRowfromUseFileList(self, index):
         if self.ui.useTemplateListView.width() - 32 < self.ui.useTemplateListView.mapFromGlobal(QCursor.pos()).x():
             #this is where to remove the row
-            print(" ouch " + str(index.row()) )
+            self.uselistmodel.removeRow(index.row())
 
     def resizeEvent(self, event):
         super().resizeEvent(event)

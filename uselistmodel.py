@@ -54,5 +54,10 @@ class ListModel(QAbstractListModel):
         self.metadataList.append(filename)
         self.endInsertRows()
 
+    def removeRow(self, rowIndex):
+        self.beginRemoveRows(QModelIndex(),rowIndex, rowIndex)
+        del self.metadataList[rowIndex]
+        self.endRemoveRows()
+
 
 
