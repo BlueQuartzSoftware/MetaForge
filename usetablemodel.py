@@ -11,7 +11,7 @@ class TableModelU(QAbstractTableModel):
     in this section. This will make it easier to move columns around and rename items.
     """
     # Total Number of Columns
-    K_COL_COUNT = 8
+    K_COL_COUNT = 7
 
     # These are some misc strings that are used.
     K_CUSTOM_INPUT = "Custom Input"
@@ -25,29 +25,32 @@ class TableModelU(QAbstractTableModel):
     K_UNITS_META_KEY = "Units"
 
     # These are the user facing header and the index of each column in the table.
+    K_SOURCE_COL_NAME = "Source"
+    K_SOURCE_COL_INDEX = 0
+
+    K_USESOURCE_COL_NAME = "Use Source Value"
+    K_USESOURCE_COL_INDEX = 1
+
     K_HTKEY_COL_NAME = "HT Name"
-    K_HTKEY_COL_INDEX = 0
+    K_HTKEY_COL_INDEX = 2
 
     K_HTVALUE_COL_NAME = "HT Value"
-    K_HTVALUE_COL_INDEX = 1
+    K_HTVALUE_COL_INDEX = 3
 
     K_HTANNOTATION_COL_NAME = "HT Annotation"
-    K_HTANNOTATION_COL_INDEX = 2
+    K_HTANNOTATION_COL_INDEX = 4
 
     K_HTUNITS_COL_NAME = "HT Units"
-    K_HTUNITS_COL_INDEX = 3
+    K_HTUNITS_COL_INDEX = 5
 
-    K_SOURCE_COL_NAME = "Source"
-    K_SOURCE_COL_INDEX = 4
+    K_REMOVE_COL_NAME = "Remove Row"
+    K_REMOVE_COL_INDEX = 6
 
-    K_UUID_COL_NAME = "UUID"
-    K_UUID_COL_INDEX = 5
+#    K_REQUIRE_COL_NAME = "Required"
+#    K_REQUIRE_COL_INDEX = 6
 
-    K_REQUIRE_COL_NAME = "Required"
-    K_REQUIRE_COL_INDEX = 6
-
-    K_EDITABLE_COL_NAME = "Editable"
-    K_EDITABLE_COL_INDEX = 7
+#    K_EDITABLE_COL_NAME = "Editable"
+#    K_EDITABLE_COL_INDEX = 7
 
     def __init__(self, data, metadataList, parent=None):
         QAbstractTableModel.__init__(self, parent)
@@ -69,13 +72,12 @@ class TableModelU(QAbstractTableModel):
             self.templatelist.append(newList[i])
             self.templatesources.append(
                 "/".join(newList[i]['Source'].split("/")[1:]))
-            print(self.templatelist)
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.metadataList)
 
     def columnCount(self, parent=QModelIndex()):
-        return 6
+        return 7
 
     def data(self, index, role):
         if role == Qt.DisplayRole:
@@ -89,8 +91,9 @@ class TableModelU(QAbstractTableModel):
                 return self.metadataList[index.row()][self.K_UNITS_META_KEY]
             elif index.column() == self.K_SOURCE_COL_INDEX:
                 return self.metadataList[index.row()][self.K_SOURCE_META_KEY]
-            elif index.column() == self.K_UUID_COL_INDEX:
-                return ""
+        elif role == Qt.CheckStateRole:
+            if index.column() == self.K_USESOURCE_COL_INDEX:
+                return 2
 
         return None
 
@@ -108,8 +111,10 @@ class TableModelU(QAbstractTableModel):
                 return self.K_HTUNITS_COL_NAME
             elif section == self.K_SOURCE_COL_INDEX:
                 return self.K_SOURCE_COL_NAME
-            elif section == self.K_UUID_COL_INDEX:
-                return self.K_UUID_COL_NAME
+            elif section == self.K_REMOVE_COL_INDEX:
+                return self.K_REMOVE_COL_NAME
+            elif section == self.K_USESOURCE_COL_INDEX:
+                return self.K_USESOURCE_COL_NAME
 
             return None
 
@@ -144,14 +149,12 @@ class TableModelU(QAbstractTableModel):
             elif index.column() == self.K_HTUNITS_COL_INDEX:
                 self.metadataList[index.row()][self.K_UNITS_META_KEY] = value
                 self.dataChanged.emit(index, index)
-            elif index.column() == self.K_UUID_COL_INDEX:
-                pass
 
             return True
         elif role == Qt.CheckStateRole:
-            if index.column() == self.K_REQUIRE_COL_INDEX or index.column() == self.K_EDITABLE_COL_INDEX:
-                self.changeChecked(index)
-            self.dataChanged.emit(index, index)
+            if index.column() == self.K_UUID_COL_INDEX:
+                pass
+            #self.dataChanged.emit(index, index)
             return True
 
         return False
@@ -159,7 +162,7 @@ class TableModelU(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemIsEnabled
-        if index.column() == self.K_HTUNITS_COL_INDEX:
+        if index.column() == self.K_HTUNITS_COL_INDEX or index.column() == self.K_REMOVE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
         else:
             if index.data() == "":

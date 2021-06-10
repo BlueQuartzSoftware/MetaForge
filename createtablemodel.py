@@ -32,11 +32,11 @@ class TableModelC(QAbstractTableModel):
     K_SOURCE_COL_NAME = "Source"
     K_SOURCE_COL_INDEX = 1
 
-    K_HTNAME_COL_NAME = "HT Name"
-    K_HTNAME_COL_INDEX = 2
-
     K_SOURCEVAL_COL_NAME = "Source Value"
-    K_SOURCEVAL_COL_INDEX = 3
+    K_SOURCEVAL_COL_INDEX = 2
+
+    K_HTNAME_COL_NAME = "HT Name"
+    K_HTNAME_COL_INDEX = 3
 
     K_HTVALUE_COL_NAME = "HT Value"
     K_HTVALUE_COL_INDEX = 4

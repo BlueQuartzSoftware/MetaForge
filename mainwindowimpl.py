@@ -58,14 +58,14 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.createtablemodel.K_HTVALUE_COL_INDEX,QHeaderView.ResizeToContents)
         self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_USESOURCE_COL_INDEX, self.width() * .1)
 
-        self.trashDelegate = TrashDelegate()
-        self.ui.metadataTableView.setItemDelegateForColumn(self.createtablemodel.K_REMOVE_COL_INDEX, self.trashDelegate)
+        self.createtrashDelegate = TrashDelegate()
+        self.ui.metadataTableView.setItemDelegateForColumn(self.createtablemodel.K_REMOVE_COL_INDEX, self.createtrashDelegate)
         self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_REMOVE_COL_INDEX,self.width()*.05)
 
         self.treeModel = TreeModel(["Available File Metadata"],aTree,self.createtablemodel)
         self.ui.metadataTreeView.setModel(self.treeModel)
         self.treeModel.checkChanged.connect(self.filterModel.checkList)
-        self.trashDelegate.pressed.connect(self.handleRemove)
+        self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
 
         self.usetablemodel = TableModelU(self,[])
         self.usefilterModel = FilterModelU(self)
@@ -74,6 +74,10 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTKEY_COL_INDEX,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTVALUE_COL_INDEX,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_SOURCE_COL_INDEX,self.width()*.25)
+        self.usetrashDelegate = TrashDelegate()
+        self.ui.useTemplateTableView.setItemDelegateForColumn(self.usetablemodel.K_REMOVE_COL_INDEX, self.usetrashDelegate)
+        self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_REMOVE_COL_INDEX,self.width()*.05)
+        self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
 
         self.uselistmodel = ListModel(self, self.usetablemodel,[])
         self.ui.useTemplateListView.setModel(self.uselistmodel)
@@ -201,7 +205,7 @@ class MainWindow(QMainWindow):
 
         self.folderuuid = self.hyperthoughtui.path + self.hyperthoughtui.stringlistmodel.uuidList[locationindex] + ","
 
-    def handleRemove(self, source):
+    def handleRemoveCreate(self, source):
         if "Custom Input" in source:
             for i in range(len(self.createtablemodel.metadataList)):
                 if self.createtablemodel.metadataList[i]["Source"] == source:
@@ -211,6 +215,14 @@ class MainWindow(QMainWindow):
                     break
         else:
             self.treeModel.changeLeafCheck(source)
+
+    def handleRemoveUse(self, source):
+        for i in range(len(self.usetablemodel.metadataList)):
+            if self.usetablemodel.metadataList[i]["Source"] == source:
+                self.usetablemodel.beginRemoveRows(QModelIndex(),i,i)
+                del self.usetablemodel.metadataList[i]
+                self.usetablemodel.endRemoveRows()
+                break
 
     def help(self):
         print("Help")
@@ -346,7 +358,7 @@ class MainWindow(QMainWindow):
             self.createTreeSearchFilterModel.setRecursiveFilteringEnabled(True)
             self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
-            self.trashDelegate.pressed.connect(self.handleRemove)
+            self.trashDelegate.pressed.connect(self.handleRemoveCreate)
 
         return True
 
