@@ -17,7 +17,7 @@ class FilterModel(QSortFilterProxyModel):
         return self.sourceModel().metadataList[source_row] not in self.sourceModel().hiddenList or self.sourceModel().metadataList[source_row] == "Custom Input"
 
     def checkList(self,checked,source):
-        if source == "Custom Input":
+        if "Custom Input" in source:
             self.setFilterRegExp(QRegExp())
         else:
             sourcelist= source.split("/")

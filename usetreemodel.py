@@ -52,6 +52,7 @@ class TreeModelU(QAbstractItemModel):
 
         for i in range(len(self.tablemodel.newmetadataList)):
             self.tablemodel.addRow(self.tablemodel.newmetadataList[i]["Key"], self.tablemodel.newmetadataList[i]["Source"], self.tablemodel.newmetadataList[i]["Value"])
+
         self.tablemodel.newmetadataList = []
         self.tablemodel.newmetadatasources = []
 

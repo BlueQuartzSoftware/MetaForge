@@ -70,8 +70,10 @@ class TableModelU(QAbstractTableModel):
 
         for i in range(len(newList)):
             self.templatelist.append(newList[i])
-            self.templatesources.append(
-                "/".join(newList[i]['Source'].split("/")[1:]))
+            if "Custom Input" not in newList[i]["Source"]:
+                self.templatesources.append("/".join(newList[i]['Source'].split("/")[1:]))
+            else:
+                self.addRow(newList[i]['Key'],newList[i]['Source'],newList[i]['Value'])
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.metadataList)

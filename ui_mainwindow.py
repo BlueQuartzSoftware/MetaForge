@@ -46,6 +46,8 @@ class Ui_MainWindow(object):
         self.actionHelp.setObjectName(u"actionHelp")
         self.actionSave_Template = QAction(MainWindow)
         self.actionSave_Template.setObjectName(u"actionSave_Template")
+        self.actionOpen_Template = QAction(MainWindow)
+        self.actionOpen_Template.setObjectName(u"actionOpen_Template")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_4 = QGridLayout(self.centralwidget)
@@ -399,6 +401,7 @@ class Ui_MainWindow(object):
         self.menubar.addAction(self.menuFile.menuAction())
         self.menubar.addAction(self.menuHelp.menuAction())
         self.menuFile.addAction(self.actionOpenPackage)
+        self.menuFile.addAction(self.actionOpen_Template)
         self.menuFile.addAction(self.actionOpen_Recent)
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionSave_Package)
@@ -411,7 +414,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(1)
+        self.TabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -428,6 +431,7 @@ class Ui_MainWindow(object):
         self.actionClose.setText(QCoreApplication.translate("MainWindow", u"Close ", None))
         self.actionHelp.setText(QCoreApplication.translate("MainWindow", u"Help", None))
         self.actionSave_Template.setText(QCoreApplication.translate("MainWindow", u"Save Template", None))
+        self.actionOpen_Template.setText(QCoreApplication.translate("MainWindow", u"Restore Template", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Data File:", None))
         self.dataFileLineEdit.setText("")
         self.dataFileSelect.setText(QCoreApplication.translate("MainWindow", u"Select", None))
@@ -442,7 +446,7 @@ class Ui_MainWindow(object):
         self.appendCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"...", None))
         self.createTemplateTreeSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.createTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
-        self.saveTemplateButton.setText(QCoreApplication.translate("MainWindow", u"Save Template", None))
+        self.saveTemplateButton.setText(QCoreApplication.translate("MainWindow", u"Save Template as ...", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.CreateTemplateTab), QCoreApplication.translate("MainWindow", u"Create Template", None))
         self.hyperthoughtTemplateLabel.setText(QCoreApplication.translate("MainWindow", u"Template File: ", None))
         self.hyperthoughtTemplateLineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"example.ez", None))

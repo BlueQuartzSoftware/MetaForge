@@ -151,16 +151,21 @@ class TableModelC(QAbstractTableModel):
                     self.metadataList[index.row(
                     )][self.K_HTVALUE_COL_NAME] = self.K_FROM_SOURCE
                 else:
+                    if "Custom Input" not in self.metadataList[index.row()]["Source"]:
+                        self.dataChanged.emit(index, index)
+                        treeDict = self.treeDict
+                        sourcePath = self.metadataList[index.row()][self.K_SOURCE_COL_NAME].split(
+                            "/")
+                        for i in range(len(sourcePath)-1):
+                            treeDict = treeDict[sourcePath[i]]
+                        treeDict[sourcePath[-1]] = value
+                        self.metadataList[index.row(
+                        )][self.K_HTVALUE_COL_NAME] = value
+
+                    else:
+                        self.metadataList[index.row()]["HT Value"] = value
                     self.dataChanged.emit(index, index)
-                    treeDict = self.treeDict
-                    sourcePath = self.metadataList[index.row()][self.K_SOURCE_COL_NAME].split(
-                        "/")
-                    for i in range(len(sourcePath)-1):
-                        treeDict = treeDict[sourcePath[i]]
-                    treeDict[sourcePath[-1]] = value
-                    self.metadataList[index.row(
-                    )][self.K_HTVALUE_COL_NAME] = value
-                    self.dataChanged.emit(index, index)
+
             #elif index.column() == self.K_REMOVE_COL_INDEX:
 #                self.metadataList.remove(index.row())
 

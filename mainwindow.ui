@@ -39,7 +39,7 @@
     <item row="0" column="1">
      <widget class="QTabWidget" name="TabWidget">
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="CreateTemplateTab">
        <attribute name="title">
@@ -344,7 +344,7 @@
               <item>
                <widget class="QPushButton" name="saveTemplateButton">
                 <property name="text">
-                 <string>Save Template</string>
+                 <string>Save Template as ...</string>
                 </property>
                </widget>
               </item>
@@ -611,6 +611,7 @@
      <string>File</string>
     </property>
     <addaction name="actionOpenPackage"/>
+    <addaction name="actionOpen_Template"/>
     <addaction name="actionOpen_Recent"/>
     <addaction name="separator"/>
     <addaction name="actionSave_Package"/>
@@ -700,6 +701,11 @@
   <action name="actionSave_Template">
    <property name="text">
     <string>Save Template</string>
+   </property>
+  </action>
+  <action name="actionOpen_Template">
+   <property name="text">
+    <string>Restore Template</string>
    </property>
   </action>
  </widget>
