@@ -2,7 +2,14 @@
 #!/usr/bin/env python3
 import sys
 import os
+import platform
 
+# This is necessary for MacOS 11.0 (10.16) and up to launch the application properly
+if platform.system() == 'Darwin':
+    v, _, _ = platform.mac_ver()
+    v = float('.'.join(v.split('.')[:2]))
+    if v >= 10.16:
+        os.environ["QT_MAC_WANTS_LAYER"] = "1"
 
 from PySide2.QtWidgets import QApplication, QWidget, QMainWindow
 from PySide2.QtCore import QFile, QIODevice, QObject
@@ -16,7 +23,7 @@ from mainwindowimpl import MainWindow
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationDisplayName("MetaForge")
-    app.setWindowIcon(QIcon('applicationIcon.png'));
+    app.setWindowIcon(QIcon('applicationIcon.png'))
     window = MainWindow()
     window.show()
 
