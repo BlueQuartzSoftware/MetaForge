@@ -1,7 +1,7 @@
 # This Python file uses the following encoding: utf-8
 
 from PySide2.QtWidgets import QApplication, QButtonGroup, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView, QToolButton, QStyle, QProgressDialog, QDialog
-from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot, QRegExp, QThread,QModelIndex
+from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot, QRegExp, QThread,QModelIndex, QEvent
 from PySide2.QtGui import QCloseEvent, QCursor, QDesktopServices
 from ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
@@ -112,6 +112,8 @@ class MainWindow(QMainWindow):
         self.createUpload.connect(self.uploader.performUpload)
         self.hyperthoughtui.apiSubmitted.connect(self.acceptKey)
         self.hyperthoughtui.finished.connect(self.getLocation)
+        self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
+        self.ui.otherDataFileLineEdit.installEventFilter(self)
 
 
     def acceptKey(self, apikey):
@@ -185,6 +187,20 @@ class MainWindow(QMainWindow):
                 self.usesearchFilterModel.setDynamicSortFilter(True)
                 self.ui.useTemplateTableView.setModel(self.usesearchFilterModel)
 
+    def eventFilter(self, object, event):
+        if object == self.ui.hyperthoughtTemplateLineEdit:
+            if event.type() == QEvent.DragEnter:
+                if str(event.mimeData().urls()[0])[-5:-2] == ".ez":
+                    event.acceptProposedAction()
+            if (event.type() == QEvent.Drop):
+                if str(event.mimeData().urls()[0])[-5:-2] == ".ez":
+                    event.acceptProposedAction()
+                    self.selectTemplate(event.mimeData().urls()[0].toLocalFile())
+
+
+        return QMainWindow.eventFilter(self, object,  event)
+
+
     def filterCreateTable(self):
         self.createTableSearchFilterModel.invalidate()
         self.createTableSearchFilterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
@@ -228,7 +244,6 @@ class MainWindow(QMainWindow):
                 break
 
     def help(self):
-
         QDesktopServices.openUrl("http://www.bluequartz.net/")
 
     def movethedamnbutton(self):
@@ -416,9 +431,13 @@ class MainWindow(QMainWindow):
 
         return True
 
-    def selectTemplate(self):
-        linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
-        QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
+    def selectTemplate(self,fileLink = None):
+        if fileLink == None:
+            linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
+            QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
+        else:
+            linetext = fileLink
+
         if linetext != "":
             self.usetablemodel.metadataList = []
             self.usefilterModel.displayed = []
@@ -438,6 +457,7 @@ class MainWindow(QMainWindow):
             self.usetablemodel.addTemplateList(self.templatedata)
             self.usefilterModel.setFilterRegExp(QRegExp())
             infile.close()
+
 
         return True
 
