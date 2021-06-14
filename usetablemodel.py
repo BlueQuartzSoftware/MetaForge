@@ -170,7 +170,7 @@ class TableModelU(QAbstractTableModel):
             if index.data() == "":
                 return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
             else:
-                return Qt.ItemIsEnabled
+                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEnabled)
 
     def prepRow(self, dataDict, source, value):
         self.newmetadataList.append(

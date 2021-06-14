@@ -226,7 +226,7 @@ class TableModelC(QAbstractTableModel):
              self.K_CHECKED_META_KEY: 0,
              self.K_REQUIRED_META_KEY: 0,
              self.K_EDITABLE_META_KEY: 0,
-             self.K_DEFAULT_META_KEY: 0})
+             self.K_DEFAULT_META_KEY: 2})
         self.endInsertRows()
 
     def addEmptyRow(self,numCustom):
@@ -240,5 +240,5 @@ class TableModelC(QAbstractTableModel):
              self.K_CHECKED_META_KEY: 0,
              self.K_REQUIRED_META_KEY: 0,
              self.K_EDITABLE_META_KEY: 0,
-             self.K_DEFAULT_META_KEY: 2})
+             self.K_DEFAULT_META_KEY: 0})
         self.endInsertRows()

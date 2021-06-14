@@ -75,9 +75,11 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTKEY_COL_INDEX,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTVALUE_COL_INDEX,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_SOURCE_COL_INDEX,self.width()*.25)
+        self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_USESOURCE_COL_INDEX,self.width()*.1)
+        self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTANNOTATION_COL_INDEX,self.width()*.1)
         self.usetrashDelegate = TrashDelegate()
         self.ui.useTemplateTableView.setItemDelegateForColumn(self.usetablemodel.K_REMOVE_COL_INDEX, self.usetrashDelegate)
-        self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_REMOVE_COL_INDEX,self.width()*.05)
+        self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_REMOVE_COL_INDEX,self.width()*.075)
         self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
 
         self.uselistmodel = ListModel(self, self.usetablemodel,[])
@@ -296,7 +298,6 @@ class MainWindow(QMainWindow):
                 if "Custom Input" in newList[i]["Source"]:
                     self.createtablemodel.beginInsertRows(self.createtablemodel.index(len(self.createtablemodel.metadataList), 0), i, i)
                     self.createtablemodel.metadataList.append(newList[i])
-                    print(i, len(self.createtablemodel.metadataList))
                     self.createtablemodel.endInsertRows()
             self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
             self.createTreeSearchFilterModel.setSourceModel(self.treeModel)
