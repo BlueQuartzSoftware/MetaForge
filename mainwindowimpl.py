@@ -232,7 +232,7 @@ class MainWindow(QMainWindow):
         QDesktopServices.openUrl("http://www.bluequartz.net/")
 
     def movethedamnbutton(self):
-        self.appendSourceFilesButton.move(self.ui.useTemplateListView.width() - self.appendSourceFilesButton.width(),self.ui.useTemplateListView.height() - self.appendSourceFilesButton.height())
+        self.appendSourceFilesButton.move(self.ui.useTemplateListView.width() - self.appendSourceFilesButton.width() - 15,self.ui.useTemplateListView.height() - self.appendSourceFilesButton.height())
 
     def openRecent(self):
         print("Clicked Open Recent.")

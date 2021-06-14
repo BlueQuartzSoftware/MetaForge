@@ -242,6 +242,7 @@ class Ui_MainWindow(object):
         self.useTemplateListView.setSizePolicy(sizePolicy3)
         self.useTemplateListView.setMinimumSize(QSize(325, 0))
         self.useTemplateListView.setAcceptDrops(True)
+        self.useTemplateListView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.useTemplateListView.setAlternatingRowColors(True)
 
         self.horizontalLayout_13.addWidget(self.useTemplateListView)
@@ -414,7 +415,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(0)
+        self.TabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
