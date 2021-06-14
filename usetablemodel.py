@@ -166,11 +166,13 @@ class TableModelU(QAbstractTableModel):
             return Qt.ItemIsEnabled
         if index.column() == self.K_HTUNITS_COL_INDEX or index.column() == self.K_REMOVE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+        elif index.column() == self.K_SOURCE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
+            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
         else:
             if index.data() == "":
                 return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
             else:
-                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEnabled)
+                return Qt.ItemIsEnabled
 
     def prepRow(self, dataDict, source, value):
         self.newmetadataList.append(

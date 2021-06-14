@@ -432,11 +432,12 @@ class MainWindow(QMainWindow):
         return True
 
     def selectTemplate(self,fileLink = None):
-        if fileLink == None:
+        if fileLink == False:
             linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
             QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
         else:
             linetext = fileLink
+        print(fileLink)
 
         if linetext != "":
             self.usetablemodel.metadataList = []
