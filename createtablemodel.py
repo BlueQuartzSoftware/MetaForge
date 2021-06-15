@@ -223,9 +223,9 @@ class TableModelC(QAbstractTableModel):
              self.K_VALUE_META_KEY: dataDict[value],
              self.K_SOURCE_META_KEY: source+value,
              self.K_HTVALUE_COL_NAME: self.K_FROM_SOURCE,
-             self.K_CHECKED_META_KEY: 0,
+             self.K_CHECKED_META_KEY: 2,
              self.K_REQUIRED_META_KEY: 0,
-             self.K_EDITABLE_META_KEY: 0,
+             self.K_EDITABLE_META_KEY: 2,
              self.K_DEFAULT_META_KEY: 2})
         self.endInsertRows()
 
@@ -237,8 +237,8 @@ class TableModelC(QAbstractTableModel):
              self.K_VALUE_META_KEY: "",
              self.K_SOURCE_META_KEY: self.K_CUSTOM_INPUT+" "+str(numCustom),
              self.K_HTVALUE_COL_NAME: "",
-             self.K_CHECKED_META_KEY: 0,
+             self.K_CHECKED_META_KEY: 2,
              self.K_REQUIRED_META_KEY: 0,
-             self.K_EDITABLE_META_KEY: 0,
+             self.K_EDITABLE_META_KEY: 2,
              self.K_DEFAULT_META_KEY: 0})
         self.endInsertRows()

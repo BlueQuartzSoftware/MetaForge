@@ -28,10 +28,11 @@ class FilterModel(QSortFilterProxyModel):
                 key=sourcelist[i]
                 sourceDict=sourceDict[key]
                 i+=1
-            if checked == Qt.Unchecked:
+            if checked == 0:
                 for j in range(len(self.sourceModel().metadataList)):
                     if source in self.sourceModel().metadataList[j]["Source"]:
                         self.sourceModel().hiddenList.append(self.sourceModel().metadataList[j])
+                        self.sourceModel().metadataList[j]["Checked"] = checked
                     iteratelist = self.displayed[:]
                     newj = 0
                     for j in range(len(iteratelist)):
@@ -48,3 +49,4 @@ class FilterModel(QSortFilterProxyModel):
                         newj+=1
 
             self.setFilterRegExp(QRegExp())
+

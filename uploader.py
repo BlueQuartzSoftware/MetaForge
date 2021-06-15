@@ -19,6 +19,10 @@ class Uploader(QObject):
     def performUpload(self,metadataList ,authControl, ht_id_path, metadata):
         self.interrupt = False
         for i in tqdm(range(len(metadataList)), desc = "Uploading Files"):
+            if not QFile.exists(metadataList[i]):
+                print("file no longer exists")
+                break
+
             if self.interrupt:
                 break
             self.currentlyUploading.emit("Currently uploading: "+ metadataList[i].split("/")[-1])

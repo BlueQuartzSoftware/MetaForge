@@ -9,6 +9,7 @@ from createtablemodel	import TableModelC
 from usetablemodel import TableModelU
 from uselistmodel import ListModel
 from treemodel import TreeModel
+from treemodelrestore import TreeModelR
 from usetreemodel import TreeModelU
 from filterModel import FilterModel
 from usefiltermodel import FilterModelU
@@ -157,10 +158,12 @@ class MainWindow(QMainWindow):
         self.mThread.wait(250)
 
 
-    def extractFile(self):
-        if self.fileType:
+    def extractFile(self, fileLink = False):
+        if fileLink == False:
             linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
             QStandardPaths.HomeLocation),self.tr("Files (*"+self.fileType+")"))[0]
+        else:
+            linetext = fileLink
         if linetext != "":
             self.setWindowTitle(linetext)
             self.ui.dataTypeText.setText(linetext.split(".")[1].upper())
@@ -174,6 +177,7 @@ class MainWindow(QMainWindow):
                 headerDict =ang.parse_header_as_dict(linetext)
             elif linetext.split(".")[1].upper() == "XML":
                 print("XML Parser used")
+
 
             if self.templatedata:
                 self.usetablemodel.metadataList = []
@@ -196,6 +200,14 @@ class MainWindow(QMainWindow):
                 if str(event.mimeData().urls()[0])[-5:-2] == ".ez":
                     event.acceptProposedAction()
                     self.selectTemplate(event.mimeData().urls()[0].toLocalFile())
+        if object == self.ui.otherDataFileLineEdit:
+            if event.type() == QEvent.DragEnter:
+                if str(event.mimeData().urls()[0])[-6:-2] == self.fileType:
+                    event.acceptProposedAction()
+            if (event.type() == QEvent.Drop):
+                if str(event.mimeData().urls()[0])[-6:-2] == self.fileType:
+                    event.acceptProposedAction()
+                    self.extractFile(event.mimeData().urls()[0].toLocalFile())
 
 
         return QMainWindow.eventFilter(self, object,  event)
@@ -293,10 +305,6 @@ class MainWindow(QMainWindow):
             infile.readline()
             newList = infile.readline()
             newList = json.loads(newList)
-#            self.createtablemodel.beginInsertRows(self.createtablemodel.index(len(newList), 0), len(
-#            newList), len(newList))
-#            self.createtablemodel.metadataList = newList
-#            self.createtablemodel.endInsertRows
             newDict = infile.readline()
             newDict = json.loads(newDict)
             self.createtablemodel = TableModelC(newDict,self)
@@ -308,12 +316,15 @@ class MainWindow(QMainWindow):
             self.createTableSearchFilterModel.setFilterKeyColumn(1)
             self.createTableSearchFilterModel.setDynamicSortFilter(True)
             self.ui.metadataTableView.setModel(self.createTableSearchFilterModel)
-            self.treeModel = TreeModel(["Available File Metadata"],newDict,self.createtablemodel)
+            self.treeModel = TreeModelR(["Available File Metadata"],newDict,self.createtablemodel, newList,self.filterModel)
+
+
             for i in range(len(newList)):
                 if "Custom Input" in newList[i]["Source"]:
                     self.createtablemodel.beginInsertRows(self.createtablemodel.index(len(self.createtablemodel.metadataList), 0), i, i)
                     self.createtablemodel.metadataList.append(newList[i])
                     self.createtablemodel.endInsertRows()
+
             self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
             self.createTreeSearchFilterModel.setSourceModel(self.treeModel)
             self.createTreeSearchFilterModel.setFilterKeyColumn(0)
@@ -437,7 +448,7 @@ class MainWindow(QMainWindow):
             QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
         else:
             linetext = fileLink
-        print(fileLink)
+
 
         if linetext != "":
             self.usetablemodel.metadataList = []
