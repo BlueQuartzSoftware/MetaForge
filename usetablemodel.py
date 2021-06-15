@@ -23,6 +23,8 @@ class TableModelU(QAbstractTableModel):
     K_SOURCE_META_KEY = "Source"
     K_ANNOTATION_META_KEY = "Annotation"
     K_UNITS_META_KEY = "Units"
+    K_EDITABLE_META_KEY = "Editable"
+    K_USESOURCE_META_KEY = "Default"
 
     # These are the user facing header and the index of each column in the table.
     K_SOURCE_COL_NAME = "Source"
@@ -73,7 +75,7 @@ class TableModelU(QAbstractTableModel):
             if "Custom Input" not in newList[i]["Source"]:
                 self.templatesources.append("/".join(newList[i]['Source'].split("/")[1:]))
             else:
-                self.addRow(newList[i]['Key'],newList[i]['Source'],newList[i]['Value'])
+                self.addRow(newList[i])
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.metadataList)
@@ -95,7 +97,7 @@ class TableModelU(QAbstractTableModel):
                 return self.metadataList[index.row()][self.K_SOURCE_META_KEY]
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_USESOURCE_COL_INDEX:
-                return 2
+                return self.metadataList[index.row()][self.K_USESOURCE_META_KEY]
 
         return None
 
@@ -135,12 +137,6 @@ class TableModelU(QAbstractTableModel):
                     )][self.K_VALUE_META_KEY] = value
                     self.dataChanged.emit(index, index)
                 else:
-                    treeDict = self.treeDict
-                    sourcePath = self.metadataList[index.row()][self.K_SOURCE_META_KEY].split(
-                        "/")
-                    for i in range(len(sourcePath)-1):
-                        treeDict = treeDict[sourcePath[i]]
-                    treeDict[sourcePath[-1]] = value
                     self.metadataList[index.row(
                     )][self.K_VALUE_META_KEY] = value
                     self.dataChanged.emit(index, index)
@@ -164,12 +160,12 @@ class TableModelU(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemIsEnabled
-        if index.column() == self.K_HTUNITS_COL_INDEX or index.column() == self.K_REMOVE_COL_INDEX:
+        if index.column() == self.K_REMOVE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
         elif index.column() == self.K_SOURCE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
         else:
-            if index.data() == "":
+            if index.data() == "" or self.metadataList[index.row()]["Editable"]:
                 return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
             else:
                 return Qt.ItemIsEnabled
@@ -180,15 +176,17 @@ class TableModelU(QAbstractTableModel):
         newsource = source+value
         self.newmetadatasources.append("/".join(newsource.split("/")[1:]))
 
-    def addRow(self, key, source, value):
+    def addRow(self, row):
         self.beginInsertRows(self.index(len(self.metadataList), 0), len(
             self.metadataList), len(self.metadataList))
         self.metadataList.append(
-            {self.K_KEY_META_KEY: key,
-             self.K_VALUE_META_KEY: value,
-             self.K_SOURCE_META_KEY: source,
+            {self.K_KEY_META_KEY: row["Key"],
+             self.K_VALUE_META_KEY: row["Value"],
+             self.K_SOURCE_META_KEY: row["Source"],
              self.K_UNITS_META_KEY: "",
-             self.K_ANNOTATION_META_KEY: ""})
+             self.K_ANNOTATION_META_KEY: "",
+             self.K_EDITABLE_META_KEY: 2,
+             self.K_USESOURCE_META_KEY: 2})
         self.endInsertRows()
 
     def addEmptyRow(self):
@@ -199,5 +197,7 @@ class TableModelU(QAbstractTableModel):
              self.K_VALUE_META_KEY: "",
              self.K_SOURCE_META_KEY: self.K_CUSTOM_INPUT,
              self.K_UNITS_META_KEY: "",
-             self.K_ANNOTATION_META_KEY: ""})
+             self.K_ANNOTATION_META_KEY: "",
+             self.K_EDITABLE_META_KEY: 2,
+             self.K_USESOURCE_META_KEY: 0})
         self.endInsertRows()

@@ -184,7 +184,14 @@ class MainWindow(QMainWindow):
                 self.usefilterModel = FilterModelU(self)
                 self.usefilterModel.setSourceModel(self.usetablemodel)
                 self.unusedTreeModel = TreeModelU(["Available File Metadata"],headerDict,self.usetablemodel,self.requireds)
-
+                self.templatelist = []
+                self.templatesources = []
+                for i in range(len(self.templatedata)):
+                    self.templatelist.append(self.templatedata[i])
+                    if "Custom Input" not in self.templatedata[i]["Source"]:
+                        self.templatesources.append("/".join(self.templatedata[i]['Source'].split("/")[1:]))
+                    else:
+                        self.usetablemodel.addRow(self.templatedata[i])
                 self.usesearchFilterModel = QSortFilterProxyModel(self)
                 self.usesearchFilterModel.setSourceModel(self.usefilterModel)
                 self.usesearchFilterModel.setFilterKeyColumn(0)
@@ -290,7 +297,6 @@ class MainWindow(QMainWindow):
             infile.close()
 
     def restoreTemplate(self):
-        print("Got to open template")
         #Clear data on create side
         self.createtablemodel.metadataList = []
         self.createtablemodel.hiddenList = []
@@ -308,7 +314,7 @@ class MainWindow(QMainWindow):
             newDict = infile.readline()
             newDict = json.loads(newDict)
             self.createtablemodel = TableModelC(newDict,self)
-            self.filterModel.displayed=[]
+            self.filterModel.displayed = []
             self.filterModel.setSourceModel(self.createtablemodel)
             self.filterModel.fileList.append(linetext)
             self.createTableSearchFilterModel = QSortFilterProxyModel(self)

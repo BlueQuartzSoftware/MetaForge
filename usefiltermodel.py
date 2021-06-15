@@ -20,5 +20,5 @@ class FilterModelU(QSortFilterProxyModel):
             if self.sourceModel().metadataList[source_row] not in self.displayed:
                 self.displayed.append(self.sourceModel().metadataList[source_row])
 
-            return self.sourceModel().metadataList[source_row]['Source'] == "Custom Input"
+            return "Custom Input" in self.sourceModel().metadataList[source_row]['Source']
 
