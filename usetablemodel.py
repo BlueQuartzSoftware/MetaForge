@@ -150,7 +150,7 @@ class TableModelU(QAbstractTableModel):
 
             return True
         elif role == Qt.CheckStateRole:
-            if index.column() == self.K_UUID_COL_INDEX:
+            if index.column() == self.K_USESOURCE_COL_INDEX:
                 pass
             #self.dataChanged.emit(index, index)
             return True

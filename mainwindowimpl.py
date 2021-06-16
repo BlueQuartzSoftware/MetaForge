@@ -13,6 +13,7 @@ from treemodelrestore import TreeModelR
 from usetreemodel import TreeModelU
 from filterModel import FilterModel
 from usefiltermodel import FilterModelU
+from checkboxdelegate import CheckBoxDelegate
 from usefiledelegate import UseFileDelegate
 from trashdelegate import TrashDelegate
 from ht_requests.ht_requests import ht_utilities
@@ -60,9 +61,12 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.createtablemodel.K_HTVALUE_COL_INDEX,QHeaderView.ResizeToContents)
         self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_USESOURCE_COL_INDEX, self.width() * .1)
 
+        self.checkboxDelegate = CheckBoxDelegate()
         self.createtrashDelegate = TrashDelegate()
+        self.ui.metadataTableView.setItemDelegateForColumn(self.createtablemodel.K_USESOURCE_COL_INDEX, self.checkboxDelegate)
+        self.ui.metadataTableView.setItemDelegateForColumn(self.createtablemodel.K_EDITABLE_COL_INDEX, self.checkboxDelegate)
         self.ui.metadataTableView.setItemDelegateForColumn(self.createtablemodel.K_REMOVE_COL_INDEX, self.createtrashDelegate)
-        self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_REMOVE_COL_INDEX,self.width()*.05)
+        self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_REMOVE_COL_INDEX,self.width() * .05)
 
         self.treeModel = TreeModel(["Available File Metadata"],aTree,self.createtablemodel)
         self.ui.metadataTreeView.setModel(self.treeModel)
@@ -79,6 +83,7 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_USESOURCE_COL_INDEX,self.width()*.1)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTANNOTATION_COL_INDEX,self.width()*.1)
         self.usetrashDelegate = TrashDelegate()
+        self.ui.useTemplateTableView.setItemDelegateForColumn(self.usetablemodel.K_USESOURCE_COL_INDEX, self.checkboxDelegate)
         self.ui.useTemplateTableView.setItemDelegateForColumn(self.usetablemodel.K_REMOVE_COL_INDEX, self.usetrashDelegate)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_REMOVE_COL_INDEX,self.width()*.075)
         self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
@@ -115,6 +120,7 @@ class MainWindow(QMainWindow):
         self.hyperthoughtui.finished.connect(self.getLocation)
         self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
         self.ui.otherDataFileLineEdit.installEventFilter(self)
+        self.ui.dataFileLineEdit.installEventFilter(self)
 
 
     def acceptKey(self, apikey):
@@ -215,6 +221,14 @@ class MainWindow(QMainWindow):
                 if str(event.mimeData().urls()[0])[-6:-2] == self.fileType:
                     event.acceptProposedAction()
                     self.extractFile(event.mimeData().urls()[0].toLocalFile())
+        if object == self.ui.dataFileLineEdit:
+            if event.type() == QEvent.DragEnter:
+                if str(event.mimeData().urls()[0])[-6:-2] == ".ctf" or str(event.mimeData().urls()[0])[-6:-2] == ".ang":
+                    event.acceptProposedAction()
+            if (event.type() == QEvent.Drop):
+                if str(event.mimeData().urls()[0])[-6:-2] == ".ctf" or str(event.mimeData().urls()[0])[-6:-2] == ".ang":
+                    event.acceptProposedAction()
+                    self.selectFile(event.mimeData().urls()[0].toLocalFile())
 
 
         return QMainWindow.eventFilter(self, object,  event)
@@ -341,7 +355,7 @@ class MainWindow(QMainWindow):
             self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
 
     def removeRowfromUseFileList(self, index):
-        if self.ui.useTemplateListView.width() - 32 < self.ui.useTemplateListView.mapFromGlobal(QCursor.pos()).x():
+        if self.ui.useTemplateListView.width() - 64 < self.ui.useTemplateListView.mapFromGlobal(QCursor.pos()).x():
             #this is where to remove the row
             self.uselistmodel.removeRow(index.row())
 
@@ -410,9 +424,12 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 json.dump(self.treeModel.treeDict, outfile)
 
-    def selectFile(self):
-        linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
-        QStandardPaths.HomeLocation),self.tr("Files (*.ctf *.xml *.ang)"))[0]
+    def selectFile(self, fileLink = None):
+        if fileLink == False:
+            linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
+            QStandardPaths.HomeLocation),self.tr("Files (*.ctf *.xml *.ang)"))[0]
+        else:
+            linetext = fileLink
         if linetext != "":
             self.setWindowTitle(linetext)
             self.ui.dataFileLineEdit.setText(linetext)

@@ -4,6 +4,8 @@ from PySide2.QtWidgets import QStyledItemDelegate
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
+from resources_rc import *
+
 
 class TrashDelegate(QItemDelegate):
     pressed = Signal(str)
@@ -23,7 +25,7 @@ class TrashDelegate(QItemDelegate):
 
     def paint(self, painter, option, index):
         if index.column() == index.model().sourceModel().sourceModel().K_REMOVE_COL_INDEX:
-            icon = QApplication.style().standardIcon(QStyle.SP_DialogCancelButton)
+            icon = QIcon(QPixmap(':/resources/close-pushed@2x.png'))
             painter.save()
             line_1x = icon.pixmap(16,16)
             painter.drawPixmap(option.rect.x()+option.rect.width()/2 - 8 ,

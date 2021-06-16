@@ -16,14 +16,14 @@ from PySide2.QtCore import QFile, QIODevice, QObject
 from PySide2.QtGui import QIcon
 from ui_mainwindow import Ui_MainWindow
 from mainwindowimpl import MainWindow
-
+from resources_rc import *
 
 
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationDisplayName("MetaForge")
-    app.setWindowIcon(QIcon('applicationIcon.png'))
+    app.setWindowIcon(QIcon(':/resources/applicationIcon.png'))
     window = MainWindow()
     window.show()
 
