@@ -6,7 +6,6 @@ from PySide2.QtWidgets import QApplication, QMainWindow
 from treeitem import TreeItem
 from treemodel import TreeModel
 
-
 class TreeModelR(TreeModel):
     checkChanged = Signal(int, str)
     def __init__(self, headers, data, tablemodel, newList, filterModel,parent=None):

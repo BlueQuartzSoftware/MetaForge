@@ -48,13 +48,11 @@ class TableModelU(QAbstractTableModel):
     K_REMOVE_COL_NAME = "Remove Row"
     K_REMOVE_COL_INDEX = 6
 
-#    K_REQUIRE_COL_NAME = "Required"
-#    K_REQUIRE_COL_INDEX = 6
 
 #    K_EDITABLE_COL_NAME = "Editable"
 #    K_EDITABLE_COL_INDEX = 7
 
-    def __init__(self, data, metadataList, parent=None):
+    def __init__(self, data, metadataList, editables, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadataList = metadataList
         self.treeDict = metadataList
@@ -64,6 +62,7 @@ class TableModelU(QAbstractTableModel):
         self.newmetadatasources = []
 
         self.hiddenList = []
+        self.editableKeys = editables
 
     def addTemplateList(self, newList):
         self.metadataList = []
@@ -165,7 +164,7 @@ class TableModelU(QAbstractTableModel):
         elif index.column() == self.K_SOURCE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
         else:
-            if index.data() == "" or self.metadataList[index.row()]["Editable"]:
+            if index.data() == "" or self.metadataList[index.row()]["Editable"] == 2:
                 return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
             else:
                 return Qt.ItemIsEnabled
@@ -179,14 +178,26 @@ class TableModelU(QAbstractTableModel):
     def addRow(self, row):
         self.beginInsertRows(self.index(len(self.metadataList), 0), len(
             self.metadataList), len(self.metadataList))
-        self.metadataList.append(
-            {self.K_KEY_META_KEY: row["Key"],
-             self.K_VALUE_META_KEY: row["Value"],
-             self.K_SOURCE_META_KEY: row["Source"],
-             self.K_UNITS_META_KEY: "",
-             self.K_ANNOTATION_META_KEY: "",
-             self.K_EDITABLE_META_KEY: 2,
-             self.K_USESOURCE_META_KEY: 2})
+        if row["Key"] in self.editableKeys:
+            self.metadataList.append(
+                {self.K_KEY_META_KEY: row["Key"],
+                 self.K_VALUE_META_KEY: row["Value"],
+                 self.K_SOURCE_META_KEY: row["Source"],
+                 self.K_UNITS_META_KEY: "",
+                 self.K_ANNOTATION_META_KEY: "",
+                 self.K_EDITABLE_META_KEY: 2,
+                 self.K_USESOURCE_META_KEY: 2})
+        else:
+
+            self.metadataList.append(
+                {self.K_KEY_META_KEY: row["Key"],
+                 self.K_VALUE_META_KEY: row["Value"],
+                 self.K_SOURCE_META_KEY: row["Source"],
+                 self.K_UNITS_META_KEY: "",
+                 self.K_ANNOTATION_META_KEY: "",
+                 self.K_EDITABLE_META_KEY: 0,
+                 self.K_USESOURCE_META_KEY: 2})
+
         self.endInsertRows()
 
     def addEmptyRow(self):
@@ -200,4 +211,5 @@ class TableModelU(QAbstractTableModel):
              self.K_ANNOTATION_META_KEY: "",
              self.K_EDITABLE_META_KEY: 2,
              self.K_USESOURCE_META_KEY: 0})
+
         self.endInsertRows()

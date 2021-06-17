@@ -9,14 +9,14 @@ from treemodel import TreeModel
 
 class TreeModelU(TreeModel):
     checkChanged = Signal(int, str)
-    def __init__(self, headers, data, tablemodel, required,parent=None):
+    def __init__(self, headers, data, tablemodel, editables,parent=None):
         super(TreeModel, self).__init__(parent)
 
         rootData = [header for header in headers]
         self.rootItem = TreeItem(rootData)
         self.treeDict= data
         self.tablemodel = tablemodel
-        self.required = required
+        self.editableKeys = editables
         self.setupModelData(data, self.rootItem)
         self.checkList()
 
@@ -31,14 +31,6 @@ class TreeModelU(TreeModel):
                     self.tablemodel.newmetadataList = []
                     self.tablemodel.newmetadatasources = []
                     return
-        for i in range(len(self.tablemodel.newmetadataList)):
-            if (self.tablemodel.newmetadataList[i]["Key"] in self.required and self.tablemodel.newmetadataList[i]["Value"] == None) or (self.tablemodel.newmetadataList[i]["Key"] in self.required and self.tablemodel.newmetadataList[i]["Value"] == ""):
-                QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + "The file extracted is missing a value for this Key name: \n\n"+ self.tablemodel.newmetadataList[i]["Key"] + "\n\nPlease try a different file")
-                self.tablemodel.metadataList = []
-                self.tablemodel.metadatasources = []
-                self.tablemodel.newmetadataList = []
-                self.tablemodel.newmetadatasources = []
-                return
 
         for i in range(len(self.tablemodel.newmetadataList)):
             self.tablemodel.addRow(self.tablemodel.newmetadataList[i])

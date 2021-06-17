@@ -72,8 +72,9 @@ class MainWindow(QMainWindow):
         self.ui.metadataTreeView.setModel(self.treeModel)
         self.treeModel.checkChanged.connect(self.filterModel.checkList)
         self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
+        self.editableKeys = []
 
-        self.usetablemodel = TableModelU(self,[])
+        self.usetablemodel = TableModelU(self,[],self.editableKeys)
         self.usefilterModel = FilterModelU(self)
         self.usefilterModel.setSourceModel(self.usetablemodel)
         self.ui.useTemplateTableView.setModel(self.usefilterModel)
@@ -189,7 +190,7 @@ class MainWindow(QMainWindow):
                 self.usetablemodel.metadataList = []
                 self.usefilterModel = FilterModelU(self)
                 self.usefilterModel.setSourceModel(self.usetablemodel)
-                self.unusedTreeModel = TreeModelU(["Available File Metadata"],headerDict,self.usetablemodel,self.requireds)
+                self.unusedTreeModel = TreeModelU(["Available File Metadata"],headerDict,self.usetablemodel,self.editableKeys)
                 self.templatelist = []
                 self.templatesources = []
                 for i in range(len(self.templatedata)):
@@ -298,8 +299,8 @@ class MainWindow(QMainWindow):
             self.fileType = json.loads(infile.readline())
             fileList = infile.readline()
             fileList = json.loads(fileList)
-            requireds = infile.readline()
-            self.requireds = json.loads(requireds)
+            editables = infile.readline()
+            self.editable = json.loads(editables)
             self.usetablemodel = TableModelU(self,[])
             self.usetablemodel.templatelist = self.templatedata
             self.usetablemodel.templatesources = templatesources
@@ -382,7 +383,7 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 json.dump(self.uselistmodel.metadataList, outfile)
                 outfile.write("\n")
-                json.dump(self.requireds, outfile)
+                json.dump(self.editableKeys, outfile)
 
     def savePackageAs(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
@@ -398,13 +399,13 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 json.dump(self.usetablemodel.templatesources, outfile)
                 outfile.write("\n")
-                son.dump(self.createtablemodel.requiredList, outfile)
+                son.dump(self.createtablemodel.editableList, outfile)
                 outfile.write("\n")
                 json.dump(self.fileType, outfile)
                 outfile.write("\n")
                 json.dump(self.uselistmodel.metadataList, outfile)
                 outfile.write("\n")
-                json.dump(self.requireds, outfile)
+                json.dump(self.editableKeys, outfile)
 
     def saveTemplate(self):
         dialog = QFileDialog(self, "Save File","", "Templates (*.ez)")
@@ -418,7 +419,11 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 json.dump(self.filterModel.fileList, outfile)
                 outfile.write("\n")
-                json.dump(self.createtablemodel.requiredList, outfile)
+                self.createtablemodel.editableList = []
+                for i in range(len(self.createtablemodel.metadataList)):
+                    if self.createtablemodel.metadataList[i]["Editable"] == 2 and self.createtablemodel.metadataList[i]["Checked"] == 2:
+                        self.createtablemodel.editableList.append(self.createtablemodel.metadataList[i]["Key"])
+                json.dump(self.createtablemodel.editableList, outfile)
                 outfile.write("\n")
                 json.dump(self.createtablemodel.metadataList, outfile)
                 outfile.write("\n")
@@ -485,8 +490,9 @@ class MainWindow(QMainWindow):
             fileType = infile.readline()
             fileType= json.loads(fileType)
             self.fileType = fileType[0][-4:]
-            requireds = infile.readline()
-            self.requireds = json.loads(requireds)
+            editables = infile.readline()
+            self.editableKeys = json.loads(editables)
+            self.usetablemodel.editableKeys = self.editableKeys
             self.toggleButtons()
             self.templatedata = json.loads(data)
             self.usetablemodel.addTemplateList(self.templatedata)
