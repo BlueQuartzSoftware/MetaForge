@@ -28,8 +28,9 @@ class CheckBoxDelegate(QItemDelegate):
         if (event.type() == QEvent.MouseButtonRelease):
              checkRect = option.rect.adjusted((option.rect.width()/2)+ 20,(option.rect.height()/2),0,0)
              if not checkRect.contains(event.pos()):
-                pass
+                print("ouch")
              else:
+                print("not ouch")
                 return False
         else:
             return False
