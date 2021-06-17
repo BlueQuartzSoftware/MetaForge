@@ -147,19 +147,8 @@ class MainWindow(QMainWindow):
 
 
     def addAppendButton(self):
-
         self.appendSourceFilesButton= QToolButton(self.ui.useTemplateListView)
         icon = QApplication.style().standardIcon(QStyle.SP_FileIcon)
-        self.appendSourceFilesButton.setIcon(icon)
-        self.appendSourceFilesButton.resize(32,32)
-
-
-        icon = QApplication.style().standardIcon(QStyle.SP_FileIcon)
-        self.ui.appendUseTableRowButton.setIcon(icon)
-        self.ui.appendUseTableRowButton.resize(24,24)
-
-        self.ui.appendCreateTableRowButton.setIcon(icon)
-        self.ui.appendCreateTableRowButton.resize(24,24)
 
 
     def addUseTableRow(self):
@@ -209,6 +198,8 @@ class MainWindow(QMainWindow):
                 self.usesearchFilterModel.setFilterKeyColumn(0)
                 self.usesearchFilterModel.setDynamicSortFilter(True)
                 self.ui.useTemplateTableView.setModel(self.usesearchFilterModel)
+        
+        self.toggleButtons()
 
     def eventFilter(self, object, event):
         if object == self.ui.hyperthoughtTemplateLineEdit:
@@ -259,9 +250,7 @@ class MainWindow(QMainWindow):
         remoteDirPath = self.hyperthoughtui.getUploadDirectory()
         self.folderuuid = ht_requests.get_ht_id_path_from_ht_path(self.hyperthoughtui.authcontrol, ht_path=remoteDirPath)
         self.ui.hyperthoughtLocationLineEdit.setText(remoteDirPath)
-        #self.toggleButtons()
-
-        #self.folderuuid = self.hyperthoughtui.path + self.hyperthoughtui.stringlistmodel.uuidList[locationindex] + ","
+        self.toggleButtons()
 
     def handleRemoveCreate(self, source):
         if "Custom Input" in source:
@@ -473,7 +462,8 @@ class MainWindow(QMainWindow):
             self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
             self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
-
+        
+        self.toggleButtons()
         return True
 
     def selectTemplate(self,fileLink = None):
@@ -513,13 +503,17 @@ class MainWindow(QMainWindow):
         self.movethedamnbutton()
 
     def toggleButtons(self):
-        self.ui.otherDataFileSelect.setEnabled(self.fileType != "")
-        self.ui.hyperthoughtLocationButton.setEnabled(self.uselistmodel.metadataList != [])
-        self.ui.hyperthoughtUploadButton.setEnabled(self.ui.hyperthoughtLocationLineEdit.text() != "")
+        if (self.ui.hyperthoughtTemplateLineEdit.text() != "" and
+            self.ui.otherDataFileLineEdit.text() != "" and
+            self.ui.useTemplateListView.model().rowCount() > 0 and
+            self.ui.hyperthoughtLocationLineEdit.text() != "") :
+            
+            self.ui.hyperthoughtUploadButton.setEnabled(True)
 
     def uploadToHyperthought(self):
         auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)
         metadataJson = ht_utilities.dict_to_ht_metadata(self.usefilterModel.displayed)
+        print(metadataJson)
         progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(self.uselistmodel.metadataList), self)
         self.createUpload.emit(self.uselistmodel.metadataList, auth_control, self.folderuuid, metadataJson)
         self.uploader.currentUploadDone.connect(progress.setValue)

@@ -44,6 +44,9 @@ def dict_to_ht_metadata(metadata_dict):
 
     metadataJson = []
     for i in range(len(metadata_dict)):
-      metadataJson.append({ 'keyName': metadata_dict[i]['Key'], 'value': {'type': 'string', 'link': metadata_dict[i]['Value']}, 'unit': metadata_dict[i]['Units'], 'annotation': metadata_dict[i]['Annotation']})
+        if metadata_dict[i]['Default'] == 2:
+            metadataJson.append({ 'keyName': metadata_dict[i]['Key'], 'value': {'type': 'string', 'link': metadata_dict[i]['Value']}, 'unit': metadata_dict[i]['Units'], 'annotation': metadata_dict[i]['Annotation']})
+        elif metadata_dict[i]['Default'] == 0:
+            metadataJson.append({ 'keyName': metadata_dict[i]['Key'], 'value': {'type': 'string', 'link': metadata_dict[i]['HT Value']}, 'unit': metadata_dict[i]['Units'], 'annotation': metadata_dict[i]['Annotation']})
     return metadataJson
 

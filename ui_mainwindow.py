@@ -12,12 +12,13 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
+import resources_rc
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1379, 686)
+        MainWindow.resize(1216, 724)
         MainWindow.setMinimumSize(QSize(0, 0))
         self.actionOpenPackage = QAction(MainWindow)
         self.actionOpenPackage.setObjectName(u"actionOpenPackage")
@@ -135,6 +136,10 @@ class Ui_MainWindow(object):
 
         self.appendCreateTableRowButton = QToolButton(self.CreateTemplateTab)
         self.appendCreateTableRowButton.setObjectName(u"appendCreateTableRowButton")
+        icon = QIcon()
+        icon.addFile(u":/resources/plus@2x.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.appendCreateTableRowButton.setIcon(icon)
+        self.appendCreateTableRowButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
         self.horizontalLayout.addWidget(self.appendCreateTableRowButton)
 
@@ -327,6 +332,10 @@ class Ui_MainWindow(object):
 
         self.appendUseTableRowButton = QToolButton(self.UseTemplateTab)
         self.appendUseTableRowButton.setObjectName(u"appendUseTableRowButton")
+        icon1 = QIcon()
+        icon1.addFile(u":/resources/plus.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.appendUseTableRowButton.setIcon(icon1)
+        self.appendUseTableRowButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
         self.horizontalLayout_12.addWidget(self.appendUseTableRowButton)
 
@@ -391,7 +400,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1379, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1216, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuHelp = QMenu(self.menubar)
@@ -437,31 +446,49 @@ class Ui_MainWindow(object):
         self.actionOpen_Template.setText(QCoreApplication.translate("MainWindow", u"Restore Template", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Data File:", None))
         self.dataFileLineEdit.setText("")
+#if QT_CONFIG(tooltip)
+        self.dataFileSelect.setToolTip(QCoreApplication.translate("MainWindow", u"Select data file to use for meta-data extraction", None))
+#endif // QT_CONFIG(tooltip)
         self.dataFileSelect.setText(QCoreApplication.translate("MainWindow", u"Select", None))
         self.dataTypeLabel.setText(QCoreApplication.translate("MainWindow", u"Data Type Detected:", None))
-        self.dataTypeText.setText(QCoreApplication.translate("MainWindow", u"ANG", None))
+        self.dataTypeText.setText(QCoreApplication.translate("MainWindow", u"None Selected", None))
         self.fileParserLabel.setText(QCoreApplication.translate("MainWindow", u"File Parser:", None))
         self.fileParserCombo.setItemText(0, QCoreApplication.translate("MainWindow", u"CTF Parser", None))
         self.fileParserCombo.setItemText(1, QCoreApplication.translate("MainWindow", u"ANG Parser", None))
         self.fileParserCombo.setItemText(2, QCoreApplication.translate("MainWindow", u"Custom Parser", None))
 
         self.fileParserCombo.setProperty("currentText", QCoreApplication.translate("MainWindow", u"CTF Parser", None))
-        self.appendCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"...", None))
+#if QT_CONFIG(tooltip)
+        self.appendCreateTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a custom value to the template", None))
+#endif // QT_CONFIG(tooltip)
+        self.appendCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Add Custom Value", None))
         self.createTemplateTreeSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.createTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.saveTemplateButton.setText(QCoreApplication.translate("MainWindow", u"Save Template as ...", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.CreateTemplateTab), QCoreApplication.translate("MainWindow", u"Create Template", None))
         self.hyperthoughtTemplateLabel.setText(QCoreApplication.translate("MainWindow", u"Template File: ", None))
         self.hyperthoughtTemplateLineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"example.ez", None))
+#if QT_CONFIG(tooltip)
+        self.hyperthoughtTemplateSelect.setToolTip(QCoreApplication.translate("MainWindow", u"Select the template file for this upload(*.ez)", None))
+#endif // QT_CONFIG(tooltip)
         self.hyperthoughtTemplateSelect.setText(QCoreApplication.translate("MainWindow", u"Select", None))
         self.label_6.setText(QCoreApplication.translate("MainWindow", u"File To Extract Metadata From: ", None))
+#if QT_CONFIG(tooltip)
+        self.otherDataFileSelect.setToolTip(QCoreApplication.translate("MainWindow", u"Select a data file to extract meta-data", None))
+#endif // QT_CONFIG(tooltip)
         self.otherDataFileSelect.setText(QCoreApplication.translate("MainWindow", u"Select", None))
         self.usetableSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search For HT Key", None))
         self.displayedFileLabel.setText(QCoreApplication.translate("MainWindow", u"No File Selected", None))
-        self.appendUseTableRowButton.setText(QCoreApplication.translate("MainWindow", u"...", None))
+#if QT_CONFIG(tooltip)
+        self.appendUseTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a Custom Value that is only going to be used for this upload", None))
+#endif // QT_CONFIG(tooltip)
+        self.appendUseTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Add Custom Value", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"HyperThought Uploader Folder", None))
         self.hyperthoughtLocationLineEdit.setText("")
-        self.hyperthoughtLocationLineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Please select a path to upload to Hyperthought.", None))
+        self.hyperthoughtLocationLineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Use the 'Select Remote Folder' button to set the remote location for the data --->", None))
+#if QT_CONFIG(tooltip)
+        self.hyperthoughtLocationButton.setToolTip(QCoreApplication.translate("MainWindow", u"Allows user to set their API key from HyperThought and set a remote location on the HyperThought server to upload the data files", None))
+#endif // QT_CONFIG(tooltip)
         self.hyperthoughtLocationButton.setText(QCoreApplication.translate("MainWindow", u"Select Remote Folder", None))
         self.hyperthoughtUploadButton.setText(QCoreApplication.translate("MainWindow", u"Upload Files", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.UseTemplateTab), QCoreApplication.translate("MainWindow", u"Use Template", None))

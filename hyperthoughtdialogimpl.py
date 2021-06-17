@@ -26,8 +26,6 @@ class HyperthoughtDialogImpl(QDialog):
         self.path = ","
         self.parentName = "/"
         self.promptui.directoryLabel.setText(self.parentName)
-        icon = QApplication.style().standardIcon(QStyle.SP_FileDialogNewFolder)
-        self.promptui.newFolderButton.setIcon(icon)
         self.promptui.parentDirectoryButton.clicked.connect(self.parentDirectory)
         self.newfolderDialog = NewFolderDialogImpl()
         self.promptui.newFolderButton.clicked.connect(self.newfolderDialog.exec)
