@@ -471,7 +471,7 @@ class MainWindow(QMainWindow):
     def selectTemplate(self):
         startLocation = self.ui.hyperthoughtTemplateLineEdit.text()
         if startLocation == "":
-            startLocation = QStandardPaths.displayName(QStandardPaths.HomeLocation())
+            startLocation = QStandardPaths.writableLocation(QStandardPaths.HomeLocation)
 
         templateFilePath = QFileDialog.getOpenFileName(self, self.tr("Select File"), startLocation, self.tr("Files (*.ez)") )[0]
         self.loadTemplateFile(templateFilePath)
