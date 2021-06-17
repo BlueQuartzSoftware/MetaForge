@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1379</width>
-    <height>686</height>
+    <width>1216</width>
+    <height>724</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -88,6 +88,9 @@
           </item>
           <item>
            <widget class="QPushButton" name="dataFileSelect">
+            <property name="toolTip">
+             <string>Select data file to use for meta-data extraction</string>
+            </property>
             <property name="text">
              <string>Select</string>
             </property>
@@ -116,7 +119,7 @@
           <item>
            <widget class="QLabel" name="dataTypeText">
             <property name="text">
-             <string>ANG</string>
+             <string>None Selected</string>
             </property>
            </widget>
           </item>
@@ -188,8 +191,18 @@
             </item>
             <item>
              <widget class="QToolButton" name="appendCreateTableRowButton">
+              <property name="toolTip">
+               <string>Add a custom value to the template</string>
+              </property>
               <property name="text">
-               <string>...</string>
+               <string>Add Custom Value</string>
+              </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/resources/plus@2x.png</normaloff>:/resources/plus@2x.png</iconset>
+              </property>
+              <property name="toolButtonStyle">
+               <enum>Qt::ToolButtonTextBesideIcon</enum>
               </property>
              </widget>
             </item>
@@ -402,6 +415,9 @@
               </item>
               <item>
                <widget class="QPushButton" name="hyperthoughtTemplateSelect">
+                <property name="toolTip">
+                 <string>Select the template file for this upload(*.ez)</string>
+                </property>
                 <property name="text">
                  <string>Select</string>
                 </property>
@@ -442,6 +458,9 @@
                 <property name="enabled">
                  <bool>true</bool>
                 </property>
+                <property name="toolTip">
+                 <string>Select a data file to extract meta-data</string>
+                </property>
                 <property name="text">
                  <string>Select</string>
                 </property>
@@ -479,8 +498,18 @@
               </item>
               <item>
                <widget class="QToolButton" name="appendUseTableRowButton">
+                <property name="toolTip">
+                 <string>Add a Custom Value that is only going to be used for this upload</string>
+                </property>
                 <property name="text">
-                 <string>...</string>
+                 <string>Add Custom Value</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="resources.qrc">
+                  <normaloff>:/resources/plus.png</normaloff>:/resources/plus.png</iconset>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonTextBesideIcon</enum>
                 </property>
                </widget>
               </item>
@@ -518,7 +547,7 @@
              <string/>
             </property>
             <property name="placeholderText">
-             <string>Please select a path to upload to Hyperthought.</string>
+             <string>Use the 'Select Remote Folder' button to set the remote location for the data ---&gt;</string>
             </property>
            </widget>
           </item>
@@ -526,6 +555,9 @@
            <widget class="QPushButton" name="hyperthoughtLocationButton">
             <property name="enabled">
              <bool>true</bool>
+            </property>
+            <property name="toolTip">
+             <string>Allows user to set their API key from HyperThought and set a remote location on the HyperThought server to upload the data files</string>
             </property>
             <property name="text">
              <string>Select Remote Folder</string>
@@ -575,7 +607,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1379</width>
+     <width>1216</width>
      <height>22</height>
     </rect>
    </property>
@@ -682,6 +714,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="resources.qrc"/>
+ </resources>
  <connections/>
 </ui>
