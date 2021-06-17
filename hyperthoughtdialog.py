@@ -25,28 +25,11 @@ class Ui_HyperthoughtDialog(object):
         HyperthoughtDialog.setSizePolicy(sizePolicy)
         HyperthoughtDialog.setModal(True)
         self.gridLayout = QGridLayout(HyperthoughtDialog)
+#ifndef Q_OS_MAC
+        self.gridLayout.setSpacing(6)
+#endif
+        self.gridLayout.setContentsMargins(4, 4, 4, 4)
         self.gridLayout.setObjectName(u"gridLayout")
-        self.apiKeyLabel = QLabel(HyperthoughtDialog)
-        self.apiKeyLabel.setObjectName(u"apiKeyLabel")
-
-        self.gridLayout.addWidget(self.apiKeyLabel, 0, 0, 1, 2)
-
-        self.apiKeyLineEdit = QLineEdit(HyperthoughtDialog)
-        self.apiKeyLineEdit.setObjectName(u"apiKeyLineEdit")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.apiKeyLineEdit.sizePolicy().hasHeightForWidth())
-        self.apiKeyLineEdit.setSizePolicy(sizePolicy1)
-        self.apiKeyLineEdit.setMinimumSize(QSize(0, 0))
-
-        self.gridLayout.addWidget(self.apiKeyLineEdit, 0, 2, 1, 2)
-
-        self.apiKeyButton = QPushButton(HyperthoughtDialog)
-        self.apiKeyButton.setObjectName(u"apiKeyButton")
-
-        self.gridLayout.addWidget(self.apiKeyButton, 0, 4, 1, 1)
-
         self.frame = QFrame(HyperthoughtDialog)
         self.frame.setObjectName(u"frame")
         sizePolicy.setHeightForWidth(self.frame.sizePolicy().hasHeightForWidth())
@@ -54,6 +37,7 @@ class Ui_HyperthoughtDialog(object):
         self.frame.setFrameShape(QFrame.StyledPanel)
         self.frame.setFrameShadow(QFrame.Raised)
         self.horizontalLayout_2 = QHBoxLayout(self.frame)
+        self.horizontalLayout_2.setContentsMargins(4, 4, 4, 4)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
@@ -71,7 +55,7 @@ class Ui_HyperthoughtDialog(object):
 
         self.horizontalLayout.addWidget(self.parentDirectoryButton)
 
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Maximum, QSizePolicy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(12, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_3)
 
@@ -82,7 +66,7 @@ class Ui_HyperthoughtDialog(object):
         if QIcon.hasThemeIcon(iconThemeName):
             icon = QIcon.fromTheme(iconThemeName)
         else:
-            icon.addFile(u".", QSize(), QIcon.Normal, QIcon.Off)
+            icon.addFile(u"", QSize(), QIcon.Normal, QIcon.Off)
         
         self.newFolderButton.setIcon(icon)
 
@@ -92,33 +76,78 @@ class Ui_HyperthoughtDialog(object):
         self.horizontalLayout_2.addLayout(self.horizontalLayout)
 
 
-        self.gridLayout.addWidget(self.frame, 1, 0, 1, 5)
+        self.gridLayout.addWidget(self.frame, 2, 0, 1, 9)
 
-        self.listView = QListView(HyperthoughtDialog)
-        self.listView.setObjectName(u"listView")
+        self.ht_server_url = QLabel(HyperthoughtDialog)
+        self.ht_server_url.setObjectName(u"ht_server_url")
 
-        self.gridLayout.addWidget(self.listView, 2, 0, 1, 5)
-
-        self.locationLabel = QLabel(HyperthoughtDialog)
-        self.locationLabel.setObjectName(u"locationLabel")
-
-        self.gridLayout.addWidget(self.locationLabel, 3, 0, 1, 1)
+        self.gridLayout.addWidget(self.ht_server_url, 1, 2, 1, 1)
 
         self.locationLineEdit = QLineEdit(HyperthoughtDialog)
         self.locationLineEdit.setObjectName(u"locationLineEdit")
 
-        self.gridLayout.addWidget(self.locationLineEdit, 3, 1, 1, 4)
+        self.gridLayout.addWidget(self.locationLineEdit, 4, 1, 1, 8)
+
+        self.listView = QListView(HyperthoughtDialog)
+        self.listView.setObjectName(u"listView")
+
+        self.gridLayout.addWidget(self.listView, 3, 0, 1, 9)
+
+        self.label = QLabel(HyperthoughtDialog)
+        self.label.setObjectName(u"label")
+
+        self.gridLayout.addWidget(self.label, 1, 0, 1, 1)
+
+        self.label_2 = QLabel(HyperthoughtDialog)
+        self.label_2.setObjectName(u"label_2")
+
+        self.gridLayout.addWidget(self.label_2, 1, 4, 1, 1)
+
+        self.apiKeyLineEdit = QLineEdit(HyperthoughtDialog)
+        self.apiKeyLineEdit.setObjectName(u"apiKeyLineEdit")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.apiKeyLineEdit.sizePolicy().hasHeightForWidth())
+        self.apiKeyLineEdit.setSizePolicy(sizePolicy1)
+        self.apiKeyLineEdit.setMinimumSize(QSize(0, 0))
+
+        self.gridLayout.addWidget(self.apiKeyLineEdit, 0, 2, 1, 6)
+
+        self.token_expiration = QLabel(HyperthoughtDialog)
+        self.token_expiration.setObjectName(u"token_expiration")
+
+        self.gridLayout.addWidget(self.token_expiration, 1, 5, 1, 1)
+
+        self.apiKeyLabel = QLabel(HyperthoughtDialog)
+        self.apiKeyLabel.setObjectName(u"apiKeyLabel")
+
+        self.gridLayout.addWidget(self.apiKeyLabel, 0, 0, 1, 2)
+
+        self.apiKeyButton = QPushButton(HyperthoughtDialog)
+        self.apiKeyButton.setObjectName(u"apiKeyButton")
+
+        self.gridLayout.addWidget(self.apiKeyButton, 0, 8, 1, 1)
+
+        self.locationLabel = QLabel(HyperthoughtDialog)
+        self.locationLabel.setObjectName(u"locationLabel")
+
+        self.gridLayout.addWidget(self.locationLabel, 4, 0, 1, 1)
 
         self.horizontalSpacer = QSpacerItem(380, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.gridLayout.addItem(self.horizontalSpacer, 4, 2, 1, 1)
+        self.gridLayout.addItem(self.horizontalSpacer, 5, 6, 1, 1)
 
         self.buttonBox = QDialogButtonBox(HyperthoughtDialog)
         self.buttonBox.setObjectName(u"buttonBox")
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
 
-        self.gridLayout.addWidget(self.buttonBox, 4, 3, 1, 2)
+        self.gridLayout.addWidget(self.buttonBox, 5, 7, 1, 2)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.gridLayout.addItem(self.horizontalSpacer_4, 1, 3, 1, 1)
 
 
         self.retranslateUi(HyperthoughtDialog)
@@ -130,11 +159,15 @@ class Ui_HyperthoughtDialog(object):
 
     def retranslateUi(self, HyperthoughtDialog):
         HyperthoughtDialog.setWindowTitle("")
-        self.apiKeyLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"Hyperthought API Key:", None))
-        self.apiKeyButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"Submit", None))
         self.directoryLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"/", None))
         self.parentDirectoryButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"...", None))
         self.newFolderButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"...", None))
+        self.ht_server_url.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Autheticated", None))
+        self.label.setText(QCoreApplication.translate("HyperthoughtDialog", u"Server:", None))
+        self.label_2.setText(QCoreApplication.translate("HyperthoughtDialog", u"Expires:", None))
+        self.token_expiration.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Autheticated", None))
+        self.apiKeyLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"Hyperthought API Key:", None))
+        self.apiKeyButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"Authenticate", None))
         self.locationLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"Location:", None))
     # retranslateUi
 

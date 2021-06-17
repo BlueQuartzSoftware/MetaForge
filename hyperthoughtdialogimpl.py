@@ -34,14 +34,20 @@ class HyperthoughtDialogImpl(QDialog):
 
     def acceptApiKey(self):
         self.accessKey = self.promptui.apiKeyLineEdit.text()
+        if self.accessKey == "":
+            QMessageBox.warning(None, QApplication.applicationDisplayName(), "Please set the API Access key.")
+            return
+
         self.apiSubmitted.emit(self.accessKey)
         try:
             self.authcontrol = htauthcontroller.HTAuthorizationController(self.accessKey)
+            self.promptui.ht_server_url.setText(self.authcontrol.base_url)
+            self.promptui.token_expiration.setText(self.authcontrol.expires_at)
             folderlist = ht_requests._list_location_contents(self.authcontrol, ht_id_path = self.path)
             self.stringlistmodel.getLists(folderlist)
             self.promptui.listView.setModel(self.stringlistmodel)
         except Exception as e:
-             QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + str(e))
+             QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error during the authentication process.\n" + str(e))
 
     def ascendingDirectories(self, myIndex):
        try:
@@ -51,7 +57,7 @@ class HyperthoughtDialogImpl(QDialog):
            folderlist = ht_requests._list_location_contents(self.authcontrol, ht_id_path = self.path)
            self.stringlistmodel.getLists(folderlist)
        except Exception as e:
-           QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + str(e))
+           QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error during directory traversal.\n" + str(e))
 
     def changeLocationText(self,myIndex):
         self.promptui.locationLineEdit.setText(myIndex.data())
@@ -62,7 +68,7 @@ class HyperthoughtDialogImpl(QDialog):
             folderlist = ht_requests._list_location_contents(self.authcontrol, ht_id_path = self.path)
             self.stringlistmodel.getLists(folderlist)
         except Exception as e:
-            QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + str(e))
+            QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error creating remote directory.\n" + str(e))
 
 
     def parentDirectory(self):
@@ -75,4 +81,4 @@ class HyperthoughtDialogImpl(QDialog):
             folderlist = ht_requests._list_location_contents(self.authcontrol, ht_id_path = self.path)
             self.stringlistmodel.getLists(folderlist)
         except Exception as e:
-            QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + str(e))
+            QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error getting the parent directory.\n" + str(e))

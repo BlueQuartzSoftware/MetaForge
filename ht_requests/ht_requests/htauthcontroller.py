@@ -33,6 +33,7 @@ class HTAuthorizationController:
         self.access_token = access_obj['accessToken']
         self.refresh_token = access_obj['refreshToken']
         self.client_id = access_obj['clientId']
+        self.expires_at = access_obj['expiresAt']
 
     def get_auth_header(self):
         """Get the authorization header to use with HyperThought API calls.
@@ -67,6 +68,9 @@ class HTAuthorizationController:
         url = f'{self.base_url}/api/auth/userinfo/'
         r = requests.get(url, cookies=self.cookies,
                          headers=auth_header, verify=False)
+
+        if r.status_code == 403:
+            raise Exception('API Access Token is expired. Please get a new token from your HyperThought account.')
 
         if r.status_code >= 400:
             raise Exception('Could not load user details!')
