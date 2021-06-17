@@ -53,7 +53,7 @@ class Ui_MainWindow(object):
         self.gridLayout_4 = QGridLayout(self.centralwidget)
         self.gridLayout_4.setSpacing(4)
         self.gridLayout_4.setObjectName(u"gridLayout_4")
-        self.gridLayout_4.setContentsMargins(2, 2, 2, 2)
+        self.gridLayout_4.setContentsMargins(2, 12, 2, 2)
         self.TabWidget = QTabWidget(self.centralwidget)
         self.TabWidget.setObjectName(u"TabWidget")
         self.CreateTemplateTab = QWidget()
@@ -149,8 +149,8 @@ class Ui_MainWindow(object):
         self.widget_3.setMinimumSize(QSize(0, 0))
         self.horizontalLayout_9 = QHBoxLayout(self.widget_3)
         self.horizontalLayout_9.setSpacing(0)
-        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
         self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
+        self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
 
         self.gridLayout_5.addWidget(self.widget_3, 2, 0, 1, 1)
 
@@ -204,14 +204,14 @@ class Ui_MainWindow(object):
         self.widget.setMinimumSize(QSize(0, 0))
         self.horizontalLayout_11 = QHBoxLayout(self.widget)
         self.horizontalLayout_11.setSpacing(2)
-        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
         self.horizontalLayout_11.setContentsMargins(2, 2, 2, 2)
+        self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
         self.widget_2 = QWidget(self.widget)
         self.widget_2.setObjectName(u"widget_2")
         self.widget_2.setMinimumSize(QSize(0, 0))
         self.horizontalLayout_10 = QHBoxLayout(self.widget_2)
-        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.horizontalLayout_10.setContentsMargins(4, 4, 4, 4)
+        self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.horizontalSpacer_5 = QSpacerItem(1227, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_10.addItem(self.horizontalSpacer_5)
@@ -232,8 +232,8 @@ class Ui_MainWindow(object):
         self.UseTemplateTab.setObjectName(u"UseTemplateTab")
         self.gridLayout_3 = QGridLayout(self.UseTemplateTab)
         self.gridLayout_3.setSpacing(2)
-        self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.gridLayout_3.setContentsMargins(4, 4, 4, 4)
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.horizontalLayout_13 = QHBoxLayout()
         self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
         self.useTemplateListView = QListView(self.UseTemplateTab)
@@ -243,7 +243,7 @@ class Ui_MainWindow(object):
         self.useTemplateListView.setMinimumSize(QSize(325, 0))
         self.useTemplateListView.setAcceptDrops(True)
         self.useTemplateListView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.useTemplateListView.setAlternatingRowColors(True)
+        self.useTemplateListView.setAlternatingRowColors(False)
 
         self.horizontalLayout_13.addWidget(self.useTemplateListView)
 
@@ -299,7 +299,7 @@ class Ui_MainWindow(object):
 
         self.otherDataFileSelect = QPushButton(self.UseTemplateTab)
         self.otherDataFileSelect.setObjectName(u"otherDataFileSelect")
-        self.otherDataFileSelect.setEnabled(False)
+        self.otherDataFileSelect.setEnabled(True)
 
         self.horizontalLayout_6.addWidget(self.otherDataFileSelect)
 
@@ -347,6 +347,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addLayout(self.horizontalLayout_13, 0, 0, 1, 1)
 
         self.horizontalLayout_7 = QHBoxLayout()
+        self.horizontalLayout_7.setSpacing(12)
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
         self.label_3 = QLabel(self.UseTemplateTab)
         self.label_3.setObjectName(u"label_3")
@@ -360,7 +361,7 @@ class Ui_MainWindow(object):
 
         self.hyperthoughtLocationButton = QPushButton(self.UseTemplateTab)
         self.hyperthoughtLocationButton.setObjectName(u"hyperthoughtLocationButton")
-        self.hyperthoughtLocationButton.setEnabled(False)
+        self.hyperthoughtLocationButton.setEnabled(True)
 
         self.horizontalLayout_7.addWidget(self.hyperthoughtLocationButton)
 
@@ -368,6 +369,7 @@ class Ui_MainWindow(object):
         self.gridLayout_3.addLayout(self.horizontalLayout_7, 1, 0, 1, 1)
 
         self.gridLayout_2 = QGridLayout()
+        self.gridLayout_2.setSpacing(6)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
@@ -415,7 +417,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(0)
+        self.TabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -443,7 +445,7 @@ class Ui_MainWindow(object):
         self.fileParserCombo.setItemText(1, QCoreApplication.translate("MainWindow", u"ANG Parser", None))
         self.fileParserCombo.setItemText(2, QCoreApplication.translate("MainWindow", u"Custom Parser", None))
 
-        self.fileParserCombo.setCurrentText(QCoreApplication.translate("MainWindow", u"ANG Parser", None))
+        self.fileParserCombo.setProperty("currentText", QCoreApplication.translate("MainWindow", u"CTF Parser", None))
         self.appendCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"...", None))
         self.createTemplateTreeSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.createTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
@@ -460,7 +462,7 @@ class Ui_MainWindow(object):
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"HyperThought Uploader Folder", None))
         self.hyperthoughtLocationLineEdit.setText("")
         self.hyperthoughtLocationLineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Please select a path to upload to Hyperthought.", None))
-        self.hyperthoughtLocationButton.setText(QCoreApplication.translate("MainWindow", u"Select", None))
+        self.hyperthoughtLocationButton.setText(QCoreApplication.translate("MainWindow", u"Select Remote Folder", None))
         self.hyperthoughtUploadButton.setText(QCoreApplication.translate("MainWindow", u"Upload Files", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.UseTemplateTab), QCoreApplication.translate("MainWindow", u"Use Template", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
