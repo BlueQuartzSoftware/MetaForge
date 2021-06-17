@@ -14,6 +14,7 @@ from PySide2.QtWidgets import *
 
 from ht_widgets.deselectable_list_view import DeselectableListView
 
+import resources_rc
 
 class Ui_HyperthoughtDialog(object):
     def setupUi(self, HyperthoughtDialog):
@@ -27,9 +28,6 @@ class Ui_HyperthoughtDialog(object):
         HyperthoughtDialog.setSizePolicy(sizePolicy)
         HyperthoughtDialog.setModal(True)
         self.gridLayout = QGridLayout(HyperthoughtDialog)
-#ifndef Q_OS_MAC
-        self.gridLayout.setSpacing(6)
-#endif
         self.gridLayout.setContentsMargins(4, 4, 4, 4)
         self.gridLayout.setObjectName(u"gridLayout")
         self.frame = QFrame(HyperthoughtDialog)
@@ -41,6 +39,16 @@ class Ui_HyperthoughtDialog(object):
         self.horizontalLayout_2 = QHBoxLayout(self.frame)
         self.horizontalLayout_2.setContentsMargins(4, 4, 4, 4)
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
+        self.parentDirectoryButton = QToolButton(self.frame)
+        self.parentDirectoryButton.setObjectName(u"parentDirectoryButton")
+        icon = QIcon()
+        icon.addFile(u":/resources/arrow-top@2x.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.parentDirectoryButton.setIcon(icon)
+        self.parentDirectoryButton.setIconSize(QSize(16, 16))
+        self.parentDirectoryButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+
+        self.horizontalLayout_2.addWidget(self.parentDirectoryButton)
+
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.directoryLabel = QLabel(self.frame)
@@ -52,25 +60,13 @@ class Ui_HyperthoughtDialog(object):
 
         self.horizontalLayout.addItem(self.horizontalSpacer_2)
 
-        self.parentDirectoryButton = QToolButton(self.frame)
-        self.parentDirectoryButton.setObjectName(u"parentDirectoryButton")
-
-        self.horizontalLayout.addWidget(self.parentDirectoryButton)
-
-        self.horizontalSpacer_3 = QSpacerItem(12, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer_3)
-
         self.newFolderButton = QToolButton(self.frame)
         self.newFolderButton.setObjectName(u"newFolderButton")
-        icon = QIcon()
-        iconThemeName = u"SP_FileDialogNewFolder"
-        if QIcon.hasThemeIcon(iconThemeName):
-            icon = QIcon.fromTheme(iconThemeName)
-        else:
-            icon.addFile(u"", QSize(), QIcon.Normal, QIcon.Off)
-        
-        self.newFolderButton.setIcon(icon)
+        icon1 = QIcon()
+        icon1.addFile(u":/resources/folder@2x.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.newFolderButton.setIcon(icon1)
+        self.newFolderButton.setIconSize(QSize(16, 16))
+        self.newFolderButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
         self.horizontalLayout.addWidget(self.newFolderButton)
 
@@ -147,6 +143,7 @@ class Ui_HyperthoughtDialog(object):
 
         self.locationLabel = QLabel(HyperthoughtDialog)
         self.locationLabel.setObjectName(u"locationLabel")
+        self.locationLabel.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.gridLayout.addWidget(self.locationLabel, 4, 0, 1, 1)
 
@@ -156,10 +153,6 @@ class Ui_HyperthoughtDialog(object):
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
 
         self.gridLayout.addWidget(self.buttonBox, 5, 10, 1, 2)
-
-        self.horizontalSpacer = QSpacerItem(380, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.gridLayout.addItem(self.horizontalSpacer, 5, 7, 1, 3)
 
         self.listView = DeselectableListView(HyperthoughtDialog)
         self.listView.setObjectName(u"listView")
@@ -171,6 +164,10 @@ class Ui_HyperthoughtDialog(object):
 
         self.gridLayout.addWidget(self.listView, 3, 0, 1, 12)
 
+        self.horizontalSpacer = QSpacerItem(380, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.gridLayout.addItem(self.horizontalSpacer, 5, 0, 1, 10)
+
 
         self.retranslateUi(HyperthoughtDialog)
         self.buttonBox.accepted.connect(HyperthoughtDialog.accept)
@@ -181,9 +178,18 @@ class Ui_HyperthoughtDialog(object):
 
     def retranslateUi(self, HyperthoughtDialog):
         HyperthoughtDialog.setWindowTitle("")
+#if QT_CONFIG(tooltip)
+        self.parentDirectoryButton.setToolTip(QCoreApplication.translate("HyperthoughtDialog", u"Move Up a Directory", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(statustip)
+        self.parentDirectoryButton.setStatusTip("")
+#endif // QT_CONFIG(statustip)
+        self.parentDirectoryButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"Up", None))
         self.directoryLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"/", None))
-        self.parentDirectoryButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"...", None))
-        self.newFolderButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"...", None))
+#if QT_CONFIG(tooltip)
+        self.newFolderButton.setToolTip(QCoreApplication.translate("HyperthoughtDialog", u"Create Remote Folder", None))
+#endif // QT_CONFIG(tooltip)
+        self.newFolderButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"New Remote Folder", None))
         self.label.setText(QCoreApplication.translate("HyperthoughtDialog", u"Server:", None))
         self.ht_server_url.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Autheticated", None))
         self.label_3.setText(QCoreApplication.translate("HyperthoughtDialog", u"User:", None))
@@ -192,6 +198,6 @@ class Ui_HyperthoughtDialog(object):
         self.token_expiration.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Autheticated", None))
         self.apiKeyLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"Hyperthought API Key:", None))
         self.apiKeyButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"Authenticate", None))
-        self.locationLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"Location:", None))
+        self.locationLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"Folder:", None))
     # retranslateUi
 
