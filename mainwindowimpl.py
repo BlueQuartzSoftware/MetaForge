@@ -255,11 +255,16 @@ class MainWindow(QMainWindow):
 
     def getLocation(self):
         location = self.hyperthoughtui.promptui.locationLineEdit.text()
-        locationindex = self.hyperthoughtui.stringlistmodel.directoryList.index(location)
+        if location in self.hyperthoughtui.stringlistmodel.directoryList:
+
+            locationindex = self.hyperthoughtui.stringlistmodel.directoryList.index(location)
+            self.folderuuid = self.hyperthoughtui.path + self.hyperthoughtui.stringlistmodel.uuidList[locationindex] + ","
+        else:
+            self.folderuuid = self.hyperthoughtui.path
         self.ui.hyperthoughtLocationLineEdit.setText(location)
         self.toggleButtons()
 
-        self.folderuuid = self.hyperthoughtui.path + self.hyperthoughtui.stringlistmodel.uuidList[locationindex] + ","
+
 
     def handleRemoveCreate(self, source):
         if "Custom Input" in source:
