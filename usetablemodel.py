@@ -86,14 +86,19 @@ class TableModelU(QAbstractTableModel):
         if role == Qt.DisplayRole:
             if index.column() == self.K_HTKEY_COL_INDEX:
                 return self.metadataList[index.row()][self.K_KEY_META_KEY]
+
             elif index.column() == self.K_HTVALUE_COL_INDEX:
                 return self.metadataList[index.row()][self.K_VALUE_META_KEY]
+
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
                 return self.metadataList[index.row()][self.K_ANNOTATION_META_KEY]
+
             elif index.column() == self.K_HTUNITS_COL_INDEX:
                 return self.metadataList[index.row()][self.K_UNITS_META_KEY]
+
             elif index.column() == self.K_SOURCE_COL_INDEX:
                 return self.metadataList[index.row()][self.K_SOURCE_META_KEY]
+                
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_USESOURCE_COL_INDEX:
                 return self.metadataList[index.row()][self.K_USESOURCE_META_KEY]
@@ -181,7 +186,7 @@ class TableModelU(QAbstractTableModel):
         if row["Key"] in self.editableKeys:
             self.metadataList.append(
                 {self.K_KEY_META_KEY: row["Key"],
-                 self.K_VALUE_META_KEY: row["Value"],
+                 self.K_VALUE_META_KEY: row[self.K_HTVALUE_COL_NAME],
                  self.K_SOURCE_META_KEY: row["Source"],
                  self.K_UNITS_META_KEY: "",
                  self.K_ANNOTATION_META_KEY: "",
