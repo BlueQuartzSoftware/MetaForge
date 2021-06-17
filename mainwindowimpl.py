@@ -16,9 +16,11 @@ from usefiltermodel import FilterModelU
 from checkboxdelegate import CheckBoxDelegate
 from usefiledelegate import UseFileDelegate
 from trashdelegate import TrashDelegate
+
 from ht_requests.ht_requests import ht_utilities
 from ht_requests.ht_requests import htauthcontroller
 from ht_requests.ht_requests import ht_requests
+
 from tqdm import tqdm
 from uploader import Uploader
 
@@ -254,17 +256,12 @@ class MainWindow(QMainWindow):
         self.usesearchFilterModel.setFilterWildcard("*"+self.ui.usetableSearchBar.text()+"*")
 
     def getLocation(self):
-        location = self.hyperthoughtui.promptui.locationLineEdit.text()
-        if location in self.hyperthoughtui.stringlistmodel.directoryList:
+        remoteDirPath = self.hyperthoughtui.getUploadDirectory()
+        self.folderuuid = ht_requests.get_ht_id_path_from_ht_path(self.hyperthoughtui.authcontrol, ht_path=remoteDirPath)
+        self.ui.hyperthoughtLocationLineEdit.setText(remoteDirPath)
+        #self.toggleButtons()
 
-            locationindex = self.hyperthoughtui.stringlistmodel.directoryList.index(location)
-            self.folderuuid = self.hyperthoughtui.path + self.hyperthoughtui.stringlistmodel.uuidList[locationindex] + ","
-        else:
-            self.folderuuid = self.hyperthoughtui.path
-        self.ui.hyperthoughtLocationLineEdit.setText(location)
-        self.toggleButtons()
-
-
+        #self.folderuuid = self.hyperthoughtui.path + self.hyperthoughtui.stringlistmodel.uuidList[locationindex] + ","
 
     def handleRemoveCreate(self, source):
         if "Custom Input" in source:
@@ -417,9 +414,10 @@ class MainWindow(QMainWindow):
 
     def saveTemplate(self):
         dialog = QFileDialog(self, "Save File","", "Templates (*.ez)")
-        dialog.setDefaultSuffix(".ez");
+        dialog.setDefaultSuffix(".ez")
         dialog.setAcceptMode(QFileDialog.AcceptSave)
-        if  dialog.exec():
+        fileName = ""
+        if dialog.exec():
             fileName  = dialog.selectedFiles()[0]
         if fileName != "":
             with open(fileName, 'w') as outfile:
@@ -440,7 +438,7 @@ class MainWindow(QMainWindow):
     def selectFile(self, fileLink = None):
         if fileLink == False:
             linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
-            QStandardPaths.HomeLocation),self.tr("Files (*.ctf *.xml *.ang)"))[0]
+            QStandardPaths.HomeLocation),self.tr("Files (*.*)"))[0]
         else:
             linetext = fileLink
         if linetext != "":

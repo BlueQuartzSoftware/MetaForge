@@ -74,7 +74,7 @@ class HTAuthorizationController:
 
         if r.status_code >= 400:
             raise Exception('Could not load user details!')
-
+        
         self.user_details = r.json()
 
     def get_username(self):
