@@ -1,7 +1,18 @@
-<RCC>
-    <qresource prefix="/">
+<!DOCTYPE RCC>
+ <RCC version="1.0">
+    <qresource>
         <file>resources/applicationIcon.png</file>
+
         <file>resources/close-pushed@2x.png</file>
         <file>resources/close-pushed.png</file>
+
+        <file>resources/arrow-top@2x.png</file>
+        <file>resources/arrow-top.png</file>
+        
+        <file>resources/folder@2x.png</file>
+        <file>resources/folder.png</file>
+        
+        <file>resources/plus@2x.png</file>
+        <file>resources/plus.png</file>
     </qresource>
 </RCC>
