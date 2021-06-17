@@ -89,8 +89,11 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_REMOVE_COL_INDEX,self.width()*.075)
         self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
 
+
         self.uselistmodel = ListModel(self, self.usetablemodel,[])
         self.ui.useTemplateListView.setModel(self.uselistmodel)
+        self.uselistmodel.rowRemoved.connect(self.toggleButtons)
+        self.uselistmodel.rowAdded.connect(self.toggleButtons)
 
         self.useFileDelegate = UseFileDelegate(self)
         self.ui.useTemplateListView.setItemDelegate(self.useFileDelegate)

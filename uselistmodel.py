@@ -1,11 +1,13 @@
 from PySide2.QtNetwork import QNetworkReply
-from PySide2.QtCore import QAbstractListModel, QMimeData, Qt, QModelIndex, QFileInfo
+from PySide2.QtCore import QAbstractListModel, QMimeData, Qt, QModelIndex, QFileInfo, Signal, Slot
 from PySide2.QtGui import QIcon, QColor
 from PySide2.QtWidgets import QApplication, QStyle
 
 
 
 class ListModel(QAbstractListModel):
+    rowAdded = Signal()
+    rowRemoved = Signal()
     def __init__(self,data,tablemodel,fileList ,parent=None):
         QAbstractListModel.__init__(self, parent)
         self.metadataList = fileList
@@ -53,11 +55,13 @@ class ListModel(QAbstractListModel):
         self.beginInsertRows(self.index(len(self.metadataList),0), len(self.metadataList),len(self.metadataList))
         self.metadataList.append(filename)
         self.endInsertRows()
+        self.rowAdded.emit()
 
     def removeRow(self, rowIndex):
         self.beginRemoveRows(QModelIndex(),rowIndex, rowIndex)
         del self.metadataList[rowIndex]
         self.endRemoveRows()
+        self.rowRemoved.emit()
 
 
 
