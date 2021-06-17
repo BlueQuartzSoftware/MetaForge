@@ -131,18 +131,21 @@ class TableModelC(QAbstractTableModel):
                     self.metadataList[int(
                         value)] = self.metadataList[index.row()]
                     self.metadataList[index.row()] = temp
+                return True
             if index.column() == self.K_HTNAME_COL_INDEX:
                 if self.K_CUSTOM_INPUT in self.metadataList[index.row()][self.K_SOURCE_COL_NAME]:
                     self.metadataList[index.row(
                     )][self.K_NAME_META_KEY] = value
                     self.dataChanged.emit(index, index)
+                return True
             elif index.column() == self.K_HTVALUE_COL_INDEX:
                 if value == "":
-                    self.metadataList[index.row(
-                    )][self.K_HTVALUE_COL_NAME] = self.K_FROM_SOURCE
+                    if self.metadataList[index.row()][self.K_DEFAULT_META_KEY] == 0:
+                        self.metadataList[index.row()][self.K_HTVALUE_COL_NAME] = self.metadataList[index.row()][self.K_VALUE_META_KEY]
+                    elif self.metadataList[index.row()][self.K_DEFAULT_META_KEY] == 2:
+                        self.metadataList[index.row()][self.K_HTVALUE_COL_NAME] = self.K_FROM_SOURCE
                 else:
                     if "Custom Input" not in self.metadataList[index.row()]["Source"]:
-                        self.dataChanged.emit(index, index)
                         treeDict = self.treeDict
                         sourcePath = self.metadataList[index.row()][self.K_SOURCE_COL_NAME].split(
                             "/")
@@ -151,10 +154,10 @@ class TableModelC(QAbstractTableModel):
                         treeDict[sourcePath[-1]] = value
                         self.metadataList[index.row(
                         )][self.K_HTVALUE_COL_NAME] = value
-
                     else:
                         self.metadataList[index.row()]["HT Value"] = value
-                    self.dataChanged.emit(index, index)
+                self.dataChanged.emit(index, index)
+                return True
 
             #elif index.column() == self.K_REMOVE_COL_INDEX:
 #                self.metadataList.remove(index.row())
@@ -183,8 +186,13 @@ class TableModelC(QAbstractTableModel):
     def flags(self, index):
         if not index.isValid():
             return Qt.ItemIsEnabled
-        if index.column() == self.K_HTVALUE_COL_INDEX or index.column() == self.K_HTNAME_COL_INDEX:
+        if index.column() == self.K_HTNAME_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+        elif index.column() == self.K_HTVALUE_COL_INDEX:
+            if self.metadataList[index.row()][self.K_DEFAULT_META_KEY] == 0:
+                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+            elif self.metadataList[index.row()][self.K_DEFAULT_META_KEY] == 2:
+                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
         elif index.column() == self.K_REMOVE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
         elif index.column() == self.K_SORT_COL_INDEX:

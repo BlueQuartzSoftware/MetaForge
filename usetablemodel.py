@@ -5,7 +5,6 @@ from PySide2.QtWidgets import QApplication, QStyle
 
 
 class TableModelU(QAbstractTableModel):
-
     """
     Define all of the column indices and column names in addition to any other strings
     in this section. This will make it easier to move columns around and rename items.
@@ -25,6 +24,9 @@ class TableModelU(QAbstractTableModel):
     K_UNITS_META_KEY = "Units"
     K_EDITABLE_META_KEY = "Editable"
     K_USESOURCE_META_KEY = "Default"
+    K_HTVAL_META_KEY = "HT Value"
+    K_HTNAME_META_KEY = "HT Name"
+
 
     # These are the user facing header and the index of each column in the table.
     K_SOURCE_COL_NAME = "Source"
@@ -185,6 +187,8 @@ class TableModelU(QAbstractTableModel):
                  self.K_SOURCE_META_KEY: row["Source"],
                  self.K_UNITS_META_KEY: "",
                  self.K_ANNOTATION_META_KEY: "",
+                 self.K_HTVAL_META_KEY: "",
+                 self.K_HTNAME_META_KEY: "",
                  self.K_EDITABLE_META_KEY: 2,
                  self.K_USESOURCE_META_KEY: 2})
         else:
@@ -195,6 +199,8 @@ class TableModelU(QAbstractTableModel):
                  self.K_SOURCE_META_KEY: row["Source"],
                  self.K_UNITS_META_KEY: "",
                  self.K_ANNOTATION_META_KEY: "",
+                 self.K_HTVAL_META_KEY: "",
+                 self.K_HTNAME_META_KEY: "",
                  self.K_EDITABLE_META_KEY: 0,
                  self.K_USESOURCE_META_KEY: 2})
 
@@ -209,6 +215,8 @@ class TableModelU(QAbstractTableModel):
              self.K_SOURCE_META_KEY: self.K_CUSTOM_INPUT,
              self.K_UNITS_META_KEY: "",
              self.K_ANNOTATION_META_KEY: "",
+             self.K_HTVAL_META_KEY: "",
+             self.K_HTNAME_META_KEY: "",
              self.K_EDITABLE_META_KEY: 2,
              self.K_USESOURCE_META_KEY: 0})
 
