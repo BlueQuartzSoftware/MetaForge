@@ -4,8 +4,10 @@ from PySide2.QtWidgets import QStyledItemDelegate
 from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
+
 from resources_rc import *
 
+import usetablemodel
 
 class TrashDelegate(QItemDelegate):
     pressed = Signal(str)
@@ -13,7 +15,7 @@ class TrashDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
 
     def createEditor(self, parent, option, index):
-        if index.column() != index.model().sourceModel().sourceModel().K_REMOVE_COL_INDEX:
+        if index.column() != usetablemodel.TableModelU.K_REMOVE_COL_INDEX:
             QStyledItemDelegate.createEditor(self,parent,option,index)
         else:
 
@@ -24,7 +26,7 @@ class TrashDelegate(QItemDelegate):
 
 
     def paint(self, painter, option, index):
-        if index.column() == index.model().sourceModel().sourceModel().K_REMOVE_COL_INDEX:
+        if index.column() == usetablemodel.TableModelU.K_REMOVE_COL_INDEX:
             icon = QIcon(QPixmap(':/resources/close-pushed@2x.png'))
             painter.save()
             line_1x = icon.pixmap(16,16)
