@@ -209,7 +209,7 @@ class MainWindow(QMainWindow):
             if (event.type() == QEvent.Drop):
                 if str(event.mimeData().urls()[0])[-5:-2] == ".ez":
                     event.acceptProposedAction()
-                    self.selectTemplate(event.mimeData().urls()[0].toLocalFile())
+                    self.loadTemplateFile(event.mimeData().urls()[0].toLocalFile())
         if object == self.ui.otherDataFileLineEdit:
             if event.type() == QEvent.DragEnter:
                 if str(event.mimeData().urls()[0])[-6:-2] == self.fileType:
@@ -468,35 +468,38 @@ class MainWindow(QMainWindow):
         self.toggleButtons()
         return True
 
-    def selectTemplate(self,fileLink = None):
-        if fileLink == False:
-            linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
-            QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
-        else:
-            linetext = fileLink
+    def selectTemplate(self):
+        startLocation = self.ui.hyperthoughtTemplateLineEdit.text()
+        if startLocation == "":
+            startLocation = QStandardPaths.displayName(QStandardPaths.HomeLocation())
+
+        templateFilePath = QFileDialog.getOpenFileName(self, self.tr("Select File"), startLocation, self.tr("Files (*.ez)") )[0]
+        self.loadTemplateFile(templateFilePath)
 
 
-        if linetext != "":
-            self.usetablemodel.metadataList = []
-            self.usefilterModel.displayed = []
-            self.currentTemplate= linetext.split("/")[-1]
-            self.ui.displayedFileLabel.setText(linetext.split("/")[-1])
-            self.ui.hyperthoughtTemplateLineEdit.setText(linetext)
-            self.ui.otherDataFileLineEdit.setText("")
-            infile = open(linetext,"r")
-            data= infile.readline()
-            fileType = infile.readline()
-            fileType= json.loads(fileType)
-            self.fileType = fileType[0][-4:]
-            editables = infile.readline()
-            self.editableKeys = json.loads(editables)
-            self.usetablemodel.editableKeys = self.editableKeys
-            self.toggleButtons()
-            self.templatedata = json.loads(data)
-            self.usetablemodel.addTemplateList(self.templatedata)
-            self.usefilterModel.setFilterRegExp(QRegExp())
-            infile.close()
+    def loadTemplateFile(self, templateFilePath = None):
+        if templateFilePath == "":
+            return False
 
+        self.usetablemodel.metadataList = []
+        self.usefilterModel.displayed = []
+        self.currentTemplate= templateFilePath.split("/")[-1]
+        self.ui.displayedFileLabel.setText(templateFilePath.split("/")[-1])
+        self.ui.hyperthoughtTemplateLineEdit.setText(templateFilePath)
+        self.ui.otherDataFileLineEdit.setText("")
+        infile = open(templateFilePath,"r")
+        data = infile.readline()
+        fileType = infile.readline()
+        fileType = json.loads(fileType)
+        self.fileType = fileType[0][-4:]
+        editables = infile.readline()
+        self.editableKeys = json.loads(editables)
+        self.usetablemodel.editableKeys = self.editableKeys
+        self.toggleButtons()
+        self.templatedata = json.loads(data)
+        self.usetablemodel.addTemplateList(self.templatedata)
+        self.usefilterModel.setFilterRegExp(QRegExp())
+        infile.close()        
 
         return True
 
@@ -515,7 +518,6 @@ class MainWindow(QMainWindow):
     def uploadToHyperthought(self):
         auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)
         metadataJson = ht_utilities.dict_to_ht_metadata(self.usefilterModel.displayed)
-        print(metadataJson)
         progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(self.uselistmodel.metadataList), self)
         self.createUpload.emit(self.uselistmodel.metadataList, auth_control, self.folderuuid, metadataJson)
         self.uploader.currentUploadDone.connect(progress.setValue)
