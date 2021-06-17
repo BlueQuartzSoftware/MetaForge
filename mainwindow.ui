@@ -25,7 +25,7 @@
      <number>2</number>
     </property>
     <property name="topMargin">
-     <number>2</number>
+     <number>12</number>
     </property>
     <property name="rightMargin">
      <number>2</number>
@@ -39,7 +39,7 @@
     <item row="0" column="1">
      <widget class="QTabWidget" name="TabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="CreateTemplateTab">
        <attribute name="title">
@@ -153,8 +153,8 @@
             </item>
             <item>
              <widget class="QComboBox" name="fileParserCombo">
-              <property name="currentText">
-               <string>ANG Parser</string>
+              <property name="currentText" stdset="0">
+               <string>CTF Parser</string>
               </property>
               <item>
                <property name="text">
@@ -209,16 +209,7 @@
            <property name="spacing">
             <number>0</number>
            </property>
-           <property name="leftMargin">
-            <number>0</number>
-           </property>
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <property name="rightMargin">
-            <number>0</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>0</number>
            </property>
           </layout>
@@ -295,16 +286,7 @@
            <property name="spacing">
             <number>2</number>
            </property>
-           <property name="leftMargin">
-            <number>2</number>
-           </property>
-           <property name="topMargin">
-            <number>2</number>
-           </property>
-           <property name="rightMargin">
-            <number>2</number>
-           </property>
-           <property name="bottomMargin">
+           <property name="margin">
             <number>2</number>
            </property>
            <item>
@@ -316,16 +298,7 @@
               </size>
              </property>
              <layout class="QHBoxLayout" name="horizontalLayout_10">
-              <property name="leftMargin">
-               <number>4</number>
-              </property>
-              <property name="topMargin">
-               <number>4</number>
-              </property>
-              <property name="rightMargin">
-               <number>4</number>
-              </property>
-              <property name="bottomMargin">
+              <property name="margin">
                <number>4</number>
               </property>
               <item>
@@ -361,16 +334,7 @@
         <string>Use Template</string>
        </attribute>
        <layout class="QGridLayout" name="gridLayout_3">
-        <property name="leftMargin">
-         <number>4</number>
-        </property>
-        <property name="topMargin">
-         <number>4</number>
-        </property>
-        <property name="rightMargin">
-         <number>4</number>
-        </property>
-        <property name="bottomMargin">
+        <property name="margin">
          <number>4</number>
         </property>
         <property name="spacing">
@@ -399,7 +363,7 @@
              <enum>Qt::ScrollBarAlwaysOn</enum>
             </property>
             <property name="alternatingRowColors">
-             <bool>true</bool>
+             <bool>false</bool>
             </property>
            </widget>
           </item>
@@ -476,7 +440,7 @@
               <item>
                <widget class="QPushButton" name="otherDataFileSelect">
                 <property name="enabled">
-                 <bool>false</bool>
+                 <bool>true</bool>
                 </property>
                 <property name="text">
                  <string>Select</string>
@@ -538,6 +502,9 @@
         </item>
         <item row="1" column="0">
          <layout class="QHBoxLayout" name="horizontalLayout_7">
+          <property name="spacing">
+           <number>12</number>
+          </property>
           <item>
            <widget class="QLabel" name="label_3">
             <property name="text">
@@ -558,10 +525,10 @@
           <item>
            <widget class="QPushButton" name="hyperthoughtLocationButton">
             <property name="enabled">
-             <bool>false</bool>
+             <bool>true</bool>
             </property>
             <property name="text">
-             <string>Select</string>
+             <string>Select Remote Folder</string>
             </property>
            </widget>
           </item>
@@ -569,6 +536,9 @@
         </item>
         <item row="2" column="0">
          <layout class="QGridLayout" name="gridLayout_2">
+          <property name="spacing">
+           <number>6</number>
+          </property>
           <item row="0" column="0">
            <spacer name="horizontalSpacer_3">
             <property name="orientation">
