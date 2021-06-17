@@ -4,7 +4,7 @@ class FilterModelU(QSortFilterProxyModel):
     def __init__(self,data ,parent=None):
         QSortFilterProxyModel.__init__(self, parent)
         self.displayed=[]
-        self.fileList=[]
+        self.fileType=[]
 
     def filterAcceptsRow(self,source_row, source_parent):
         curSource = self.sourceModel().metadataList[source_row]['Source']

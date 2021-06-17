@@ -4,7 +4,7 @@ class FilterModel(QSortFilterProxyModel):
     def __init__(self,data ,parent=None):
         QSortFilterProxyModel.__init__(self, parent)
         self.displayed=[]
-        self.fileList=[]
+        self.fileType=[]
         self.setDynamicSortFilter(True)
         self.sort(0)
 

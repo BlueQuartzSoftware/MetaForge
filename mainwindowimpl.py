@@ -100,7 +100,7 @@ class MainWindow(QMainWindow):
         self.useFileDelegate = UseFileDelegate(self)
         self.ui.useTemplateListView.setItemDelegate(self.useFileDelegate)
 
-        self.ui.useTemplateListView.clicked.connect(self.removeRowfromUseFileList)
+        self.ui.useTemplateListView.clicked.connect(self.removeRowfromUsefileType)
 
         self.addAppendButton()
         self.ui.TabWidget.currentChanged.connect(self.movethedamnbutton)
@@ -291,8 +291,8 @@ class MainWindow(QMainWindow):
             self.templatedata = json.loads(self.templatedata)
             templatesources = json.loads(infile.readline())
             self.fileType = json.loads(infile.readline())
-            fileList = infile.readline()
-            fileList = json.loads(fileList)
+            fileType = infile.readline()
+            fileType = json.loads(fileType)
             editables = infile.readline()
             self.editable = json.loads(editables)
             self.usetablemodel = TableModelU(self,[])
@@ -300,7 +300,7 @@ class MainWindow(QMainWindow):
             self.usetablemodel.templatesources = templatesources
             self.ui.hyperthoughtTemplateLineEdit.setText(linetext)
             self.ui.useTemplateTableView.setModel(self.usetablemodel)
-            self.uselistmodel = ListModel(self, self.usetablemodel, fileList)
+            self.uselistmodel = ListModel(self, self.usetablemodel, fileType)
             self.ui.useTemplateListView.setModel(self.uselistmodel)
             self.toggleButtons()
             infile.close()
@@ -316,16 +316,18 @@ class MainWindow(QMainWindow):
         if linetext != "":
             infile = open(linetext,"r")
             infile.readline()
-            infile.readline()
+            fileType = infile.readline()
+            self.fileType = json.loads(fileType)
             infile.readline()
             newList = infile.readline()
             newList = json.loads(newList)
             newDict = infile.readline()
             newDict = json.loads(newDict)
+            self.ui.dataFileLineEdit.setText(self.fileType[0])
             self.createtablemodel = TableModelC(newDict,self)
             self.filterModel.displayed = []
             self.filterModel.setSourceModel(self.createtablemodel)
-            self.filterModel.fileList.append(linetext)
+            self.filterModel.fileType = self.fileType
             self.createTableSearchFilterModel = QSortFilterProxyModel(self)
             self.createTableSearchFilterModel.setSourceModel(self.filterModel)
             self.createTableSearchFilterModel.setFilterKeyColumn(1)
@@ -349,7 +351,7 @@ class MainWindow(QMainWindow):
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
             self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
 
-    def removeRowfromUseFileList(self, index):
+    def removeRowfromUsefileType(self, index):
         if self.ui.useTemplateListView.width() - 64 < self.ui.useTemplateListView.mapFromGlobal(QCursor.pos()).x():
             #this is where to remove the row
             self.uselistmodel.removeRow(index.row())
@@ -412,7 +414,7 @@ class MainWindow(QMainWindow):
             with open(fileName, 'w') as outfile:
                 json.dump(self.filterModel.displayed, outfile)
                 outfile.write("\n")
-                json.dump(self.filterModel.fileList, outfile)
+                json.dump(self.filterModel.fileType, outfile)
                 outfile.write("\n")
                 self.createtablemodel.editableList = []
                 for i in range(len(self.createtablemodel.metadataList)):
@@ -447,7 +449,7 @@ class MainWindow(QMainWindow):
             self.createtablemodel = TableModelC(headerDict,self)
             self.filterModel.displayed=[]
             self.filterModel.setSourceModel(self.createtablemodel)
-            self.filterModel.fileList.append(linetext)
+            self.filterModel.fileType.append(linetext)
             self.createTableSearchFilterModel = QSortFilterProxyModel(self)
             self.createTableSearchFilterModel.setSourceModel(self.filterModel)
             self.createTableSearchFilterModel.setFilterKeyColumn(1)
