@@ -203,7 +203,7 @@ class TreeModel(QAbstractItemModel):
                              if (isinstance(curDict[key],dict)):
                                 grandParents[key]= (curDict[key],parent)
                              else:
-                                self.tablemodel.addRow(curDict,tempSource,key)
+                                self.tablemodel.addRow(curDict, tempSource, key)
 
     def uncheckChildren(self,index,value):
         if not index.isValid():

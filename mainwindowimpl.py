@@ -1,5 +1,6 @@
 # This Python file uses the following encoding: utf-8
 
+from ezmodel.ezmetadataentry import EzMetadataEntry
 from PySide2.QtWidgets import QApplication, QButtonGroup, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView, QToolButton, QStyle, QProgressDialog, QDialog
 from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot, QRegExp, QThread,QModelIndex, QEvent
 from PySide2.QtGui import QCloseEvent, QCursor, QDesktopServices
@@ -25,8 +26,10 @@ from tqdm import tqdm
 from uploader import Uploader
 
 import ctf
-import ang
+import parsers.ang as ang
 import json
+
+from ezmodel.ezmetadatamodel import EzMetadataModel
 
 class MainWindow(QMainWindow):
     createUpload = Signal(list,htauthcontroller.HTAuthorizationController, str, list)
@@ -53,7 +56,7 @@ class MainWindow(QMainWindow):
         self.numCustoms = 0
 
         aTree={}
-        self.createtablemodel = TableModelC(aTree,self)
+        self.createtablemodel = TableModelC(aTree, metadata_model=EzMetadataModel(), parent=self)
         self.filterModel = FilterModel(self)
         self.filterModel.setSourceModel(self.createtablemodel)
         self.ui.metadataTableView.setModel(self.filterModel)
@@ -451,16 +454,19 @@ class MainWindow(QMainWindow):
                 headerDict =ang.parse_header_as_dict(linetext)
             elif linetext.split(".")[1].upper() == "XML":
                 print("XML Parser used")
-
-            self.createtablemodel = TableModelC(headerDict,self)
-            self.filterModel.displayed=[]
-            self.filterModel.setSourceModel(self.createtablemodel)
-            self.filterModel.fileType.append(linetext)
-            self.createTableSearchFilterModel = QSortFilterProxyModel(self)
-            self.createTableSearchFilterModel.setSourceModel(self.filterModel)
-            self.createTableSearchFilterModel.setFilterKeyColumn(1)
-            self.createTableSearchFilterModel.setDynamicSortFilter(True)
-            self.ui.metadataTableView.setModel(self.createTableSearchFilterModel)
+            
+            metadata_model = EzMetadataModel.create_model(headerDict,
+                                                          linetext,
+                                                          source_type=EzMetadataEntry.SourceType.FILE)
+            self.createtablemodel = TableModelC(tree_data=headerDict, metadata_model=metadata_model, parent=self)
+            # self.filterModel.displayed=[]
+            # self.filterModel.setSourceModel(self.createtablemodel)
+            # self.filterModel.fileType.append(linetext)
+            # self.createTableSearchFilterModel = QSortFilterProxyModel(self)
+            # self.createTableSearchFilterModel.setSourceModel(self.filterModel)
+            # self.createTableSearchFilterModel.setFilterKeyColumn(1)
+            # self.createTableSearchFilterModel.setDynamicSortFilter(True)
+            self.ui.metadataTableView.setModel(self.createtablemodel)
             self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.createtablemodel)
             self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
             self.createTreeSearchFilterModel.setSourceModel(self.treeModel)

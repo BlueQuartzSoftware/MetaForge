@@ -4,7 +4,7 @@ from dataclasses_json import dataclass_json
 import json
 from typing import List
 
-from ezmetadataentry import EzMetadataEntry
+from ezmodel.ezmetadataentry import EzMetadataEntry
 
 @dataclass_json
 @dataclass
@@ -78,6 +78,16 @@ class EzMetadataModel:
 
     def to_json_string(self, indent: int = 4):
         return self.to_json(indent=indent)
+
+    def size(self) -> int:
+        return len(self.entries)
+    
+    def enabled_count(self) -> int:
+        count = 0
+        for entry in self.entries:
+            if entry.enabled is True:
+                count = count + 1
+        return count
     
     @staticmethod
     def from_json_file(file_path: str) -> EzMetadataModel:

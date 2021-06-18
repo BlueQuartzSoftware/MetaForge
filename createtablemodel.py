@@ -3,6 +3,9 @@ from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex
 from PySide2.QtGui import QIcon, QColor
 from PySide2.QtWidgets import QApplication, QStyle
 
+from ezmodel.ezmetadataentry import EzMetadataEntry
+from ezmodel.ezmetadatamodel import EzMetadataModel
+
 
 class TableModelC(QAbstractTableModel):
     """
@@ -50,7 +53,7 @@ class TableModelC(QAbstractTableModel):
     K_HTUNITS_COL_NAME = "HT Units"
     K_HTUNITS_COL_INDEX = 6
 
-    K_USESOURCE_COL_NAME = "Use Source Value"
+    K_USESOURCE_COL_NAME = "Override Source Value"
     K_USESOURCE_COL_INDEX = 7
 
     K_EDITABLE_COL_NAME = "Editable"
@@ -59,19 +62,19 @@ class TableModelC(QAbstractTableModel):
     K_REMOVE_COL_NAME = "Remove Row"
     K_REMOVE_COL_INDEX = 9
 
-    def __init__(self, data, parent=None):
+    def __init__(self, tree_data: dict, metadata_model: EzMetadataModel, parent=None):
         QAbstractTableModel.__init__(self, parent)
-        self.metadataList = []
+        self.metadata_model = metadata_model
         visited = {}
         queue = []
         grandParents = {}
         source = ""
-        self.hiddenList = []
-        self.treeDict = data
-        self.editableList = []
+        self.treeDict = tree_data
+
 
     def rowCount(self, parent=QModelIndex()):
-        return len(self.metadataList)
+        model_row_count = self.metadata_model.size()
+        return model_row_count
 
     def columnCount(self, parent=QModelIndex()):
         return self.K_COL_COUNT
@@ -81,25 +84,22 @@ class TableModelC(QAbstractTableModel):
             if index.column() == self.K_SORT_COL_INDEX:
                 return index.row()
             elif index.column() == self.K_HTNAME_COL_INDEX:
-                return self.metadataList[index.row()][self.K_HTNAME_META_KEY]
+                return self.metadata_model.entry(index.row()).ht_name
             elif index.column() == self.K_SOURCEVAL_COL_INDEX:
-                if self.metadataList[index.row()][self.K_VALUE_META_KEY] == "None":
-                    return ""
-                return str(self.metadataList[index.row()][self.K_VALUE_META_KEY])
+                return self.metadata_model.entry(index.row()).source_value
             elif index.column() == self.K_SOURCE_COL_INDEX:
-                return self.metadataList[index.row()][self.K_SOURCE_COL_NAME]
+                return self.metadata_model.entry(index.row()).source_path
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                return self.metadataList[index.row()][self.K_HTVALUE_COL_NAME]
+                return self.metadata_model.entry(index.row()).ht_value
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
-                return self.metadataList[index.row()][self.K_HTANNOTATION_META_KEY]
-
+                return self.metadata_model.entry(index.row()).ht_annotation
             elif index.column() == self.K_HTUNITS_COL_INDEX:
-                return self.metadataList[index.row()][self.K_HTUNITS_META_KEY]
+                return self.metadata_model.entry(index.row()).ht_units
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_EDITABLE_COL_INDEX:
-                return self.metadataList[index.row()][self.K_EDITABLE_COL_NAME]
+                return self.metadata_model.entry(index.row()).editable
             elif index.column() == self.K_USESOURCE_COL_INDEX:
-                return self.metadataList[index.row()][self.K_DEFAULT_META_KEY]
+                return self.metadata_model.entry(index.row()).override_source_value
 
         return None
 
@@ -130,124 +130,94 @@ class TableModelC(QAbstractTableModel):
             return None
 
     def setData(self, index, value, role):
-        #print(f'setData: {index}, {value}')
+        if not index.isValid():
+            return False
+            
         if role == Qt.EditRole:
-            if not index.isValid():
-                return False
-            if index.column() == self.K_SORT_COL_INDEX:
-                if int(value) > -1 and int(value) < len(self.metadataList):
-                    temp = self.metadataList[int(value)]
-                    self.metadataList[int(
-                        value)] = self.metadataList[index.row()]
-                    self.metadataList[index.row()] = temp
+            # if index.column() == self.K_SORT_COL_INDEX:
+            #     if int(value) > -1 and int(value) < len(<<<self.metadataList>>>):
+            #         temp = <<<self.metadataList>>>[int(value)]
+            #         <<<self.metadataList>>>[int(value)] = <<<self.metadataList>>>[index.row()]
+            #         <<<self.metadataList>>>[index.row()] = temp
             if index.column() == self.K_HTNAME_COL_INDEX:
-                self.metadataList[index.row(
-                )][self.K_HTNAME_META_KEY] = value
+                self.metadata_model.entry(index.row()).ht_name = value
                 self.dataChanged.emit(index, index)
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                if value == "":
-                    self.metadataList[index.row(
-                    )][self.K_HTVALUE_COL_NAME] = self.K_FROM_SOURCE
-                else:
-                    if "Custom Input" not in self.metadataList[index.row()]["Source"]:
-                        self.dataChanged.emit(index, index)
-                        treeDict = self.treeDict
-                        sourcePath = self.metadataList[index.row()][self.K_SOURCE_COL_NAME].split(
-                            "/")
-                        for i in range(len(sourcePath)-1):
-                            treeDict = treeDict[sourcePath[i]]
-                        treeDict[sourcePath[-1]] = value
-                        self.metadataList[index.row(
-                        )][self.K_HTVALUE_COL_NAME] = value
-
-                    else:
-                        self.metadataList[index.row()]["HT Value"] = value
-                    self.dataChanged.emit(index, index)
+                self.metadata_model.entry(index.row()).ht_value = value
+                self.dataChanged.emit(index, index)
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
-                self.metadataList[index.row(
-                )][self.K_HTANNOTATION_META_KEY] = value
+                self.metadata_model.entry(index.row()).ht_annotation = value
                 self.dataChanged.emit(index, index)
             elif index.column() == self.K_HTUNITS_COL_INDEX:
-                self.metadataList[index.row()][self.K_HTUNITS_META_KEY] = value
+                self.metadata_model.entry(index.row()).ht_units = value
                 self.dataChanged.emit(index, index)
-
-
-
+            else:
+                return False
             return True
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
                 self.changeChecked(index)
-
             return True
 
         return False
 
     def changeChecked(self, index):
-        if index.column() == self.K_EDITABLE_COL_INDEX:
-            if self.metadataList[index.row()][self.K_EDITABLE_COL_NAME] == 0:
-                self.metadataList[index.row()][self.K_EDITABLE_COL_NAME] = 2
-            else:
-                self.metadataList[index.row()][self.K_EDITABLE_COL_NAME] = 0
-            self.dataChanged.emit(index, index)
-        elif index.column() == self.K_USESOURCE_COL_INDEX:
-            if self.metadataList[index.row()][self.K_DEFAULT_META_KEY] == 0:
-                self.metadataList[index.row()][self.K_HTVALUE_META_KEY] = self.K_FROM_SOURCE
-                self.metadataList[index.row()][self.K_DEFAULT_META_KEY] = 2
-            else:
-                self.metadataList[index.row()][self.K_HTVALUE_META_KEY] = self.metadataList[index.row()][self.K_VALUE_META_KEY]
-                self.metadataList[index.row()][self.K_DEFAULT_META_KEY] = 0
-            anIndex = self.index(index.row(),self.K_HTVALUE_COL_INDEX)
-            self.dataChanged.emit(anIndex,index)
+        pass
+        # if index.column() == self.K_EDITABLE_COL_INDEX:
+        #     if <<<self.metadataList>>>[index.row()][self.K_EDITABLE_COL_NAME] == 0:
+        #         <<<self.metadataList>>>[index.row()][self.K_EDITABLE_COL_NAME] = 2
+        #     else:
+        #         <<<self.metadataList>>>[index.row()][self.K_EDITABLE_COL_NAME] = 0
+        #     self.dataChanged.emit(index, index)
+        # elif index.column() == self.K_USESOURCE_COL_INDEX:
+        #     if <<<self.metadataList>>>[index.row()][self.K_DEFAULT_META_KEY] == 0:
+        #         <<<self.metadataList>>>[index.row()][self.K_HTVALUE_META_KEY] = self.K_FROM_SOURCE
+        #         <<<self.metadataList>>>[index.row()][self.K_DEFAULT_META_KEY] = 2
+        #     else:
+        #         <<<self.metadataList>>>[index.row()][self.K_HTVALUE_META_KEY] = <<<self.metadataList>>>[index.row()][self.K_VALUE_META_KEY]
+        #         <<<self.metadataList>>>[index.row()][self.K_DEFAULT_META_KEY] = 0
+        #     anIndex = self.index(index.row(),self.K_HTVALUE_COL_INDEX)
+        #     self.dataChanged.emit(anIndex,index)
 
     def flags(self, index):
-        if not index.isValid():
-            return Qt.NoItemFlags
-        if index.column() == self.K_HTNAME_COL_INDEX:
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-        elif index.column() == self.K_HTVALUE_COL_INDEX:
-            if self.metadataList[index.row()]["Default"] == 2:
-                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
-            elif self.metadataList[index.row()]["Default"] == 0:
-                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable | Qt.ItemIsEnabled)
-        elif index.column() == self.K_REMOVE_COL_INDEX:
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-        elif index.column() == self.K_SORT_COL_INDEX:
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-        elif index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable)
-        else:
-#            if index.data() == "":
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-#            return Qt.ItemIsEnabled
+        return Qt.NoItemFlags
+        # if not index.isValid():
+        #     return Qt.NoItemFlags
+        # if index.column() == self.K_HTNAME_COL_INDEX:
+        #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+        # elif index.column() == self.K_HTVALUE_COL_INDEX:
+        #     if <<<self.metadataList>>>[index.row()]["Default"] == 2:
+        #         return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
+        #     elif <<<self.metadataList>>>[index.row()]["Default"] == 0:
+        #         return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable | Qt.ItemIsEnabled)
+        # elif index.column() == self.K_REMOVE_COL_INDEX:
+        #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+        # elif index.column() == self.K_SORT_COL_INDEX:
+        #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+        # elif index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
+        #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable)
+        # else:
+        #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+
 
     def addRow(self, dataDict, source, value):
-        self.beginInsertRows(self.index(len(self.metadataList), 0), len(
-            self.metadataList), len(self.metadataList))
-        self.metadataList.append(
-            {self.K_NAME_META_KEY: value,
-             self.K_VALUE_META_KEY: dataDict[value],
-             self.K_SOURCE_META_KEY: source+value,
-             self.K_HTVALUE_COL_NAME: self.K_FROM_SOURCE,
-             self.K_HTNAME_COL_NAME: value,
-             self.K_CHECKED_META_KEY: 2,
-             self.K_HTUNITS_META_KEY: "",
-             self.K_HTANNOTATION_META_KEY: "",
-             self.K_EDITABLE_META_KEY: 2,
-             self.K_DEFAULT_META_KEY: 2})
-        self.endInsertRows()
+        # self.beginInsertRows(self.index(self.metadata_model.enabled_count(), 0), self.metadata_model.size(), self.metadata_model.size())
+        print(f'source:{source} ===> value:{value}')
+        # self.endInsertRows()
 
-    def addEmptyRow(self,numCustom):
-        self.beginInsertRows(self.index(len(self.metadataList), 0), len(
-            self.metadataList), len(self.metadataList))
-        self.metadataList.append(
-            {self.K_NAME_META_KEY: "",
-             self.K_VALUE_META_KEY: "",
-             self.K_SOURCE_META_KEY: self.K_CUSTOM_INPUT+" "+str(numCustom),
-             self.K_HTVALUE_COL_NAME: "",
-             self.K_HTNAME_COL_NAME: "",
-             self.K_CHECKED_META_KEY: 2,
-             self.K_HTUNITS_META_KEY: "",
-             self.K_HTANNOTATION_META_KEY: "",
-             self.K_EDITABLE_META_KEY: 2,
-             self.K_DEFAULT_META_KEY: 0})
-        self.endInsertRows()
+    def addEmptyRow(self, numCustom):
+        pass
+        # self.beginInsertRows(self.index(len(<<<self.metadataList>>>), 0), len(
+        #     <<<self.metadataList>>>), len(<<<self.metadataList>>>))
+        # <<<self.metadataList>>>.append(
+        #     {self.K_NAME_META_KEY: "",
+        #      self.K_VALUE_META_KEY: "",
+        #      self.K_SOURCE_META_KEY: self.K_CUSTOM_INPUT+" "+str(numCustom),
+        #      self.K_HTVALUE_COL_NAME: "",
+        #      self.K_HTNAME_COL_NAME: "",
+        #      self.K_CHECKED_META_KEY: 2,
+        #      self.K_HTUNITS_META_KEY: "",
+        #      self.K_HTANNOTATION_META_KEY: "",
+        #      self.K_EDITABLE_META_KEY: 2,
+        #      self.K_DEFAULT_META_KEY: 0})
+        # self.endInsertRows()
