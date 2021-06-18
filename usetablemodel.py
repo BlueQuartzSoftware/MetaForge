@@ -185,9 +185,9 @@ class TableModelU(QAbstractTableModel):
             self.metadataList), len(self.metadataList))
         if row["Key"] in self.editableKeys:
             self.metadataList.append(
-                {self.K_KEY_META_KEY: row["Key"],
-                 self.K_VALUE_META_KEY: row[self.K_HTVALUE_COL_NAME],
-                 self.K_SOURCE_META_KEY: row["Source"],
+                {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
+                 self.K_VALUE_META_KEY: row[self.K_VALUE_META_KEY],
+                 self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
                  self.K_UNITS_META_KEY: "",
                  self.K_ANNOTATION_META_KEY: "",
                  self.K_EDITABLE_META_KEY: 2,
@@ -195,9 +195,9 @@ class TableModelU(QAbstractTableModel):
         else:
 
             self.metadataList.append(
-                {self.K_KEY_META_KEY: row["Key"],
-                 self.K_VALUE_META_KEY: row["Value"],
-                 self.K_SOURCE_META_KEY: row["Source"],
+                {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
+                 self.K_VALUE_META_KEY: row[self.K_VALUE_META_KEY],
+                 self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
                  self.K_UNITS_META_KEY: "",
                  self.K_ANNOTATION_META_KEY: "",
                  self.K_EDITABLE_META_KEY: 0,
