@@ -270,6 +270,12 @@ class MainWindow(QMainWindow):
                 del self.usetablemodel.metadataList[i]
                 self.usetablemodel.endRemoveRows()
                 break
+        for i in range(len(self.usefilterModel.displayed)):
+            if self.usefilterModel.displayed[i]["Source"] == source:
+                self.usefilterModel.beginRemoveRows(QModelIndex(),i,i)
+                del self.usefilterModel.displayed[i]
+                self.usefilterModel.endRemoveRows()
+                break
 
     def help(self):
         QDesktopServices.openUrl("http://www.bluequartz.net/")
@@ -519,11 +525,15 @@ class MainWindow(QMainWindow):
         auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)
         metadataJson = ht_utilities.dict_to_ht_metadata(self.usefilterModel.displayed)
         progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(self.uselistmodel.metadataList), self)
+
+        progress.setWindowFlags( Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint )
+        progress.setAttribute(Qt.WA_DeleteOnClose)
         self.createUpload.emit(self.uselistmodel.metadataList, auth_control, self.folderuuid, metadataJson)
         self.uploader.currentUploadDone.connect(progress.setValue)
         self.uploader.currentlyUploading.connect(progress.setLabelText)
         self.uploader.allUploadsDone.connect(progress.accept)
         progress.canceled.connect(lambda: self.uploader.interruptUpload())
+        progress.setFixedSize( 500, 100 )
         progress.exec()
 
 
