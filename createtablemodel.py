@@ -19,14 +19,13 @@ class TableModelC(QAbstractTableModel):
     # These are the keys to the Meta Data Dictionary that stores each row of data in the table.
     K_NAME_META_KEY = "Key"
     K_VALUE_META_KEY = "Value"
-    K_HTNAME_META_KEY = "HT Name"
     K_HTVALUE_META_KEY = "HT Value"
     K_SOURCE_META_KEY = "Source"
     K_CHECKED_META_KEY = "Checked"
     K_EDITABLE_META_KEY = "Editable"
     K_DEFAULT_META_KEY = "Default"
-    K_HTANNOTATION_META_KEY = "HT Annotation"
-    K_HTUNITS_META_KEY = "HT Units"
+    K_ANNOTATION_META_KEY = "Annotation"
+    K_UNITS_META_KEY = "Units"
 
     # These are the user facing header and the index of each column in the table.
     K_SORT_COL_NAME = "#^"
@@ -81,7 +80,7 @@ class TableModelC(QAbstractTableModel):
             if index.column() == self.K_SORT_COL_INDEX:
                 return index.row()
             elif index.column() == self.K_HTNAME_COL_INDEX:
-                return self.metadataList[index.row()][self.K_HTNAME_META_KEY]
+                return self.metadataList[index.row()][self.K_NAME_META_KEY]
             elif index.column() == self.K_SOURCEVAL_COL_INDEX:
                 if self.metadataList[index.row()][self.K_VALUE_META_KEY] == "None":
                     return ""
@@ -91,10 +90,10 @@ class TableModelC(QAbstractTableModel):
             elif index.column() == self.K_HTVALUE_COL_INDEX:
                 return self.metadataList[index.row()][self.K_HTVALUE_COL_NAME]
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
-                return self.metadataList[index.row()][self.K_HTANNOTATION_META_KEY]
+                return self.metadataList[index.row()][self.K_ANNOTATION_META_KEY]
 
             elif index.column() == self.K_HTUNITS_COL_INDEX:
-                return self.metadataList[index.row()][self.K_HTUNITS_META_KEY]
+                return self.metadataList[index.row()][self.K_UNITS_META_KEY]
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_EDITABLE_COL_INDEX:
                 return self.metadataList[index.row()][self.K_EDITABLE_COL_NAME]
@@ -142,7 +141,7 @@ class TableModelC(QAbstractTableModel):
                     self.metadataList[index.row()] = temp
             if index.column() == self.K_HTNAME_COL_INDEX:
                 self.metadataList[index.row(
-                )][self.K_HTNAME_META_KEY] = value
+                )][self.K_NAME_META_KEY] = value
                 self.dataChanged.emit(index, index)
             elif index.column() == self.K_HTVALUE_COL_INDEX:
                 if value == "":
@@ -165,10 +164,10 @@ class TableModelC(QAbstractTableModel):
                     self.dataChanged.emit(index, index)
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
                 self.metadataList[index.row(
-                )][self.K_HTANNOTATION_META_KEY] = value
+                )][self.K_ANNOTATION_META_KEY] = value
                 self.dataChanged.emit(index, index)
             elif index.column() == self.K_HTUNITS_COL_INDEX:
-                self.metadataList[index.row()][self.K_HTUNITS_META_KEY] = value
+                self.metadataList[index.row()][self.K_UNITS_META_KEY] = value
                 self.dataChanged.emit(index, index)
 
 
@@ -228,10 +227,9 @@ class TableModelC(QAbstractTableModel):
              self.K_VALUE_META_KEY: dataDict[value],
              self.K_SOURCE_META_KEY: source+value,
              self.K_HTVALUE_COL_NAME: self.K_FROM_SOURCE,
-             self.K_HTNAME_COL_NAME: value,
              self.K_CHECKED_META_KEY: 2,
-             self.K_HTUNITS_META_KEY: "",
-             self.K_HTANNOTATION_META_KEY: "",
+             self.K_UNITS_META_KEY: "",
+             self.K_ANNOTATION_META_KEY: "",
              self.K_EDITABLE_META_KEY: 2,
              self.K_DEFAULT_META_KEY: 2})
         self.endInsertRows()
@@ -244,10 +242,9 @@ class TableModelC(QAbstractTableModel):
              self.K_VALUE_META_KEY: "",
              self.K_SOURCE_META_KEY: self.K_CUSTOM_INPUT+" "+str(numCustom),
              self.K_HTVALUE_COL_NAME: "",
-             self.K_HTNAME_COL_NAME: "",
              self.K_CHECKED_META_KEY: 2,
-             self.K_HTUNITS_META_KEY: "",
-             self.K_HTANNOTATION_META_KEY: "",
+             self.K_UNITS_META_KEY: "",
+             self.K_ANNOTATION_META_KEY: "",
              self.K_EDITABLE_META_KEY: 2,
              self.K_DEFAULT_META_KEY: 0})
         self.endInsertRows()

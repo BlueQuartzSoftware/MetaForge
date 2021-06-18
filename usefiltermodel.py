@@ -22,4 +22,6 @@ class FilterModelU(QSortFilterProxyModel):
                     self.displayed.append(self.sourceModel().metadataList[source_row])
 
                 return "Custom Input" in self.sourceModel().metadataList[source_row]['Source']
+        else:
+            return False
 

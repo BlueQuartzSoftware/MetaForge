@@ -12,7 +12,7 @@ class FilterModel(QSortFilterProxyModel):
     def filterAcceptsRow(self,source_row, source_parent):
         if self.sourceModel().metadataList[source_row] not in self.sourceModel().hiddenList and self.sourceModel().metadataList[source_row] not in self.displayed:
             self.displayed.append(self.sourceModel().metadataList[source_row])
-        elif self.sourceModel().metadataList[source_row]["Source"] == "Custom Input" and self.sourceModel().metadataList[source_row] not in self.displayed:
+        elif  "Custom Input" in self.sourceModel().metadataList[source_row]["Source"] and self.sourceModel().metadataList[source_row] not in self.displayed:
             self.displayed.append(self.sourceModel().metadataList[source_row])
         return self.sourceModel().metadataList[source_row] not in self.sourceModel().hiddenList or self.sourceModel().metadataList[source_row] == "Custom Input"
 

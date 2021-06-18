@@ -21,6 +21,8 @@ class TableModelU(QAbstractTableModel):
     K_KEY_META_KEY = "Key"
     K_VALUE_META_KEY = "Value"
     K_SOURCE_META_KEY = "Source"
+    K_HTNAME_META_KEY = "HT Name"
+    K_HTVALUE_META_KEY = "HT Value"
     K_ANNOTATION_META_KEY = "Annotation"
     K_UNITS_META_KEY = "Units"
     K_EDITABLE_META_KEY = "Editable"
@@ -73,8 +75,6 @@ class TableModelU(QAbstractTableModel):
             self.templatelist.append(newList[i])
             if "Custom Input" not in newList[i]["Source"]:
                 self.templatesources.append("/".join(newList[i]['Source'].split("/")[1:]))
-            else:
-                self.addRow(newList[i])
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.metadataList)
@@ -183,13 +183,20 @@ class TableModelU(QAbstractTableModel):
     def addRow(self, row):
         self.beginInsertRows(self.index(len(self.metadataList), 0), len(
             self.metadataList), len(self.metadataList))
-        if row["Key"] in self.editableKeys:
+
+        units = ""
+        annotation = ""
+        for i in range(len(self.templatelist)):
+            if self.templatelist[i][self.K_KEY_META_KEY] == row[self.K_KEY_META_KEY]:
+                units = self.templatelist[i][self.K_UNITS_META_KEY]
+                annotation = self.templatelist[i][self.K_ANNOTATION_META_KEY]
+        if row[self.K_KEY_META_KEY] in self.editableKeys:
             self.metadataList.append(
                 {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
                  self.K_VALUE_META_KEY: row[self.K_VALUE_META_KEY],
                  self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
-                 self.K_UNITS_META_KEY: "",
-                 self.K_ANNOTATION_META_KEY: "",
+                 self.K_UNITS_META_KEY: units,
+                 self.K_ANNOTATION_META_KEY: annotation,
                  self.K_EDITABLE_META_KEY: 2,
                  self.K_USESOURCE_META_KEY: 2})
         else:
@@ -198,10 +205,34 @@ class TableModelU(QAbstractTableModel):
                 {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
                  self.K_VALUE_META_KEY: row[self.K_VALUE_META_KEY],
                  self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
-                 self.K_UNITS_META_KEY: "",
-                 self.K_ANNOTATION_META_KEY: "",
+                 self.K_UNITS_META_KEY: units,
+                 self.K_ANNOTATION_META_KEY: annotation,
                  self.K_EDITABLE_META_KEY: 0,
                  self.K_USESOURCE_META_KEY: 2})
+
+        self.endInsertRows()
+
+    def addExistingRow(self, row):
+        self.beginInsertRows(self.index(len(self.metadataList), 0), len(
+            self.metadataList), len(self.metadataList))
+        if row[self.K_USESOURCE_META_KEY] == 0:
+            self.metadataList.append(
+             {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
+             self.K_VALUE_META_KEY: row[self.K_HTVALUE_META_KEY],
+             self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
+             self.K_UNITS_META_KEY: row[self.K_UNITS_META_KEY],
+             self.K_ANNOTATION_META_KEY: row[self.K_ANNOTATION_META_KEY],
+             self.K_EDITABLE_META_KEY: row[self.K_EDITABLE_META_KEY],
+             self.K_USESOURCE_META_KEY: row[self.K_USESOURCE_META_KEY]} )
+        else:
+            self.metadataList.append(
+             {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
+             self.K_VALUE_META_KEY: row[self.K_VALUE_META_KEY],
+             self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
+             self.K_UNITS_META_KEY: row[self.K_UNITS_META_KEY],
+             self.K_ANNOTATION_META_KEY: row[self.K_ANNOTATION_META_KEY],
+             self.K_EDITABLE_META_KEY: row[self.K_EDITABLE_META_KEY],
+             self.K_USESOURCE_META_KEY: row[self.K_USESOURCE_META_KEY]} )
 
         self.endInsertRows()
 

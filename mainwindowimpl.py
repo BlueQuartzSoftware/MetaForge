@@ -192,7 +192,7 @@ class MainWindow(QMainWindow):
                     if "Custom Input" not in self.templatedata[i]["Source"]:
                         self.templatesources.append("/".join(self.templatedata[i]['Source'].split("/")[1:]))
                     else:
-                        self.usetablemodel.addRow(self.templatedata[i])
+                        self.usetablemodel.addExistingRow(self.templatedata[i])
                 self.usesearchFilterModel = QSortFilterProxyModel(self)
                 self.usesearchFilterModel.setSourceModel(self.usefilterModel)
                 self.usesearchFilterModel.setFilterKeyColumn(0)
