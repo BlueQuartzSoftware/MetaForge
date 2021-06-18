@@ -1,3 +1,4 @@
 tqdm
 pyside2
 requests
+dataclasses_json
