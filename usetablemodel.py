@@ -88,7 +88,7 @@ class TableModelU(QAbstractTableModel):
                 return self.metadataList[index.row()][self.K_KEY_META_KEY]
 
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                return self.metadataList[index.row()][self.K_VALUE_META_KEY]
+                return str(self.metadataList[index.row()][self.K_VALUE_META_KEY])
 
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
                 return self.metadataList[index.row()][self.K_ANNOTATION_META_KEY]
