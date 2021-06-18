@@ -15,28 +15,21 @@ class TrashDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
 
     def createEditor(self, parent, option, index):
-        if index.column() != usetablemodel.TableModelU.K_REMOVE_COL_INDEX:
-            QStyledItemDelegate.createEditor(self,parent,option,index)
-        else:
-
-            sourceModelIndex = (index.model().mapToSource(index))
-            realSourceModelIndex = sourceModelIndex.model().mapToSource(sourceModelIndex).row()
-            #The index goes from the Proxy Model to the Table Model to look into the masterlist.
-            self.pressed.emit(index.model().sourceModel().sourceModel().metadataList[realSourceModelIndex]["Source"])
+        sourceModelIndex = (index.model().mapToSource(index))
+        realSourceModelIndex = sourceModelIndex.model().mapToSource(sourceModelIndex).row()
+        #The index goes from the Proxy Model to the Table Model to look into the masterlist.
+        self.pressed.emit(index.model().sourceModel().sourceModel().metadataList[realSourceModelIndex]["Source"])
 
 
     def paint(self, painter, option, index):
-        if index.column() == usetablemodel.TableModelU.K_REMOVE_COL_INDEX:
-            icon = QIcon(QPixmap(':/resources/close-pushed@2x.png'))
-            painter.save()
-            line_1x = icon.pixmap(16,16)
-            painter.drawPixmap(option.rect.x()+option.rect.width()/2 - 8 ,
-            option.rect.y()+option.rect.height()/2 - 8,
-            16,
-            16,
-            line_1x)
-            painter.restore()
-        else:
-            QItemDelegate.paint(self, painter, option, index)
+        icon = QIcon(QPixmap(':/resources/close-pushed@2x.png'))
+        painter.save()
+        line_1x = icon.pixmap(16,16)
+        painter.drawPixmap(option.rect.x()+option.rect.width()/2 - 8 ,
+        option.rect.y()+option.rect.height()/2 - 8,
+        16,
+        16,
+        line_1x)
+        painter.restore()
 
 

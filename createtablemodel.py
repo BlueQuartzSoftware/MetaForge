@@ -19,6 +19,8 @@ class TableModelC(QAbstractTableModel):
     # These are the keys to the Meta Data Dictionary that stores each row of data in the table.
     K_NAME_META_KEY = "Key"
     K_VALUE_META_KEY = "Value"
+    K_HTNAME_META_KEY = "HT Key"
+    K_HTVALUE_META_KEY = "HT Value"
     K_SOURCE_META_KEY = "Source"
     K_CHECKED_META_KEY = "Checked"
     K_EDITABLE_META_KEY = "Editable"
@@ -163,7 +165,7 @@ class TableModelC(QAbstractTableModel):
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
                 self.changeChecked(index)
-                self.dataChanged.emit(index, index)
+
             return True
 
         return False
@@ -174,17 +176,27 @@ class TableModelC(QAbstractTableModel):
                 self.metadataList[index.row()][self.K_EDITABLE_COL_NAME] = 2
             else:
                 self.metadataList[index.row()][self.K_EDITABLE_COL_NAME] = 0
+            self.dataChanged.emit(index, index)
         elif index.column() == self.K_USESOURCE_COL_INDEX:
             if self.metadataList[index.row()][self.K_DEFAULT_META_KEY] == 0:
+                self.metadataList[index.row()][self.K_HTVALUE_META_KEY] = self.K_FROM_SOURCE
                 self.metadataList[index.row()][self.K_DEFAULT_META_KEY] = 2
             else:
+                self.metadataList[index.row()][self.K_HTVALUE_META_KEY] = self.metadataList[index.row()][self.K_VALUE_META_KEY]
                 self.metadataList[index.row()][self.K_DEFAULT_META_KEY] = 0
+            anIndex = self.index(index.row(),self.K_HTVALUE_COL_INDEX)
+            self.dataChanged.emit(anIndex,index)
 
     def flags(self, index):
         if not index.isValid():
-            return Qt.ItemIsEnabled
-        if index.column() == self.K_HTVALUE_COL_INDEX or index.column() == self.K_HTNAME_COL_INDEX:
+            return Qt.NoItemFlags
+        if index.column() == self.K_HTNAME_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+        elif index.column() == self.K_HTVALUE_COL_INDEX:
+            if self.metadataList[index.row()]["Default"] == 2:
+                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
+            elif self.metadataList[index.row()]["Default"] == 0:
+                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable | Qt.ItemIsEnabled)
         elif index.column() == self.K_REMOVE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
         elif index.column() == self.K_SORT_COL_INDEX:
@@ -192,9 +204,9 @@ class TableModelC(QAbstractTableModel):
         elif index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable)
         else:
-            if index.data() == "":
-                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-            return Qt.ItemIsEnabled
+#            if index.data() == "":
+            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+#            return Qt.ItemIsEnabled
 
     def addRow(self, dataDict, source, value):
         self.beginInsertRows(self.index(len(self.metadataList), 0), len(
