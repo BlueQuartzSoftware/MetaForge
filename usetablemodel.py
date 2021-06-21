@@ -186,29 +186,36 @@ class TableModelU(QAbstractTableModel):
 
         units = ""
         annotation = ""
+        default = 2
+        value = row[self.K_VALUE_META_KEY]
+        name = row[self.K_KEY_META_KEY]
         for i in range(len(self.templatelist)):
             if self.templatelist[i][self.K_KEY_META_KEY] == row[self.K_KEY_META_KEY]:
+                if self.templatelist[i][self.K_USESOURCE_META_KEY] == 0:
+                    default = 0
+                    value = self.templatelist[i][self.K_HTVALUE_META_KEY]
+                name = self.templatelist[i][self.K_HTNAME_META_KEY]
                 units = self.templatelist[i][self.K_UNITS_META_KEY]
                 annotation = self.templatelist[i][self.K_ANNOTATION_META_KEY]
         if row[self.K_KEY_META_KEY] in self.editableKeys:
             self.metadataList.append(
-                {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
-                 self.K_VALUE_META_KEY: row[self.K_VALUE_META_KEY],
+                {self.K_KEY_META_KEY: name,
+                 self.K_VALUE_META_KEY: value,
                  self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
                  self.K_UNITS_META_KEY: units,
                  self.K_ANNOTATION_META_KEY: annotation,
                  self.K_EDITABLE_META_KEY: 2,
-                 self.K_USESOURCE_META_KEY: 2})
+                 self.K_USESOURCE_META_KEY: default})
         else:
 
             self.metadataList.append(
-                {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
-                 self.K_VALUE_META_KEY: row[self.K_VALUE_META_KEY],
+                {self.K_KEY_META_KEY: name,
+                 self.K_VALUE_META_KEY: value,
                  self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
                  self.K_UNITS_META_KEY: units,
                  self.K_ANNOTATION_META_KEY: annotation,
                  self.K_EDITABLE_META_KEY: 0,
-                 self.K_USESOURCE_META_KEY: 2})
+                 self.K_USESOURCE_META_KEY: default})
 
         self.endInsertRows()
 
