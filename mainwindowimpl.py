@@ -108,7 +108,7 @@ class MainWindow(QMainWindow):
         self.addAppendButton()
         self.ui.TabWidget.currentChanged.connect(self.movethedamnbutton)
         self.appendSourceFilesButton.clicked.connect(self.addFile)
-        self.ui.appendCreateTableRowButton.clicked.connect(self.addCreateTableRow)
+        self.ui.appendCreateTableRowButton.clicked.connect(self.addCustomRowToCreateTable)
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
         self.ui.hyperthoughtLocationButton.clicked.connect(self.hyperthoughtui.exec)
         self.ui.usetableSearchBar.textChanged.connect(self.filterUseTable)
@@ -136,8 +136,8 @@ class MainWindow(QMainWindow):
         self.accessKey = apikey
 
 
-    def addCreateTableRow(self):
-       self.create_ez_table_model.addEmptyRow(self.numCustoms)
+    def addCustomRowToCreateTable(self):
+       self.create_ez_table_model.addCustomRow(self.numCustoms)
        self.numCustoms+=1
 
 

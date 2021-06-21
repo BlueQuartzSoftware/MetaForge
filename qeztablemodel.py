@@ -205,19 +205,23 @@ class QEzTableModel(QAbstractTableModel):
         # self.beginInsertRows(self.index(self.metadata_model.enabled_count(), 0), self.metadata_model.size(), self.metadata_model.size())
         # self.endInsertRows()
 
-    def addEmptyRow(self, numCustom):
-        pass
-        # self.beginInsertRows(self.index(len(<<<self.metadataList>>>), 0), len(
-        #     <<<self.metadataList>>>), len(<<<self.metadataList>>>))
-        # <<<self.metadataList>>>.append(
-        #     {self.K_NAME_META_KEY: "",
-        #      self.K_VALUE_META_KEY: "",
-        #      self.K_SOURCE_META_KEY: self.K_CUSTOM_INPUT+" "+str(numCustom),
-        #      self.K_HTVALUE_COL_NAME: "",
-        #      self.K_HTNAME_COL_NAME: "",
-        #      self.K_CHECKED_META_KEY: 2,
-        #      self.K_HTUNITS_META_KEY: "",
-        #      self.K_HTANNOTATION_META_KEY: "",
-        #      self.K_EDITABLE_META_KEY: 2,
-        #      self.K_DEFAULT_META_KEY: 0})
-        # self.endInsertRows()
+    def addCustomRow(self, numCustom):
+        
+        self.beginInsertRows(self.index(len(self.metadata_model.entries), 0), len(
+            self.metadata_model.entries), len(self.metadata_model.entries))
+        custom = EzMetadataEntry()
+        custom.source_type =  EzMetadataEntry.SourceType.CUSTOM
+        custom.source_path  = ""
+        custom.source_value  = ""
+        custom.ht_name  = "Custom HT Name"
+        custom.ht_value  = "Custom HT Value"
+        custom.ht_annotation  = ""
+        custom.ht_units  = ""
+        custom.override_source_value  = True
+        custom.editable  = True
+        custom.required  = True
+        custom.enabled  = True
+
+        self.metadata_model.append(custom)
+
+        self.endInsertRows()
