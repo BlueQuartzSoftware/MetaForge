@@ -1,5 +1,5 @@
 from ezmodel.ezmetadataentry import EzMetadataEntry
-from ezmetadatamodel import EzMetadataModel
+from ezmodel.ezmetadatamodel import EzMetadataModel
 from parsers.ang import parse_header_as_dict
 
 # Paths (change these!)
