@@ -2,15 +2,20 @@ from ezmodel.ezmetadataentry import EzMetadataEntry
 from ezmodel.ezmetadatamodel import EzMetadataModel
 from parsers.ang import parse_header_as_dict
 
+import json
+
 # Paths (change these!)
 data_file_path = '/Users/joeykleingers/Downloads/011.ang'
 json_file_path = '011.json'
 
 # Parse the data file header
 model_dict = parse_header_as_dict(data_file_path)
+with open(json_file_path, 'w') as json_file:
+    json.dump(model_dict, json_file, indent=4)
 
 # Create a EzMetadataModel from the header dictionary
-model = EzMetadataModel.create_model(model_dict, data_file_path, EzMetadataEntry.SourceType.FILE)
+model = EzMetadataModel.create_model(
+    model_dict, data_file_path, EzMetadataEntry.SourceType.FILE)
 
 custom0 = EzMetadataEntry()
 custom0.source_type = EzMetadataEntry.SourceType.CUSTOM

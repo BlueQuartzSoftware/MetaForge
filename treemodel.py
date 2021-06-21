@@ -1,21 +1,23 @@
 # This Python file uses the following encoding: utf-8
 
 
-from PySide2.QtCore import QAbstractItemModel, QFile, QIODevice, QItemSelectionModel, QModelIndex, QObject ,Qt, Signal, Slot
+from PySide2.QtCore import QAbstractItemModel, QFile, QIODevice, QItemSelectionModel, QModelIndex, QObject, Qt, Signal, Slot
 from PySide2.QtWidgets import QApplication, QMainWindow
 from treeitem import TreeItem
+
+from ezmodel.ezmetadatamodel import EzMetadataModel
 
 
 class TreeModel(QAbstractItemModel):
     checkChanged = Signal(int, str)
-    def __init__(self, headers, data, tablemodel, parent=None):
+
+    def __init__(self, headers, metadata_model: EzMetadataModel, parent=None):
         super(TreeModel, self).__init__(parent)
 
         rootData = [header for header in headers]
         self.rootItem = TreeItem(rootData)
-        self.treeDict = data
-        self.tablemodel = tablemodel
-        self.setupModelData(data, self.rootItem)
+        self.metadata_model = metadata_model
+        self.setupModelData(self.metadata_model, self.rootItem)
 
     def changeLeafCheck(self, source):
         curNode = self.rootItem.child(0)
@@ -24,13 +26,11 @@ class TreeModel(QAbstractItemModel):
         for key in keyNames:
             for i in range(curNode.childCount()):
                 if curNode.child(i).itemData[0] == key:
-                        curNode = curNode.child(i)
-                        curRow = i
-                        break
+                    curNode = curNode.child(i)
+                    curRow = i
+                    break
         anIndex = self.createIndex(curRow, curNode.columnCount(), curNode)
         self.setData(anIndex, 0, Qt.CheckStateRole)
-
-
 
     def columnCount(self, parent=QModelIndex()):
         return self.rootItem.columnCount()
@@ -46,7 +46,6 @@ class TreeModel(QAbstractItemModel):
             return item.checked
 
         return None
-
 
     def flags(self, index):
         if not index.isValid():
@@ -90,7 +89,7 @@ class TreeModel(QAbstractItemModel):
         parentItem = self.getItem(parent)
         self.beginInsertRows(parent, position, position + rows - 1)
         success = parentItem.insertChildren(position, rows,
-                self.rootItem.columnCount())
+                                            self.rootItem.columnCount())
         self.endInsertRows()
 
         return success
@@ -133,28 +132,27 @@ class TreeModel(QAbstractItemModel):
 
     def setData(self, index, value, role=Qt.EditRole):
         if role == Qt.EditRole:
-           item = self.getItem(index)
-           result = item.setData(index.column(), value)
-           if result:
-               self.dataChanged.emit(index, index)
-               return result
+            item = self.getItem(index)
+            result = item.setData(index.column(), value)
+            if result:
+                self.dataChanged.emit(index, index)
+                return result
         elif role == Qt.CheckStateRole:
             item = self.getItem(index)
             item.checked = value
             checked = item.checked
-            source=""
-            sourceList= []
+            source = ""
+            sourceList = []
 
             while item.parentItem:
-                sourceList.insert(0,item.itemData[0]+"/")
+                sourceList.insert(0, item.itemData[0]+"/")
                 item = item.parentItem
 
-            self.checkChanged.emit(checked,source.join(sourceList)[:-1])
-            self.uncheckChildren(index,value)
+            self.checkChanged.emit(checked, source.join(sourceList)[:-1])
+            self.uncheckChildren(index, value)
             self.dataChanged.emit(index, index)
             return True
         return False
-
 
     def setHeaderData(self, section, orientation, value, role=Qt.EditRole):
         if role != Qt.EditRole or orientation != Qt.Horizontal:
@@ -166,46 +164,47 @@ class TreeModel(QAbstractItemModel):
 
         return result
 
-    def setupModelData(self, data, parent):
-             visited={}
-             queue=[]
-             grandParents = {}
+    def setupModelData(self, metadata_model: EzMetadataModel, parent):
+        treeDict = metadata_model.to_file_tree_dict()
 
-             for key in data.keys():
-                 visited[(parent.itemData[0])]=[key]
-                 queue.append((key,parent,""))
-                 grandParents[key] = (data[key],parent)
-             curDict = data
-             tempSource= ""
-             while queue:
-                 poppedItem = queue.pop(0)
-                 child = poppedItem[0]
-                 parentOfChild = poppedItem[1]
-                 childSource = poppedItem[2]
-                 parent = parentOfChild
-                 parent.insertChildren(parent.childCount(),1,self.rootItem.columnCount())
-                 parent.child(parent.childCount() -1).setData(0,child)
+        visited = {}
+        queue = []
+        grandParents = {}
 
-                 if child in grandParents:
+        for key in treeDict.keys():
+            visited[(parent.itemData[0])] = [key]
+            queue.append((key, parent, ""))
+            grandParents[key] = (treeDict[key], parent)
+        curDict = treeDict
+        tempSource = ""
+        while queue:
+            poppedItem = queue.pop(0)
+            child = poppedItem[0]
+            parentOfChild = poppedItem[1]
+            childSource = poppedItem[2]
+            parent = parentOfChild
+            parent.insertChildren(parent.childCount(), 1,
+                                  self.rootItem.columnCount())
+            parent.child(parent.childCount() - 1).setData(0, child)
 
-                     curDict =  grandParents[child][0]
-                     tempSource = childSource+child+"/"
-                     for curChild in range(grandParents[child][1].childCount()):
-                         if child == grandParents[child][1].child(curChild).itemData[0]:
-                            parent = grandParents[child][1].child(curChild)
-                            visited[(parent.itemData[0])]=[]
+            if child in grandParents:
 
-                 if isinstance(curDict, dict):
-                     for key in curDict.keys():
-                         if key not in visited[(parent.itemData[0])]:
-                             visited[(parent.itemData[0])].append(key)
-                             queue.append((key,parent,tempSource))
-                             if (isinstance(curDict[key],dict)):
-                                grandParents[key]= (curDict[key],parent)
-                             else:
-                                self.tablemodel.addRow(curDict, tempSource, key)
+                curDict = grandParents[child][0]
+                tempSource = childSource+child+"/"
+                for curChild in range(grandParents[child][1].childCount()):
+                    if child == grandParents[child][1].child(curChild).itemData[0]:
+                        parent = grandParents[child][1].child(curChild)
+                        visited[(parent.itemData[0])] = []
 
-    def uncheckChildren(self,index,value):
+            if isinstance(curDict, dict):
+                for key in curDict.keys():
+                    if key not in visited[(parent.itemData[0])]:
+                        visited[(parent.itemData[0])].append(key)
+                        queue.append((key, parent, tempSource))
+                        if (isinstance(curDict[key], dict)):
+                            grandParents[key] = (curDict[key], parent)
+
+    def uncheckChildren(self, index, value):
         if not index.isValid():
             return
         else:
@@ -213,7 +212,4 @@ class TreeModel(QAbstractItemModel):
             for i in range(childCount):
                 child = index.child(i, 0)
                 self.setData(child, value, Qt.CheckStateRole)
-                self.uncheckChildren(child,value)
-
-
-
+                self.uncheckChildren(child, value)

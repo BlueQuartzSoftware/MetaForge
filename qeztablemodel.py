@@ -62,14 +62,9 @@ class QEzTableModel(QAbstractTableModel):
     K_REMOVE_COL_NAME = "Remove Row"
     K_REMOVE_COL_INDEX = 9
 
-    def __init__(self, tree_data: dict, metadata_model: EzMetadataModel, parent=None):
+    def __init__(self, metadata_model: EzMetadataModel, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadata_model = metadata_model
-        visited = {}
-        queue = []
-        grandParents = {}
-        source = ""
-        self.treeDict = tree_data
 
 
     def rowCount(self, parent=QModelIndex()):

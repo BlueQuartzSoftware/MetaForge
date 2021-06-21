@@ -5,6 +5,7 @@ from dataclasses_json import dataclass_json
 from enum import Enum
 from typing import List
 
+
 @dataclass_json
 @dataclass
 class EzMetadataEntry:
@@ -28,9 +29,8 @@ class EzMetadataEntry:
     ht_value: str = ""
     ht_annotation: str = ""
     ht_units: str = ""
-    source_type: SourceType = SourceType.FILE
+    source_type: EzMetadataEntry.SourceType = SourceType.FILE
     override_source_value: bool = False
     editable: bool = True
     required: bool = False
     enabled: bool = True
-
