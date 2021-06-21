@@ -530,6 +530,9 @@
                 <property name="text">
                  <string>Add Extracted Metadata File To File List</string>
                 </property>
+                <property name="checked">
+                 <bool>true</bool>
+                </property>
                </widget>
               </item>
               <item>

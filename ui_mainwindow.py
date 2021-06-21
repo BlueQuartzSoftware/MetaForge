@@ -327,6 +327,7 @@ class Ui_MainWindow(object):
 
         self.addMetadataFileCheckBox = QCheckBox(self.UseTemplateTab)
         self.addMetadataFileCheckBox.setObjectName(u"addMetadataFileCheckBox")
+        self.addMetadataFileCheckBox.setChecked(True)
 
         self.horizontalLayout_12.addWidget(self.addMetadataFileCheckBox)
 
