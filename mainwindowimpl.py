@@ -373,7 +373,7 @@ class MainWindow(QMainWindow):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
                                    "/Packages/",
                                    "Packages (*.ez)")
-        dialog.setDefaultSuffix(".ezpak")
+        fileName.setDefaultSuffix(".ezpak")
         if fileName != "":
             myDir= QDir()
             myDir.mkpath(fileName[0])
