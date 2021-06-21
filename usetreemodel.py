@@ -17,6 +17,8 @@ class TreeModelU(TreeModel):
         self.treeDict= data
         self.tablemodel = tablemodel
         self.editableKeys = editables
+        self.examingParents = False
+        self.examiningChildren = False
         self.setupModelData(data, self.rootItem)
         self.checkList()
 

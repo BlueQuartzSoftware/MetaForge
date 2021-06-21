@@ -288,7 +288,7 @@ class MainWindow(QMainWindow):
 
     def openPackage(self):
         linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
-        QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
+        QStandardPaths.HomeLocation),self.tr("Files (*.ezpak)"))[0]
         if linetext != "":
             self.currentTemplate= linetext.split("/")[-1]
             self.ui.displayedFileLabel.setText(linetext.split("/")[-1])
@@ -371,6 +371,7 @@ class MainWindow(QMainWindow):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
                                    "/Packages/",
                                    "Packages (*.ez)")
+        dialog.setDefaultSuffix(".ezpak")
         if fileName != "":
             myDir= QDir()
             myDir.mkpath(fileName[0])
@@ -391,6 +392,7 @@ class MainWindow(QMainWindow):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
                                    "/Packages/",
                                    "Packages (*)")
+        dialog.setDefaultSuffix(".ezpak")
         if fileName != "":
             myDir= QDir()
             myDir.mkpath(fileName[0])
@@ -424,7 +426,7 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 self.createtablemodel.editableList = []
                 for i in range(len(self.createtablemodel.metadataList)):
-                    if self.createtablemodel.metadataList[i]["Editable"] == 2 and self.createtablemodel.metadataList[i]["Checked"] == 2:
+                    if self.createtablemodel.metadataList[i]["Editable"] == 2 and (self.createtablemodel.metadataList[i]["Checked"] == 2 or self.createtablemodel.metadataList[i]["Checked"] == 1):
                         self.createtablemodel.editableList.append(self.createtablemodel.metadataList[i]["Key"])
                 json.dump(self.createtablemodel.editableList, outfile)
                 outfile.write("\n")

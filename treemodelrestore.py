@@ -17,6 +17,8 @@ class TreeModelR(TreeModel):
         self.tablemodel = tablemodel
         self.newList = newList
         self.filterModel = filterModel
+        self.examingParents = False
+        self.examiningChildren = False
         self.setupModelData(data, self.rootItem)
 
     def setupModelData(self, data, parent):
@@ -66,6 +68,7 @@ class TreeModelR(TreeModel):
                                 grandParents[key]= (curDict[key],parent)
                              else:
                                 pass
+
 
 
 

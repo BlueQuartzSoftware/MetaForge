@@ -41,6 +41,10 @@ class FilterModel(QSortFilterProxyModel):
                             newj+=1
 
             else:
+                for j in range(len(self.sourceModel().metadataList)):
+                    if source in self.sourceModel().metadataList[j]["Source"]:
+                        self.sourceModel().hiddenList.append(self.sourceModel().metadataList[j])
+                        self.sourceModel().metadataList[j]["Checked"] = checked
                 iteratelist = self.sourceModel().hiddenList[:]
                 newj=0
                 for j in range(len(iteratelist)):
