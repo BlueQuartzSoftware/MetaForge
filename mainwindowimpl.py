@@ -111,6 +111,7 @@ class MainWindow(QMainWindow):
         self.ui.usetableSearchBar.textChanged.connect(self.filterUseTable)
         self.ui.createTemplateListSearchBar.textChanged.connect(self.filterCreateTable)
         self.ui.createTemplateTreeSearchBar.textChanged.connect(self.filterCreateTree)
+        self.ui.addMetadataFileCheckBox.stateChanged.connect(self.checkFileList)
 
 
         self.fileType = ""
@@ -154,6 +155,15 @@ class MainWindow(QMainWindow):
     def addUseTableRow(self):
         self.usetablemodel.addEmptyRow()
 
+    def checkFileList(self, checked):
+        if checked == Qt.Checked:
+          if self.ui.otherDataFileLineEdit.text() != "":
+              self.uselistmodel.addRow(self.ui.otherDataFileLineEdit.text())
+        elif checked == Qt.Unchecked:
+            if self.ui.otherDataFileLineEdit.text() in self.uselistmodel.metadataList:
+                rowIndex = self.uselistmodel.metadataList.index(self.ui.otherDataFileLineEdit.text())
+                self.uselistmodel.removeRow(rowIndex)
+
     def closeEvent(self, event):
         self.mThread.quit()
         self.mThread.wait(250)
@@ -169,6 +179,9 @@ class MainWindow(QMainWindow):
             self.setWindowTitle(linetext)
             self.ui.dataTypeText.setText(linetext.split(".")[1].upper())
             self.ui.otherDataFileLineEdit.setText(linetext)
+            if self.ui.addMetadataFileCheckBox.checkState() == Qt.Checked:
+                self.uselistmodel.addRow(linetext)
+                self.toggleButtons()
             if self.ui.fileParserCombo.findText(linetext.split(".")[1].upper()+" Parser") != -1:
                 headerDict= {}
                 self.ui.fileParserCombo.setCurrentIndex(self.ui.fileParserCombo.findText(linetext.split(".")[1].upper()+" Parser"))

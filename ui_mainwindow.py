@@ -154,8 +154,8 @@ class Ui_MainWindow(object):
         self.widget_3.setMinimumSize(QSize(0, 0))
         self.horizontalLayout_9 = QHBoxLayout(self.widget_3)
         self.horizontalLayout_9.setSpacing(0)
-        self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
+        self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
 
         self.gridLayout_5.addWidget(self.widget_3, 2, 0, 1, 1)
 
@@ -209,14 +209,14 @@ class Ui_MainWindow(object):
         self.widget.setMinimumSize(QSize(0, 0))
         self.horizontalLayout_11 = QHBoxLayout(self.widget)
         self.horizontalLayout_11.setSpacing(2)
-        self.horizontalLayout_11.setContentsMargins(2, 2, 2, 2)
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.horizontalLayout_11.setContentsMargins(2, 2, 2, 2)
         self.widget_2 = QWidget(self.widget)
         self.widget_2.setObjectName(u"widget_2")
         self.widget_2.setMinimumSize(QSize(0, 0))
         self.horizontalLayout_10 = QHBoxLayout(self.widget_2)
-        self.horizontalLayout_10.setContentsMargins(4, 4, 4, 4)
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalLayout_10.setContentsMargins(4, 4, 4, 4)
         self.horizontalSpacer_5 = QSpacerItem(1227, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_10.addItem(self.horizontalSpacer_5)
@@ -237,8 +237,8 @@ class Ui_MainWindow(object):
         self.UseTemplateTab.setObjectName(u"UseTemplateTab")
         self.gridLayout_3 = QGridLayout(self.UseTemplateTab)
         self.gridLayout_3.setSpacing(2)
-        self.gridLayout_3.setContentsMargins(4, 4, 4, 4)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.gridLayout_3.setContentsMargins(4, 4, 4, 4)
         self.horizontalLayout_13 = QHBoxLayout()
         self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
         self.useTemplateListView = QListView(self.UseTemplateTab)
@@ -312,6 +312,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout_6)
 
         self.horizontalLayout_12 = QHBoxLayout()
+        self.horizontalLayout_12.setSpacing(9)
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
         self.usetableSearchBar = QLineEdit(self.UseTemplateTab)
         self.usetableSearchBar.setObjectName(u"usetableSearchBar")
@@ -323,6 +324,11 @@ class Ui_MainWindow(object):
         self.usetableSearchBar.setReadOnly(False)
 
         self.horizontalLayout_12.addWidget(self.usetableSearchBar)
+
+        self.addMetadataFileCheckBox = QCheckBox(self.UseTemplateTab)
+        self.addMetadataFileCheckBox.setObjectName(u"addMetadataFileCheckBox")
+
+        self.horizontalLayout_12.addWidget(self.addMetadataFileCheckBox)
 
         self.displayedFileLabel = QLabel(self.UseTemplateTab)
         self.displayedFileLabel.setObjectName(u"displayedFileLabel")
@@ -457,7 +463,7 @@ class Ui_MainWindow(object):
         self.fileParserCombo.setItemText(1, QCoreApplication.translate("MainWindow", u"ANG Parser", None))
         self.fileParserCombo.setItemText(2, QCoreApplication.translate("MainWindow", u"Custom Parser", None))
 
-        self.fileParserCombo.setProperty("currentText", QCoreApplication.translate("MainWindow", u"CTF Parser", None))
+        self.fileParserCombo.setCurrentText(QCoreApplication.translate("MainWindow", u"CTF Parser", None))
 #if QT_CONFIG(tooltip)
         self.appendCreateTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a custom value to the template", None))
 #endif // QT_CONFIG(tooltip)
@@ -478,6 +484,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.otherDataFileSelect.setText(QCoreApplication.translate("MainWindow", u"Select", None))
         self.usetableSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search For HT Key", None))
+        self.addMetadataFileCheckBox.setText(QCoreApplication.translate("MainWindow", u"Add Extracted Metadata File To File List", None))
         self.displayedFileLabel.setText(QCoreApplication.translate("MainWindow", u"No File Selected", None))
 #if QT_CONFIG(tooltip)
         self.appendUseTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a Custom Value that is only going to be used for this upload", None))
