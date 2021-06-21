@@ -201,8 +201,8 @@ class QEzTableModel(QAbstractTableModel):
 
 
     def addRow(self, dataDict, source, value):
+        pass
         # self.beginInsertRows(self.index(self.metadata_model.enabled_count(), 0), self.metadata_model.size(), self.metadata_model.size())
-        print(f'source:{source} ===> value:{value}')
         # self.endInsertRows()
 
     def addEmptyRow(self, numCustom):

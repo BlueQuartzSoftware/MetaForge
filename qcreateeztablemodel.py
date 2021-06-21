@@ -18,15 +18,19 @@ class QCreateEzTableModel(QSortFilterProxyModel):
         metadata_model = self.sourceModel().metadata_model
         metadata_entry: EzMetadataEntry = metadata_model.entry(source_row)
 
+        regex = self.filterRegExp()
+        match = regex.exactMatch(metadata_entry.ht_name)
+
         # Custom data use case
-        if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+        if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM and match:
             return True
 
         # All other use cases
-        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE and match:
             return metadata_entry.enabled
         else:
             return False
+        
     
     def flags(self, index):
         if not index.isValid():
