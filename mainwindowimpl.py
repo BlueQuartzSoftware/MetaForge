@@ -329,6 +329,8 @@ class MainWindow(QMainWindow):
             newList = json.loads(newList)
             newDict = infile.readline()
             newDict = json.loads(newDict)
+            self.ui.dataTypeText.setText(self.fileType[0][-3:].upper())
+            self.ui.fileParserCombo.setCurrentIndex(self.ui.fileParserCombo.findText(self.fileType[0][-3:].upper()+" Parser"))
             self.ui.dataFileLineEdit.setText(self.fileType[0])
             self.createtablemodel = TableModelC(newDict,self)
             self.filterModel.displayed = []
