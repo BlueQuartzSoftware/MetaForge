@@ -288,7 +288,7 @@ class MainWindow(QMainWindow):
 
     def openPackage(self):
         linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
-        QStandardPaths.HomeLocation),self.tr("Files (*.ezpak)"))[0]
+        QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
         if linetext != "":
             self.currentTemplate= linetext.split("/")[-1]
             self.ui.displayedFileLabel.setText(linetext.split("/")[-1])
@@ -301,7 +301,7 @@ class MainWindow(QMainWindow):
             fileType = json.loads(fileType)
             editables = infile.readline()
             self.editable = json.loads(editables)
-            self.usetablemodel = TableModelU(self,[])
+            self.usetablemodel = TableModelU(self,[],self.editable)
             self.usetablemodel.templatelist = self.templatedata
             self.usetablemodel.templatesources = templatesources
             self.ui.hyperthoughtTemplateLineEdit.setText(linetext)
@@ -329,8 +329,8 @@ class MainWindow(QMainWindow):
             newList = json.loads(newList)
             newDict = infile.readline()
             newDict = json.loads(newDict)
-            self.ui.dataTypeText.setText(self.fileType[0][-3:].upper())
-            self.ui.fileParserCombo.setCurrentIndex(self.ui.fileParserCombo.findText(self.fileType[0][-3:].upper()+" Parser"))
+            self.ui.dataTypeText.setText(self.fileType[0][-4:].upper())
+            self.ui.fileParserCombo.setCurrentIndex(self.ui.fileParserCombo.findText(self.fileType[0][-4:].upper()+" Parser"))
             self.ui.dataFileLineEdit.setText(self.fileType[0])
             self.createtablemodel = TableModelC(newDict,self)
             self.filterModel.displayed = []
@@ -373,7 +373,6 @@ class MainWindow(QMainWindow):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
                                    "/Packages/",
                                    "Packages (*.ez)")
-        fileName.setDefaultSuffix(".ezpak")
         if fileName != "":
             myDir= QDir()
             myDir.mkpath(fileName[0])
