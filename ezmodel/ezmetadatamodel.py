@@ -71,6 +71,20 @@ class EzMetadataModel:
     def entry(self, index: int) -> EzMetadataEntry:
         return self.entries[index]
 
+    def entry_by_source(self, source:str) -> EzMetadataEntry:
+        for e in self.entries:
+            if e.source_path == source:
+                return e
+        return None
+    
+    def index_from_source(self, source: str) -> int:
+        index = 0
+        for e in self.entries:
+            if e.source_path == source:
+                return index
+            index = index + 1
+        return index
+
     def to_json_file(self, file_path: str, indent: int = 4):
         json_string = self.to_json_string(indent=indent)
         with open(file_path, 'w') as outfile:

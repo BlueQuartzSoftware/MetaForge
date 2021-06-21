@@ -7,7 +7,7 @@ from ezmodel.ezmetadataentry import EzMetadataEntry
 from ezmodel.ezmetadatamodel import EzMetadataModel
 
 
-class TableModelC(QAbstractTableModel):
+class QEzTableModel(QAbstractTableModel):
     """
     Define all of the column indices and column names in addition to any other strings
     in this section. This will make it easier to move columns around and rename items.
@@ -54,7 +54,7 @@ class TableModelC(QAbstractTableModel):
     K_HTUNITS_COL_INDEX = 6
 
     K_USESOURCE_COL_NAME = "Override Source Value"
-    K_USESOURCE_COL_INDEX = 7
+    K_OVERRIDESOURCEVALUE_COL_INDEX = 7
 
     K_EDITABLE_COL_NAME = "Editable"
     K_EDITABLE_COL_INDEX = 8
@@ -98,7 +98,7 @@ class TableModelC(QAbstractTableModel):
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_EDITABLE_COL_INDEX:
                 return self.metadata_model.entry(index.row()).editable
-            elif index.column() == self.K_USESOURCE_COL_INDEX:
+            elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 return self.metadata_model.entry(index.row()).override_source_value
 
         return None
@@ -117,7 +117,7 @@ class TableModelC(QAbstractTableModel):
                 return self.K_SOURCE_COL_NAME
             elif section == self.K_HTVALUE_COL_INDEX:
                 return self.K_HTVALUE_COL_NAME
-            elif section == self.K_USESOURCE_COL_INDEX:
+            elif section == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 return self.K_USESOURCE_COL_NAME
             elif section == self.K_EDITABLE_COL_INDEX:
                 return self.K_EDITABLE_COL_NAME
@@ -155,7 +155,7 @@ class TableModelC(QAbstractTableModel):
                 return False
             return True
         elif role == Qt.CheckStateRole:
-            if index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
+            if index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 self.changeChecked(index)
             return True
 
@@ -169,7 +169,7 @@ class TableModelC(QAbstractTableModel):
         #     else:
         #         <<<self.metadataList>>>[index.row()][self.K_EDITABLE_COL_NAME] = 0
         #     self.dataChanged.emit(index, index)
-        # elif index.column() == self.K_USESOURCE_COL_INDEX:
+        # elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
         #     if <<<self.metadataList>>>[index.row()][self.K_DEFAULT_META_KEY] == 0:
         #         <<<self.metadataList>>>[index.row()][self.K_HTVALUE_META_KEY] = self.K_FROM_SOURCE
         #         <<<self.metadataList>>>[index.row()][self.K_DEFAULT_META_KEY] = 2
@@ -194,7 +194,7 @@ class TableModelC(QAbstractTableModel):
         #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
         # elif index.column() == self.K_SORT_COL_INDEX:
         #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-        # elif index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
+        # elif index.column() == self.K_EDIDEX or index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
         #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable)
         # else:
         #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)

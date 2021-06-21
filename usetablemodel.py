@@ -31,7 +31,7 @@ class TableModelU(QAbstractTableModel):
     K_SOURCE_COL_INDEX = 0
 
     K_USESOURCE_COL_NAME = "Use Source Value"
-    K_USESOURCE_COL_INDEX = 1
+    K_OVERRIDESOURCEVALUE_COL_INDEX = 1
 
     K_HTKEY_COL_NAME = "HT Name"
     K_HTKEY_COL_INDEX = 2
@@ -100,7 +100,7 @@ class TableModelU(QAbstractTableModel):
                 return self.metadataList[index.row()][self.K_SOURCE_META_KEY]
                 
         elif role == Qt.CheckStateRole:
-            if index.column() == self.K_USESOURCE_COL_INDEX:
+            if index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 return self.metadataList[index.row()][self.K_USESOURCE_META_KEY]
 
         return None
@@ -121,7 +121,7 @@ class TableModelU(QAbstractTableModel):
                 return self.K_SOURCE_COL_NAME
             elif section == self.K_REMOVE_COL_INDEX:
                 return self.K_REMOVE_COL_NAME
-            elif section == self.K_USESOURCE_COL_INDEX:
+            elif section == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 return self.K_USESOURCE_COL_NAME
 
             return None
@@ -154,7 +154,7 @@ class TableModelU(QAbstractTableModel):
 
             return True
         elif role == Qt.CheckStateRole:
-            if index.column() == self.K_USESOURCE_COL_INDEX:
+            if index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 pass
             #self.dataChanged.emit(index, index)
             return True
@@ -166,7 +166,7 @@ class TableModelU(QAbstractTableModel):
             return Qt.ItemIsEnabled
         if index.column() == self.K_REMOVE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-        elif index.column() == self.K_SOURCE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
+        elif index.column() == self.K_SOURCE_COL_INDEX or index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
         else:
             if index.data() == "" or self.metadataList[index.row()]["Editable"] == 2:

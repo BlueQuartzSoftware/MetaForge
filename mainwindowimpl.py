@@ -6,13 +6,13 @@ from PySide2.QtCore import QFile, QDir ,QIODevice, Qt, QStandardPaths, QSortFilt
 from PySide2.QtGui import QCloseEvent, QCursor, QDesktopServices
 from ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
-from createtablemodel	import TableModelC
+from qeztablemodel	import QEzTableModel
 from usetablemodel import TableModelU
 from uselistmodel import ListModel
 from treemodel import TreeModel
 from treemodelrestore import TreeModelR
 from usetreemodel import TreeModelU
-from filterModel import FilterModel
+from qcreateeztablemodel import QCreateEzTableModel
 from usefiltermodel import FilterModelU
 from checkboxdelegate import CheckBoxDelegate
 from usefiledelegate import UseFileDelegate
@@ -56,26 +56,26 @@ class MainWindow(QMainWindow):
         self.numCustoms = 0
 
         aTree={}
-        self.createtablemodel = TableModelC(aTree, metadata_model=EzMetadataModel(), parent=self)
-        self.filterModel = FilterModel(self)
-        self.filterModel.setSourceModel(self.createtablemodel)
-        self.ui.metadataTableView.setModel(self.filterModel)
-        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.createtablemodel.K_SOURCE_COL_INDEX,QHeaderView.ResizeToContents)
-        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.createtablemodel.K_HTNAME_COL_INDEX,QHeaderView.ResizeToContents)
-        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.createtablemodel.K_SOURCEVAL_COL_INDEX,QHeaderView.ResizeToContents)
-        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.createtablemodel.K_HTVALUE_COL_INDEX,QHeaderView.ResizeToContents)
-        self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_USESOURCE_COL_INDEX, self.width() * .1)
+        self.create_ez_table_model = QEzTableModel(aTree, metadata_model=EzMetadataModel(), parent=self)
+        self.create_ez_table_model_proxy = QCreateEzTableModel(self)
+        self.create_ez_table_model_proxy.setSourceModel(self.create_ez_table_model)
+        self.ui.metadataTableView.setModel(self.create_ez_table_model_proxy)
+        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.create_ez_table_model.K_SOURCE_COL_INDEX,QHeaderView.ResizeToContents)
+        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.create_ez_table_model.K_HTNAME_COL_INDEX,QHeaderView.ResizeToContents)
+        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.create_ez_table_model.K_SOURCEVAL_COL_INDEX,QHeaderView.ResizeToContents)
+        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(self.create_ez_table_model.K_HTVALUE_COL_INDEX,QHeaderView.ResizeToContents)
+        self.ui.metadataTableView.setColumnWidth(self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width() * .1)
 
         self.checkboxDelegate = CheckBoxDelegate()
         self.createtrashDelegate = TrashDelegate()
-        self.ui.metadataTableView.setItemDelegateForColumn(self.createtablemodel.K_USESOURCE_COL_INDEX, self.checkboxDelegate)
-        self.ui.metadataTableView.setItemDelegateForColumn(self.createtablemodel.K_EDITABLE_COL_INDEX, self.checkboxDelegate)
-        self.ui.metadataTableView.setItemDelegateForColumn(self.createtablemodel.K_REMOVE_COL_INDEX, self.createtrashDelegate)
-        self.ui.metadataTableView.setColumnWidth(self.createtablemodel.K_REMOVE_COL_INDEX,self.width() * .05)
+        self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
+        self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_EDITABLE_COL_INDEX, self.checkboxDelegate)
+        self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_REMOVE_COL_INDEX, self.createtrashDelegate)
+        self.ui.metadataTableView.setColumnWidth(self.create_ez_table_model.K_REMOVE_COL_INDEX,self.width() * .05)
 
-        self.treeModel = TreeModel(["Available File Metadata"],aTree,self.createtablemodel)
+        self.treeModel = TreeModel(["Available File Metadata"],aTree,self.create_ez_table_model)
         self.ui.metadataTreeView.setModel(self.treeModel)
-        self.treeModel.checkChanged.connect(self.filterModel.checkList)
+        self.treeModel.checkChanged.connect(self.create_ez_table_model_proxy.checkList)
         self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
         self.editableKeys = []
 
@@ -86,10 +86,10 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTKEY_COL_INDEX,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTVALUE_COL_INDEX,self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_SOURCE_COL_INDEX,self.width()*.25)
-        self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_USESOURCE_COL_INDEX,self.width()*.1)
+        self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_OVERRIDESOURCEVALUE_COL_INDEX,self.width()*.1)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_HTANNOTATION_COL_INDEX,self.width()*.1)
         self.usetrashDelegate = TrashDelegate()
-        self.ui.useTemplateTableView.setItemDelegateForColumn(self.usetablemodel.K_USESOURCE_COL_INDEX, self.checkboxDelegate)
+        self.ui.useTemplateTableView.setItemDelegateForColumn(self.usetablemodel.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
         self.ui.useTemplateTableView.setItemDelegateForColumn(self.usetablemodel.K_REMOVE_COL_INDEX, self.usetrashDelegate)
         self.ui.useTemplateTableView.setColumnWidth(self.usetablemodel.K_REMOVE_COL_INDEX,self.width()*.075)
         self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
@@ -137,8 +137,8 @@ class MainWindow(QMainWindow):
 
 
     def addCreateTableRow(self):
-        self.createtablemodel.addEmptyRow(self.numCustoms)
-        self.numCustoms+=1
+       self.create_ez_table_model.addEmptyRow(self.numCustoms)
+       self.numCustoms+=1
 
 
     def addFile(self):
@@ -235,9 +235,9 @@ class MainWindow(QMainWindow):
 
 
     def filterCreateTable(self):
-        self.createTableSearchFilterModel.invalidate()
-        self.createTableSearchFilterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        self.createTableSearchFilterModel.setFilterWildcard("*"+self.ui.createTemplateListSearchBar.text()+"*")
+        self.create_ez_table_model_proxy.invalidate()
+        self.create_ez_table_model_proxy.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.create_ez_table_model_proxy.setFilterWildcard("*"+self.ui.createTemplateListSearchBar.text()+"*")
 
     def filterCreateTree(self):
         self.createTreeSearchFilterModel.invalidate()
@@ -257,11 +257,11 @@ class MainWindow(QMainWindow):
 
     def handleRemoveCreate(self, source):
         if "Custom Input" in source:
-            for i in range(len(self.createtablemodel.metadataList)):
-                if self.createtablemodel.metadataList[i]["Source"] == source:
-                    self.createtablemodel.beginRemoveRows(QModelIndex(),i,i)
-                    del self.createtablemodel.metadataList[i]
-                    self.createtablemodel.endRemoveRows()
+            for i in range(len(self.create_ez_table_model.metadataList)):
+                if self.create_ez_table_model.metadataList[i]["Source"] == source:
+                    self.create_ez_table_model.beginRemoveRows(QModelIndex(),i,i)
+                    del self.create_ez_table_model.metadataList[i]
+                    self.create_ez_table_model.endRemoveRows()
                     break
         else:
             self.treeModel.changeLeafCheck(source)
@@ -316,9 +316,9 @@ class MainWindow(QMainWindow):
 
     def restoreTemplate(self):
         #Clear data on create side
-        self.createtablemodel.metadataList = []
-        self.createtablemodel.hiddenList = []
-        self.filterModel.displayed = []
+        self.create_ez_table_model.metadataList = []
+        self.create_ez_table_model.hiddenList = []
+        self.create_ez_table_model_proxy.displayed = []
         #open template
         linetext = QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
         QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
@@ -333,23 +333,18 @@ class MainWindow(QMainWindow):
             newDict = infile.readline()
             newDict = json.loads(newDict)
             self.ui.dataFileLineEdit.setText(self.fileType[0])
-            self.createtablemodel = TableModelC(newDict,self)
-            self.filterModel.displayed = []
-            self.filterModel.setSourceModel(self.createtablemodel)
-            self.filterModel.fileType = self.fileType
-            self.createTableSearchFilterModel = QSortFilterProxyModel(self)
-            self.createTableSearchFilterModel.setSourceModel(self.filterModel)
-            self.createTableSearchFilterModel.setFilterKeyColumn(1)
-            self.createTableSearchFilterModel.setDynamicSortFilter(True)
-            self.ui.metadataTableView.setModel(self.createTableSearchFilterModel)
-            self.treeModel = TreeModelR(["Available File Metadata"],newDict,self.createtablemodel, newList,self.filterModel)
+            self.create_ez_table_model = QEzTableModel(newDict,self)
+            
+            self.init_create_table_model_proxy(self.create_ez_table_model, linetext)
 
+            self.ui.metadataTableView.setModel(self.create_ez_table_model_proxy)
+            self.treeModel = TreeModelR(["Available File Metadata"],newDict,self.create_ez_table_model, newList,self.create_ez_table_model_proxy)
 
             for i in range(len(newList)):
                 if "Custom Input" in newList[i]["Source"]:
-                    self.createtablemodel.beginInsertRows(self.createtablemodel.index(len(self.createtablemodel.metadataList), 0), i, i)
-                    self.createtablemodel.metadataList.append(newList[i])
-                    self.createtablemodel.endInsertRows()
+                   self.create_ez_table_model.beginInsertRows(self.create_ez_table_model.index(len(self.create_ez_table_model.metadataList), 0), i, i)
+                   self.create_ez_table_model.metadataList.append(newList[i])
+                   self.create_ez_table_model.endInsertRows()
 
             self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
             self.createTreeSearchFilterModel.setSourceModel(self.treeModel)
@@ -357,7 +352,7 @@ class MainWindow(QMainWindow):
             self.createTreeSearchFilterModel.setDynamicSortFilter(True)
             self.createTreeSearchFilterModel.setRecursiveFilteringEnabled(True)
             self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
-            self.treeModel.checkChanged.connect(self.filterModel.checkList)
+            self.treeModel.checkChanged.connect(self.create_ez_table_model_proxy.checkList)
             self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
 
     def removeRowfromUsefileType(self, index):
@@ -404,7 +399,7 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 json.dump(self.usetablemodel.templatesources, outfile)
                 outfile.write("\n")
-                son.dump(self.createtablemodel.editableList, outfile)
+                json.dump(self.create_ez_table_model.editableList, outfile)
                 outfile.write("\n")
                 json.dump(self.fileType, outfile)
                 outfile.write("\n")
@@ -421,19 +416,8 @@ class MainWindow(QMainWindow):
             fileName  = dialog.selectedFiles()[0]
         if fileName != "":
             with open(fileName, 'w') as outfile:
-                json.dump(self.filterModel.displayed, outfile)
-                outfile.write("\n")
-                json.dump(self.filterModel.fileType, outfile)
-                outfile.write("\n")
-                self.createtablemodel.editableList = []
-                for i in range(len(self.createtablemodel.metadataList)):
-                    if self.createtablemodel.metadataList[i]["Editable"] == 2 and self.createtablemodel.metadataList[i]["Checked"] == 2:
-                        self.createtablemodel.editableList.append(self.createtablemodel.metadataList[i]["Key"])
-                json.dump(self.createtablemodel.editableList, outfile)
-                outfile.write("\n")
-                json.dump(self.createtablemodel.metadataList, outfile)
-                outfile.write("\n")
-                json.dump(self.treeModel.treeDict, outfile)
+                model_string = self.create_ez_table_model.metadata_model.to_json_string()
+                outfile.write(model_string)
 
     def selectFile(self, fileLink = None):
         if fileLink == False:
@@ -458,27 +442,31 @@ class MainWindow(QMainWindow):
             metadata_model = EzMetadataModel.create_model(headerDict,
                                                           linetext,
                                                           source_type=EzMetadataEntry.SourceType.FILE)
-            self.createtablemodel = TableModelC(tree_data=headerDict, metadata_model=metadata_model, parent=self)
-            # self.filterModel.displayed=[]
-            # self.filterModel.setSourceModel(self.createtablemodel)
-            # self.filterModel.fileType.append(linetext)
-            # self.createTableSearchFilterModel = QSortFilterProxyModel(self)
-            # self.createTableSearchFilterModel.setSourceModel(self.filterModel)
-            # self.createTableSearchFilterModel.setFilterKeyColumn(1)
-            # self.createTableSearchFilterModel.setDynamicSortFilter(True)
-            self.ui.metadataTableView.setModel(self.createtablemodel)
-            self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.createtablemodel)
+            self.create_ez_table_model = QEzTableModel(tree_data=headerDict, metadata_model=metadata_model, parent=self)
+            self.init_create_table_model_proxy(self.create_ez_table_model, linetext)
+
+
+            self.ui.metadataTableView.setModel(self.create_ez_table_model_proxy)
+            self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.create_ez_table_model)
             self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
             self.createTreeSearchFilterModel.setSourceModel(self.treeModel)
             self.createTreeSearchFilterModel.setFilterKeyColumn(0)
             self.createTreeSearchFilterModel.setDynamicSortFilter(True)
             self.createTreeSearchFilterModel.setRecursiveFilteringEnabled(True)
             self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
-            self.treeModel.checkChanged.connect(self.filterModel.checkList)
+            self.treeModel.checkChanged.connect(self.create_ez_table_model_proxy.checkList)
             self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
         
         self.toggleButtons()
         return True
+
+    def init_create_table_model_proxy(self, source_model: QEzTableModel, linetext:str):
+        self.create_ez_table_model_proxy.displayed=[]
+        self.create_ez_table_model_proxy.setSourceModel(source_model)
+        self.create_ez_table_model_proxy.fileType.append(linetext)
+        self.create_ez_table_model_proxy.setFilterKeyColumn(1)
+        self.create_ez_table_model_proxy.setDynamicSortFilter(True)
+        self.filterCreateTable()
 
     def selectTemplate(self):
         startLocation = self.ui.hyperthoughtTemplateLineEdit.text()
@@ -541,6 +529,3 @@ class MainWindow(QMainWindow):
         progress.canceled.connect(lambda: self.uploader.interruptUpload())
         progress.setFixedSize( 500, 100 )
         progress.exec()
-
-
-
