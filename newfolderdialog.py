@@ -1,52 +1,39 @@
 # -*- coding: utf-8 -*-
 
-################################################################################
-## Form generated from reading UI file 'newfolderdialog.ui'
-##
-## Created by: Qt User Interface Compiler version 5.15.2
-##
-## WARNING! All changes made in this file will be lost when recompiling UI file!
-################################################################################
+# Form implementation generated from reading ui file '/Users/mjackson/Workspace4/EasyBake/newfolderdialog.ui',
+# licensing of '/Users/mjackson/Workspace4/EasyBake/newfolderdialog.ui' applies.
+#
+# Created: Mon Jun 21 13:12:38 2021
+#      by: pyside2-uic  running on PySide2 5.13.2
+#
+# WARNING! All changes made in this file will be lost!
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-
+from PySide2 import QtCore, QtGui, QtWidgets
 
 class Ui_NewFolderDialog(object):
     def setupUi(self, NewFolderDialog):
-        if not NewFolderDialog.objectName():
-            NewFolderDialog.setObjectName(u"NewFolderDialog")
+        NewFolderDialog.setObjectName("NewFolderDialog")
         NewFolderDialog.resize(448, 96)
-        self.gridLayout = QGridLayout(NewFolderDialog)
-        self.gridLayout.setObjectName(u"gridLayout")
-        self.folderNameLabel = QLabel(NewFolderDialog)
-        self.folderNameLabel.setObjectName(u"folderNameLabel")
-
+        NewFolderDialog.setWindowTitle("")
+        self.gridLayout = QtWidgets.QGridLayout(NewFolderDialog)
+        self.gridLayout.setObjectName("gridLayout")
+        self.folderNameLabel = QtWidgets.QLabel(NewFolderDialog)
+        self.folderNameLabel.setObjectName("folderNameLabel")
         self.gridLayout.addWidget(self.folderNameLabel, 0, 0, 1, 1)
-
-        self.folderNameLineEdit = QLineEdit(NewFolderDialog)
-        self.folderNameLineEdit.setObjectName(u"folderNameLineEdit")
-
+        self.folderNameLineEdit = QtWidgets.QLineEdit(NewFolderDialog)
+        self.folderNameLineEdit.setObjectName("folderNameLineEdit")
         self.gridLayout.addWidget(self.folderNameLineEdit, 1, 0, 1, 1)
-
-        self.buttonBox = QDialogButtonBox(NewFolderDialog)
-        self.buttonBox.setObjectName(u"buttonBox")
-        self.buttonBox.setOrientation(Qt.Horizontal)
-        self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
-
+        self.buttonBox = QtWidgets.QDialogButtonBox(NewFolderDialog)
+        self.buttonBox.setOrientation(QtCore.Qt.Horizontal)
+        self.buttonBox.setStandardButtons(QtWidgets.QDialogButtonBox.Cancel|QtWidgets.QDialogButtonBox.Ok)
+        self.buttonBox.setObjectName("buttonBox")
         self.gridLayout.addWidget(self.buttonBox, 2, 0, 1, 1)
 
-
         self.retranslateUi(NewFolderDialog)
-        self.buttonBox.accepted.connect(NewFolderDialog.accept)
-        self.buttonBox.rejected.connect(NewFolderDialog.reject)
-
-        QMetaObject.connectSlotsByName(NewFolderDialog)
-    # setupUi
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), NewFolderDialog.accept)
+        QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("rejected()"), NewFolderDialog.reject)
+        QtCore.QMetaObject.connectSlotsByName(NewFolderDialog)
 
     def retranslateUi(self, NewFolderDialog):
-        NewFolderDialog.setWindowTitle("")
-        self.folderNameLabel.setText(QCoreApplication.translate("NewFolderDialog", u"Folder Name:", None))
-    # retranslateUi
+        self.folderNameLabel.setText(QtWidgets.QApplication.translate("NewFolderDialog", "Folder Name:", None, -1))
 
