@@ -215,10 +215,16 @@ class TableModelC(QAbstractTableModel):
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
         elif index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable)
+        elif index.column() == self.K_HTUNITS_COL_INDEX or index.column() == self.K_HTANNOTATION_COL_INDEX:
+             return Qt.ItemFlags(Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable))
+        elif index.column() == self.K_USESOURCE_COL_INDEX:
+            if "Custom Input" in self.metadataList[index.row()][self.K_SOURCE_META_KEY]:
+                return Qt.ItemFlags(Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled))
+            else:
+                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable)
         else:
-#            if index.data() == "":
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-#            return Qt.ItemIsEnabled
+            return Qt.ItemFlags(Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled))
+
 
     def addRow(self, dataDict, source, value):
         self.beginInsertRows(self.index(len(self.metadataList), 0), len(

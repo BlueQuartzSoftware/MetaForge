@@ -51,6 +51,7 @@ class MainWindow(QMainWindow):
         self.ui.hyperthoughtUploadButton.clicked.connect(self.uploadToHyperthought)
         self.setAcceptDrops(True)
         self.numCustoms = 0
+        self.customInputs = []
 
         aTree={}
         self.createtablemodel = TableModelC(aTree,self)
@@ -128,7 +129,6 @@ class MainWindow(QMainWindow):
         self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
         self.ui.otherDataFileLineEdit.installEventFilter(self)
         self.ui.dataFileLineEdit.installEventFilter(self)
-
 
     def acceptKey(self, apikey):
         self.accessKey = apikey
@@ -342,8 +342,8 @@ class MainWindow(QMainWindow):
             newList = json.loads(newList)
             newDict = infile.readline()
             newDict = json.loads(newDict)
-            self.ui.dataTypeText.setText(self.fileType[0][-4:].upper())
-            self.ui.fileParserCombo.setCurrentIndex(self.ui.fileParserCombo.findText(self.fileType[0][-4:].upper()+" Parser"))
+            self.ui.dataTypeText.setText(self.fileType[0][-3:].upper())
+            self.ui.fileParserCombo.setCurrentIndex(self.ui.fileParserCombo.findText(self.fileType[0][-3:].upper()+" Parser"))
             self.ui.dataFileLineEdit.setText(self.fileType[0])
             self.createtablemodel = TableModelC(newDict,self)
             self.filterModel.displayed = []
@@ -356,9 +356,10 @@ class MainWindow(QMainWindow):
             self.ui.metadataTableView.setModel(self.createTableSearchFilterModel)
             self.treeModel = TreeModelR(["Available File Metadata"],newDict,self.createtablemodel, newList,self.filterModel)
 
-
             for i in range(len(newList)):
                 if "Custom Input" in newList[i]["Source"]:
+                    self.numCustoms += 1
+                    self.customInputs.append(newList[i])
                     self.createtablemodel.beginInsertRows(self.createtablemodel.index(len(self.createtablemodel.metadataList), 0), i, i)
                     self.createtablemodel.metadataList.append(newList[i])
                     self.createtablemodel.endInsertRows()
@@ -478,6 +479,13 @@ class MainWindow(QMainWindow):
             self.createTableSearchFilterModel.setDynamicSortFilter(True)
             self.ui.metadataTableView.setModel(self.createTableSearchFilterModel)
             self.treeModel = TreeModel(["Available File Metadata"],headerDict,self.createtablemodel)
+
+            if len(self.customInputs) != 0:
+                for i in range(len(self.customInputs)):
+                    self.createtablemodel.beginInsertRows(self.createtablemodel.index(len(self.createtablemodel.metadataList), 0), i, i)
+                    self.createtablemodel.metadataList.append(self.customInputs[i])
+                    self.createtablemodel.endInsertRows()
+
             self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
             self.createTreeSearchFilterModel.setSourceModel(self.treeModel)
             self.createTreeSearchFilterModel.setFilterKeyColumn(0)
