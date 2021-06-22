@@ -1,4 +1,9 @@
 import os
+import json
+
+from ezmodel.ezmetadatamodel import EzMetadataModel
+from ezmodel.ezmetadataentry import EzMetadataEntry
+
 
 
 def dict_to_ht_metadata(metadata_dict):
@@ -47,6 +52,52 @@ def dict_to_ht_metadata(metadata_dict):
         if metadata_dict[i]['Default'] == 2:
             metadataJson.append({ 'keyName': metadata_dict[i]['Key'], 'value': {'type': 'string', 'link': metadata_dict[i]['Value']}, 'unit': metadata_dict[i]['Units'], 'annotation': metadata_dict[i]['Annotation']})
         elif metadata_dict[i]['Default'] == 0:
-            metadataJson.append({ 'keyName': metadata_dict[i]['Key'], 'value': {'type': 'string', 'link': metadata_dict[i]['HT Value']}, 'unit': metadata_dict[i]['Units'], 'annotation': metadata_dict[i]['Annotation']})
+            metadataJson.append(
+                { 'keyName': metadata_dict[i]['Key'], 
+                   'value': 
+                   {
+                        'type': 'string', 
+                        'link': metadata_dict[i]['HT Value']
+                   }, 
+                   'unit': metadata_dict[i]['Units'], 
+                   'annotation': metadata_dict[i]['Annotation']
+                }
+                )
+    return metadataJson
+
+
+def ezmodel_to_ht_metadata(model: EzMetadataModel):
+    """
+
+    """
+
+    metadataJson = []
+    entries = model.entries
+    for e in entries:
+        if e.enabled and (e.override_source_value or e.source_type is EzMetadataEntry.SourceType.CUSTOM):
+           metadataJson.append(
+               {"keyName": e.ht_name,
+                "value":
+                {
+                    "type": "string",
+                    "link": e.ht_value
+                },
+                "unit": e.ht_units,
+                "annotation": e.ht_annotation
+               }
+           )
+        
+        elif e.enabled and not e.override_source_value:
+           metadataJson.append(
+               {"keyName": e.ht_name,
+                "value":
+                {
+                    "type": "string",
+                    "link": e.source_value
+                },
+                "unit": e.ht_units,
+                "annotation": e.ht_annotation
+               }
+           )
     return metadataJson
 
