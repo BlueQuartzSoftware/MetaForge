@@ -131,12 +131,12 @@ class TableModelU(QAbstractTableModel):
             if not index.isValid():
                 return False
             elif index.column() == self.K_HTKEY_COL_INDEX:
-                if self.metadataList[index.row()][self.K_SOURCE_META_KEY] == self.K_CUSTOM_INPUT:
+                if self.K_CUSTOM_INPUT in self.metadataList[index.row()][self.K_SOURCE_META_KEY]:
                     self.metadataList[index.row(
                     )][self.K_KEY_META_KEY] = value
                     self.dataChanged.emit(index, index)
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                if self.metadataList[index.row()][self.K_SOURCE_META_KEY] == self.K_CUSTOM_INPUT:
+                if self.K_CUSTOM_INPUT in self.metadataList[index.row()][self.K_SOURCE_META_KEY]:
                     self.metadataList[index.row(
                     )][self.K_VALUE_META_KEY] = value
                     self.dataChanged.emit(index, index)
@@ -165,11 +165,14 @@ class TableModelU(QAbstractTableModel):
         if not index.isValid():
             return Qt.ItemIsEnabled
         if index.column() == self.K_REMOVE_COL_INDEX:
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+            if self.K_CUSTOM_INPUT == self.metadataList[index.row()][self.K_SOURCE_META_KEY]:
+                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+            else:
+                return Qt.ItemIsEnabled
         elif index.column() == self.K_SOURCE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
         else:
-            if index.data() == "" or self.metadataList[index.row()]["Editable"] == 2:
+            if index.data() == "" or self.metadataList[index.row()][self.K_EDITABLE_META_KEY] == 2:
                 return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
             else:
                 return Qt.ItemIsEnabled

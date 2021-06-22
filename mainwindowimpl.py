@@ -180,6 +180,7 @@ class MainWindow(QMainWindow):
             self.ui.dataTypeText.setText(linetext.split(".")[1].upper())
             self.ui.otherDataFileLineEdit.setText(linetext)
             if self.ui.addMetadataFileCheckBox.checkState() == Qt.Checked:
+                self.uselistmodel.removeAllRows()
                 self.uselistmodel.addRow(linetext)
                 self.toggleButtons()
             if self.ui.fileParserCombo.findText(linetext.split(".")[1].upper()+" Parser") != -1:
@@ -265,7 +266,7 @@ class MainWindow(QMainWindow):
         self.ui.hyperthoughtLocationLineEdit.setText(remoteDirPath)
         self.toggleButtons()
 
-    def handleRemoveCreate(self, source):
+    def handleRemoveCreate(self, source, filterIndex, tableIndex):
         if "Custom Input" in source:
             for i in range(len(self.createtablemodel.metadataList)):
                 if self.createtablemodel.metadataList[i]["Source"] == source:
@@ -276,19 +277,10 @@ class MainWindow(QMainWindow):
         else:
             self.treeModel.changeLeafCheck(source)
 
-    def handleRemoveUse(self, source):
-        for i in range(len(self.usetablemodel.metadataList)):
-            if self.usetablemodel.metadataList[i]["Source"] == source:
-                self.usetablemodel.beginRemoveRows(QModelIndex(),i,i)
-                del self.usetablemodel.metadataList[i]
-                self.usetablemodel.endRemoveRows()
-                break
-        for i in range(len(self.usefilterModel.displayed)):
-            if self.usefilterModel.displayed[i]["Source"] == source:
-                self.usefilterModel.beginRemoveRows(QModelIndex(),i,i)
-                del self.usefilterModel.displayed[i]
-                self.usefilterModel.endRemoveRows()
-                break
+    def handleRemoveUse(self, source, listIndex, filterIndex):
+        self.usetablemodel.beginRemoveRows(QModelIndex(),listIndex.row(),listIndex.row())
+        del self.usetablemodel.metadataList[listIndex.row()]
+        self.usetablemodel.endRemoveRows()
 
     def help(self):
         QDesktopServices.openUrl("http://www.bluequartz.net/")
@@ -407,7 +399,7 @@ class MainWindow(QMainWindow):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
                                    "/Packages/",
                                    "Packages (*)")
-        dialog.setDefaultSuffix(".ezpak")
+#        dialog.setDefaultSuffix(".ezpak")
         if fileName != "":
             myDir= QDir()
             myDir.mkpath(fileName[0])

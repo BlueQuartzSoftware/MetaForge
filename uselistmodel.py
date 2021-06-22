@@ -63,5 +63,9 @@ class ListModel(QAbstractListModel):
         self.endRemoveRows()
         self.rowRemoved.emit()
 
+    def removeAllRows(self):
+        for i in range(len(self.metadataList)):
+            self.removeRow(i)
+
 
 
