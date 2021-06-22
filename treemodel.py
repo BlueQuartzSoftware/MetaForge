@@ -15,7 +15,7 @@ class TreeModel(QAbstractItemModel):
     def __init__(self, header, metadata_model: EzMetadataModel, parent=None):
         super(TreeModel, self).__init__(parent)
 
-        self.rootItem = TreeItem(name=header)
+        self.rootItem = TreeItem(display_name=header)
         self.metadata_model = metadata_model
         self.setupModelData(self.metadata_model, self.rootItem)
 
@@ -126,12 +126,29 @@ class TreeModel(QAbstractItemModel):
             return True
         elif role == Qt.CheckStateRole:
             item = self.getItem(index)
-            item.check_state = value
-            # item_path = self._get_item_path(item)
-            # self.checkChanged.emit(item.check_state, item_path)
-            self.dataChanged.emit(index, index)
+            item.set_check_state(value)
+            self._notify_data_changed(item)
+            self._notify_parents_data_changed(item)
+            self._notify_children_data_changed(item)
             return True
         return False
+
+    def _notify_parents_data_changed(self, item: TreeItem):
+        parent_item = item.parent()
+        if parent_item is not None:
+            self._notify_data_changed(parent_item)
+            self._notify_parents_data_changed(parent_item)
+
+    def _notify_children_data_changed(self, item: TreeItem):
+        for child_item in item.childItems:
+            self._notify_data_changed(child_item)
+            self._notify_children_data_changed(child_item)
+
+    def _notify_data_changed(self, item: TreeItem):
+        index = self.get_index_from_item(item)
+        self.dataChanged.emit(index, index)
+        item_path = self._get_item_path(item)
+        self.checkChanged.emit(item.get_check_state(), item_path)
 
     # def _sync_check_states(self, item: TreeItem):
     #     if item is not None:
@@ -193,16 +210,11 @@ class TreeModel(QAbstractItemModel):
                 token = source_tokens[i]
                 child_item = tree_item.child_by_name(token)
                 if child_item is None:
-                    if entry.enabled is True:
-                        check_state = Qt.Checked
-                    else:
-                        check_state = Qt.Unchecked
                     self.insertRows(tree_item.childCount(), 1, tree_index)
-                    index = self.index(tree_item.childCount() - 1,
-                                       0, tree_index)
-                    self.setData(index, token, role=Qt.EditRole)
-                    self.setData(index, check_state, role=Qt.CheckStateRole)
                     child_item = tree_item.child(tree_item.childCount() - 1)
+                    child_item.display_name = token
+                    if i == len(source_tokens) - 1:
+                        child_item.metadata_entry = entry
                 tree_index = self.index(tree_item.childCount() - 1,
                                         0, parent=tree_index)
                 tree_item = child_item

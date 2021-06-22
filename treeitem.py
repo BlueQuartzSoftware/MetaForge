@@ -63,12 +63,24 @@ class TreeItem(object):
             else:
                 return Qt.Unchecked
 
+    def set_check_state(self, check_state: Qt.CheckState):
+        if self.metadata_entry is None:
+            for child_item in self.childItems:
+                child_item.set_check_state(check_state)
+        else:
+            if check_state == Qt.Checked:
+                self.metadata_entry.enabled = True
+            elif check_state == Qt.Unchecked:
+                self.metadata_entry.enabled = False
+            else:
+                raise RuntimeError('Tree leaf check state cannot be partial!')
+
     def insertChildren(self, position, count):
         if position < 0 or position > len(self.childItems):
             return False
 
         for num in range(count):
-            item = TreeItem(None, self)
+            item = TreeItem(None, None, self)
             item.parentItem = self
             self.childItems.insert(position + num, item)
 
