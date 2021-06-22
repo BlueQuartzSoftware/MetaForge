@@ -441,7 +441,7 @@ class Ui_MainWindow(object):
         MainWindow.setWindowTitle("")
         self.actionOpenPackage.setText(QCoreApplication.translate("MainWindow", u"Open Package", None))
         self.actionOpen_Recent.setText(QCoreApplication.translate("MainWindow", u"Open Recent", None))
-        self.actionSave_Package.setText(QCoreApplication.translate("MainWindow", u"Save Package", None))
+        self.actionSave_Package.setText(QCoreApplication.translate("MainWindow", u"Save Package As...", None))
         self.actionSave_Package_As.setText(QCoreApplication.translate("MainWindow", u"Save Package As", None))
         self.actionUse_Template.setText(QCoreApplication.translate("MainWindow", u"Use Template", None))
         self.actionCreate_Template.setText(QCoreApplication.translate("MainWindow", u"Create Template", None))

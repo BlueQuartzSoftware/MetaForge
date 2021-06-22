@@ -38,7 +38,7 @@ class MainWindow(QMainWindow):
         self.ui.TabWidget.setCurrentWidget(self.ui.CreateTemplateTab)
         self.ui.actionHelp.triggered.connect(self.help)
         self.ui.actionOpenPackage.triggered.connect(self.openPackage)
-        self.ui.actionSave_Package.triggered.connect(self.savePackage)
+        self.ui.actionSave_Package.triggered.connect(self.savePackageAs)
         self.ui.actionClose.triggered.connect(self.close)
         self.ui.actionSave_Template.triggered.connect(self.saveTemplate)
         self.ui.actionOpen_Template.triggered.connect(self.restoreTemplate)
@@ -366,7 +366,7 @@ class MainWindow(QMainWindow):
         self.movethedamnbutton()
 
 
-    def savePackage(self):
+    def savePackageAs(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
                                    "/Packages/",
                                    "Packages (*.ezpak)")[0]
@@ -399,10 +399,6 @@ class MainWindow(QMainWindow):
                 outfile.write("\n")
                 json.dump(self.uselistmodel.metadataList, outfile)
 
-
-
-    def savePackageAs(self):
-        pass
 
     def saveTemplate(self):
         dialog = QFileDialog(self, "Save File","", "Templates (*.ez)")
