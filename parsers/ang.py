@@ -197,7 +197,8 @@ def parse_header_as_dict(filepath: str) -> dict:
 
   phases_dict = _get_phases_as_dict(phases)
   entries["Phases"] = phases_dict
-  file_name = os.path.basename(filepath)
+  #file_name = os.path.basename(filepath)
+  file_name = "SOURCE"
   file_dict = {file_name: entries}
 
   return file_dict

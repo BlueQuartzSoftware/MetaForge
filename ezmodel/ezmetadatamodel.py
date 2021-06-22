@@ -40,6 +40,19 @@ class EzMetadataModel:
                                                  ht_units='')
                 model.append(metadata_entry)
 
+    def update_model_values_from_dict(self, item: dict, parent_path: str = ""):
+        for key, value in item.items():
+            if type(value) is dict:
+                new_parent_path = parent_path + key + '/'
+                self.update_model_values_from_dict(value, new_parent_path)
+            else:
+                item_path = parent_path + key
+                entry = self.entry_by_source(item_path)
+
+                if entry is not None and entry.override_source_value is False:
+                    entry.ht_value = value
+
+
     def append(self, entry: EzMetadataEntry):
         self.entries.append(entry)
 

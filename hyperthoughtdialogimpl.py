@@ -5,7 +5,7 @@ from PySide2.QtCore import Signal, QStringListModel, Qt, Slot
 from ht_requests.ht_requests import ht_utilities
 from ht_requests.ht_requests import htauthcontroller
 from ht_requests.ht_requests import ht_requests
-from hyperthoughtdialog import Ui_HyperthoughtDialog
+from ui_hyperthoughtdialog import Ui_HyperthoughtDialog
 from newfolderdialogimpl import NewFolderDialogImpl
 from stringlistmodel import StringListModel
 

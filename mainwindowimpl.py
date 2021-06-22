@@ -13,7 +13,7 @@ from treemodel import TreeModel
 from treemodelrestore import TreeModelR
 from usetreemodel import TreeModelU
 from qcreateeztablemodel import QCreateEzTableModel
-from usefiltermodel import QUseEzTableModel
+from quseeztablemodel import QUseEzTableModel
 from checkboxdelegate import CheckBoxDelegate
 from usefiledelegate import UseFileDelegate
 from trashdelegate import TrashDelegate
@@ -55,7 +55,7 @@ class MainWindow(QMainWindow):
         self.ui.dataFileSelect.clicked.connect(self.selectFile)
         self.ui.hyperthoughtTemplateSelect.clicked.connect(self.selectTemplate)
         self.ui.saveTemplateButton.clicked.connect(self.saveTemplate)
-        self.ui.otherDataFileSelect.clicked.connect(self.extractFile)
+        self.ui.otherDataFileSelect.clicked.connect(self.loadOtherDataFile)
         self.ui.hyperthoughtUploadButton.clicked.connect(
             self.uploadToHyperthought)
         self.setAcceptDrops(True)
@@ -185,51 +185,6 @@ class MainWindow(QMainWindow):
         self.mThread.quit()
         self.mThread.wait(250)
 
-    def extractFile(self, fileLink=False):
-        if fileLink == False:
-            linetext = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(
-                QStandardPaths.HomeLocation), self.tr("Files (*"+self.fileType+")"))[0]
-        else:
-            linetext = fileLink
-        if linetext != "":
-            self.setWindowTitle(linetext)
-            self.ui.dataTypeText.setText(linetext.split(".")[1].upper())
-            self.ui.otherDataFileLineEdit.setText(linetext)
-            if self.ui.fileParserCombo.findText(linetext.split(".")[1].upper()+" Parser") != -1:
-                headerDict = {}
-                self.ui.fileParserCombo.setCurrentIndex(
-                    self.ui.fileParserCombo.findText(linetext.split(".")[1].upper()+" Parser"))
-            if linetext.split(".")[1].upper() == "CTF":
-                headerDict = ctf.parse_header_as_dict(linetext)
-            elif linetext.split(".")[1].upper() == "ANG":
-                headerDict = ang.parse_header_as_dict(linetext)
-            elif linetext.split(".")[1].upper() == "XML":
-                print("XML Parser used")
-
-            if self.templatedata:
-                self.usetablemodel.metadataList = []
-                self.usefilterModel = QUseEzTableModel(self)
-                self.usefilterModel.setSourceModel(self.usetablemodel)
-                self.unusedTreeModel = TreeModelU(
-                    [self.K_CREATE_TREE_HEADER], headerDict, self.usetablemodel, self.editableKeys)
-                self.templatelist = []
-                self.templatesources = []
-                for i in range(len(self.templatedata)):
-                    self.templatelist.append(self.templatedata[i])
-                    if "Custom Input" not in self.templatedata[i]["Source"]:
-                        self.templatesources.append(
-                            "/".join(self.templatedata[i]['Source'].split("/")[1:]))
-                    else:
-                        self.usetablemodel.addRow(self.templatedata[i])
-                self.usesearchFilterModel = QSortFilterProxyModel(self)
-                self.usesearchFilterModel.setSourceModel(self.usefilterModel)
-                self.usesearchFilterModel.setFilterKeyColumn(0)
-                self.usesearchFilterModel.setDynamicSortFilter(True)
-                self.ui.useTemplateTableView.setModel(
-                    self.usesearchFilterModel)
-
-        self.toggleButtons()
-
     def eventFilter(self, object, event):
         if object == self.ui.hyperthoughtTemplateLineEdit:
             if event.type() == QEvent.DragEnter:
@@ -238,8 +193,8 @@ class MainWindow(QMainWindow):
             if (event.type() == QEvent.Drop):
                 if str(event.mimeData().urls()[0])[-5:-2] == ".ez":
                     event.acceptProposedAction()
-                    self.loadTemplateFile(
-                        event.mimeData().urls()[0].toLocalFile())
+                    self.ui.hyperthoughtTemplateLineEditl.setText(event.mimeData().urls()[0].toLocalFile())
+                    self.loadTemplateFile()
         if object == self.ui.otherDataFileLineEdit:
             if event.type() == QEvent.DragEnter:
                 if str(event.mimeData().urls()[0])[-6:-2] == self.fileType:
@@ -247,7 +202,8 @@ class MainWindow(QMainWindow):
             if (event.type() == QEvent.Drop):
                 if str(event.mimeData().urls()[0])[-6:-2] == self.fileType:
                     event.acceptProposedAction()
-                    self.extractFile(event.mimeData().urls()[0].toLocalFile())
+                    self.ui.otherDataFileLineEdit.setText(event.mimeData().urls()[0].toLocalFile())
+                    self.importMetadataFromDataFile()
         if object == self.ui.dataFileLineEdit:
             if event.type() == QEvent.DragEnter:
                 if str(event.mimeData().urls()[0])[-6:-2] == ".ctf" or str(event.mimeData().urls()[0])[-6:-2] == ".ang":
@@ -261,10 +217,8 @@ class MainWindow(QMainWindow):
 
     def filterCreateTable(self):
         self.create_ez_table_model_proxy.invalidate()
-        self.create_ez_table_model_proxy.setFilterCaseSensitivity(
-            Qt.CaseInsensitive)
-        self.create_ez_table_model_proxy.setFilterWildcard(
-            "*"+self.ui.createTemplateListSearchBar.text()+"*")
+        self.create_ez_table_model_proxy.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.create_ez_table_model_proxy.setFilterWildcard("*"+self.ui.createTemplateListSearchBar.text()+"*")
 
     def filterCreateTree(self):
         self.createTreeSearchFilterModel.invalidate()
@@ -274,10 +228,9 @@ class MainWindow(QMainWindow):
             "*"+self.ui.createTemplateTreeSearchBar.text()+"*")
 
     def filterUseTable(self):
-        self.usesearchFilterModel.invalidate()
-        self.usesearchFilterModel.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        self.usesearchFilterModel.setFilterWildcard(
-            "*"+self.ui.usetableSearchBar.text()+"*")
+        self.use_ez_table_model_proxy.invalidate()
+        self.use_ez_table_model_proxy.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        self.use_ez_table_model_proxy.setFilterWildcard("*"+self.ui.usetableSearchBar.text()+"*")
 
     def getLocation(self):
         remoteDirPath = self.hyperthoughtui.getUploadDirectory()
@@ -400,6 +353,15 @@ class MainWindow(QMainWindow):
         self.create_ez_table_model_proxy.setFilterKeyColumn(1)
         self.create_ez_table_model_proxy.setDynamicSortFilter(True)
         self.filterCreateTable()
+    
+    def init_use_table_model_proxy(self, source_model: QEzTableModel):
+        self.use_ez_table_model_proxy = QUseEzTableModel(self)
+        self.use_ez_table_model_proxy.displayed = []
+        self.use_ez_table_model_proxy.setSourceModel(source_model)
+        # self.use_ez_table_model_proxy.fileType.append(linetext)
+        self.use_ez_table_model_proxy.setFilterKeyColumn(1)
+        self.use_ez_table_model_proxy.setDynamicSortFilter(True)
+        self.filterUseTable()       
 
     def removeRowfromUsefileType(self, index):
         if self.ui.useTemplateListView.width() - 64 < self.ui.useTemplateListView.mapFromGlobal(QCursor.pos()).x():
@@ -476,15 +438,12 @@ class MainWindow(QMainWindow):
             metadata_model = EzMetadataModel.create_model(headerDict,
                                                           linetext,
                                                           source_type=EzMetadataEntry.SourceType.FILE)
-            self.create_ez_table_model = QEzTableModel(
-                metadata_model=metadata_model, parent=self)
-            self.init_create_table_model_proxy(
-                self.create_ez_table_model, linetext)
+            self.create_ez_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
+            self.init_create_table_model_proxy(self.create_ez_table_model, linetext)
 
-            self.ui.metadataTableView.setModel(
-                self.create_ez_table_model_proxy)
+            self.ui.metadataTableView.setModel(self.create_ez_table_model_proxy)
             self.treeModel = TreeModel(
-                [self.K_CREATE_TREE_HEADER], headerDict, self.create_ez_table_model)
+                [self.K_CREATE_TREE_HEADER], metadata_model=metadata_model, parent=self.create_ez_table_model)
             self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
             self.createTreeSearchFilterModel.setSourceModel(self.treeModel)
             self.createTreeSearchFilterModel.setFilterKeyColumn(0)
@@ -506,38 +465,69 @@ class MainWindow(QMainWindow):
 
         templateFilePath = QFileDialog.getOpenFileName(self, self.tr(
             "Select File"), startLocation, self.tr("Files (*.ez)"))[0]
-        self.loadTemplateFile(templateFilePath)
 
-    def loadTemplateFile(self, templateFilePath=None):
+        self.ui.hyperthoughtTemplateLineEdit.setText(templateFilePath)
+
+        self.loadTemplateFile()
+
+    def loadTemplateFile(self):
+
+        templateFilePath = self.ui.hyperthoughtTemplateLineEdit.text()
+
         if templateFilePath == "":
             return False
 
         # Load the EzMetadataModel from the json file (Template file)
-        ez_metadata_model = EzMetadataModel.from_json_file(templateFilePath)
+        metadata_model = EzMetadataModel.from_json_file(templateFilePath)
+        self.use_ez_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
+        self.init_use_table_model_proxy(self.use_ez_table_model)
 
-        ez_qtable_model = QEzTableModel(ez_metadata_model)
-        self.ui.useTemplateTableView.setModel(ez_qtable_model)
+        self.ui.useTemplateTableView.setModel(self.use_ez_table_model_proxy)
 
         self.currentTemplate = templateFilePath.split("/")[-1]
         self.ui.displayedFileLabel.setText(templateFilePath.split("/")[-1])
-        self.ui.hyperthoughtTemplateLineEdit.setText(templateFilePath)
-        self.ui.otherDataFileLineEdit.setText("")
+        
+        self.updateUseTableModel()
 
-        # infile = open(templateFilePath,"r")
-        # data = infile.readline()
-        # fileType = infile.readline()
-        # fileType = json.loads(fileType)
-        # self.fileType = fileType[0][-4:]
-        # editables = infile.readline()
-        # self.editableKeys = json.loads(editables)
-        # self.usetablemodel.editableKeys = self.editableKeys
-        # self.toggleButtons()
-        # self.templatedata = json.loads(data)
-        # self.usetablemodel.addTemplateList(self.templatedata)
-        # self.usefilterModel.setFilterRegExp(QRegExp())
-        # infile.close()
+    def loadOtherDataFile(self):
+        datafile_input_path = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(
+                QStandardPaths.HomeLocation), self.tr("Files (*"+self.fileType+")"))[0]
+        self.ui.otherDataFileLineEdit.setText(datafile_input_path)
+        self.importMetadataFromDataFile()
 
-        return True
+    def importMetadataFromDataFile(self):
+        
+        filePath = self.ui.otherDataFileLineEdit.text()
+
+        self.setWindowTitle(filePath)
+        self.ui.dataTypeText.setText(filePath.split(".")[1].upper())
+        self.updateUseTableModel()
+
+
+    def updateUseTableModel(self):
+        templateFilePath = self.ui.hyperthoughtTemplateLineEdit.text()
+        filePath = self.ui.otherDataFileLineEdit.text()
+
+        if filePath == "" or templateFilePath == "":
+            return
+        
+        # Load the dictionary from the newly inserted datafile
+        if self.ui.fileParserCombo.findText(filePath.split(".")[1].upper()+" Parser") != -1:
+            headerDict = {}
+            self.ui.fileParserCombo.setCurrentIndex(
+                self.ui.fileParserCombo.findText(filePath.split(".")[1].upper()+" Parser"))
+        if filePath.split(".")[1].upper() == "CTF":
+            headerDict = ctf.parse_header_as_dict(filePath)
+        elif filePath.split(".")[1].upper() == "ANG":
+            headerDict = ang.parse_header_as_dict(filePath)
+        elif filePath.split(".")[1].upper() == "XML":
+            print("XML Parser used")
+
+        self.use_ez_table_model.metadata_model.update_model_values_from_dict(headerDict)
+
+        index0 = self.use_ez_table_model.index(0, 0)
+        index1 = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
+        self.use_ez_table_model.dataChanged.emit(index0, index1)
 
     def showEvent(self, event):
         super().showEvent(event)

@@ -6,14 +6,17 @@ HyperThought Data/MetaData Uploading program
 
 Best practice would be to create a virtual environment for python.
   ```lang-console
-  conda create -n easybake python=3.8 tqdm pyside2 requests
+  conda create -n easybake python=3.8 tqdm requests
+  pip install pyside2
+  pip install dataclasses-json
   ```
   or
 
   ```lang-console
-  python3 -m venv easybake tqdm pyside2 requests
+  python3 -m venv easybake tqdm requests
   source easybake/bin/activate
-  pip install tqdm pyside2 requests
+  pip install pyside2
+  pip install dataclasses-json
   ```
 
 
