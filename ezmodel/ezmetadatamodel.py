@@ -84,6 +84,8 @@ class EzMetadataModel:
         return False
 
     def entry(self, index: int) -> EzMetadataEntry:
+        if index < 0 or index >= len(self.entries):
+            return None
         return self.entries[index]
 
     def entry_by_source(self, source: str) -> EzMetadataEntry:
