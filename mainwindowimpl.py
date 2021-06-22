@@ -13,7 +13,7 @@ from treemodel import TreeModel
 from treemodelrestore import TreeModelR
 from usetreemodel import TreeModelU
 from qcreateeztablemodel import QCreateEzTableModel
-from usefiltermodel import FilterModelU
+from usefiltermodel import QUseEzTableModel
 from checkboxdelegate import CheckBoxDelegate
 from usefiledelegate import UseFileDelegate
 from trashdelegate import TrashDelegate
@@ -97,12 +97,12 @@ class MainWindow(QMainWindow):
         self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
         self.editableKeys = []
 
-        self.usetablemodel = TableModelU(self, [], self.editableKeys)
-        self.usefilterModel = FilterModelU(self)
+        self.usetablemodel = QEzTableModel(EzMetadataModel(), parent=self)
+        self.usefilterModel = QUseEzTableModel(self)
         self.usefilterModel.setSourceModel(self.usetablemodel)
         self.ui.useTemplateTableView.setModel(self.usefilterModel)
         self.ui.useTemplateTableView.setColumnWidth(
-            self.usetablemodel.K_HTKEY_COL_INDEX, self.width()*.25)
+            self.usetablemodel.K_HTNAME_COL_INDEX, self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(
             self.usetablemodel.K_HTVALUE_COL_INDEX, self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(
@@ -208,7 +208,7 @@ class MainWindow(QMainWindow):
 
             if self.templatedata:
                 self.usetablemodel.metadataList = []
-                self.usefilterModel = FilterModelU(self)
+                self.usefilterModel = QUseEzTableModel(self)
                 self.usefilterModel.setSourceModel(self.usetablemodel)
                 self.unusedTreeModel = TreeModelU(
                     [self.K_CREATE_TREE_HEADER], headerDict, self.usetablemodel, self.editableKeys)

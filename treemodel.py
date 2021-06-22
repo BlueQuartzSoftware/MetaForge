@@ -6,16 +6,16 @@ from PySide2.QtWidgets import QApplication, QMainWindow
 from treeitem import TreeItem
 
 from ezmodel.ezmetadatamodel import EzMetadataModel
+from ezmodel.ezmetadataentry import EzMetadataEntry
 
 
 class TreeModel(QAbstractItemModel):
     checkChanged = Signal(int, str)
 
-    def __init__(self, headers, metadata_model: EzMetadataModel, parent=None):
+    def __init__(self, header, metadata_model: EzMetadataModel, parent=None):
         super(TreeModel, self).__init__(parent)
 
-        rootData = [header for header in headers]
-        self.rootItem = TreeItem(rootData)
+        self.rootItem = TreeItem(name=header)
         self.metadata_model = metadata_model
         self.setupModelData(self.metadata_model, self.rootItem)
 
@@ -25,7 +25,7 @@ class TreeModel(QAbstractItemModel):
         curRow = 0
         for key in keyNames:
             for i in range(curNode.childCount()):
-                if curNode.child(i).itemData[0] == key:
+                if curNode.child(i).display_name == key:
                     curNode = curNode.child(i)
                     curRow = i
                     break
@@ -41,9 +41,9 @@ class TreeModel(QAbstractItemModel):
 
         item = self.getItem(index)
         if role == Qt.DisplayRole:
-            return item.data(index.column())
+            return item.get_display_name()
         elif role == Qt.CheckStateRole:
-            return item.checked
+            return item.get_check_state()
 
         return None
 
@@ -61,9 +61,15 @@ class TreeModel(QAbstractItemModel):
 
         return self.rootItem
 
+    def get_index_from_item(self, item: TreeItem) -> QModelIndex:
+        if item is not None:
+            self.createIndex(item.childNumber(), 0, item)
+
+        return QModelIndex()
+
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if orientation == Qt.Horizontal and role == Qt.DisplayRole:
-            return self.rootItem.data(section)
+            return self.rootItem.get_display_name()
 
         return None
 
@@ -78,18 +84,10 @@ class TreeModel(QAbstractItemModel):
         else:
             return QModelIndex()
 
-    def insertColumns(self, position, columns, parent=QModelIndex()):
-        self.beginInsertColumns(parent, position, position + columns - 1)
-        success = self.rootItem.insertColumns(position, columns)
-        self.endInsertColumns()
-
-        return success
-
     def insertRows(self, position, rows, parent=QModelIndex()):
         parentItem = self.getItem(parent)
         self.beginInsertRows(parent, position, position + rows - 1)
-        success = parentItem.insertChildren(position, rows,
-                                            self.rootItem.columnCount())
+        success = parentItem.insertChildren(position, rows)
         self.endInsertRows()
 
         return success
@@ -105,16 +103,6 @@ class TreeModel(QAbstractItemModel):
             return QModelIndex()
 
         return self.createIndex(parentItem.childNumber(), 0, parentItem)
-
-    def removeColumns(self, position, columns, parent=QModelIndex()):
-        self.beginRemoveColumns(parent, position, position + columns - 1)
-        success = self.rootItem.removeColumns(position, columns)
-        self.endRemoveColumns()
-
-        if self.rootItem.columnCount() == 0:
-            self.removeRows(0, self.rowCount())
-
-        return success
 
     def removeRows(self, position, rows, parent=QModelIndex()):
         parentItem = self.getItem(parent)
@@ -133,26 +121,52 @@ class TreeModel(QAbstractItemModel):
     def setData(self, index, value, role=Qt.EditRole):
         if role == Qt.EditRole:
             item = self.getItem(index)
-            result = item.setData(index.column(), value)
-            if result:
-                self.dataChanged.emit(index, index)
-                return result
+            item.display_name = value
+            self.dataChanged.emit(index, index)
+            return True
         elif role == Qt.CheckStateRole:
             item = self.getItem(index)
-            item.checked = value
-            checked = item.checked
-            source = ""
-            sourceList = []
-
-            while item.parentItem:
-                sourceList.insert(0, item.itemData[0]+"/")
-                item = item.parentItem
-
-            self.checkChanged.emit(checked, source.join(sourceList)[:-1])
-            self.uncheckChildren(index, value)
+            item.check_state = value
+            # item_path = self._get_item_path(item)
+            # self.checkChanged.emit(item.check_state, item_path)
             self.dataChanged.emit(index, index)
             return True
         return False
+
+    # def _sync_check_states(self, item: TreeItem):
+    #     if item is not None:
+    #         child_items = item.childItems
+    #         if len(child_items) == 0:
+    #             return
+
+    #         all_checked = True
+    #         all_unchecked = True
+    #         for child_item in child_items:
+    #             self._sync_check_states(child_item)
+    #             if child_item.check_state is Qt.Checked:
+    #                 all_unchecked = False
+    #             elif child_item.check_state is Qt.Unchecked:
+    #                 all_checked = False
+    #         if all_checked is True:
+    #             item.check_state = Qt.Checked
+    #         elif all_unchecked is True:
+    #             item.check_state = Qt.Unchecked
+    #         else:
+    #             item.check_state = Qt.PartiallyChecked
+
+    #         index = self.get_index_from_item(item)
+    #         self.dataChanged.emit(index, index)
+
+    def _get_item_path(self, item: TreeItem) -> str:
+        path_list = []
+        path = "/"
+        current_item = item
+        while current_item is not self.rootItem:
+            path_list.insert(0, current_item.display_name)
+            current_item = current_item.parent()
+
+        path = path.join(path_list)
+        return path
 
     def setHeaderData(self, section, orientation, value, role=Qt.EditRole):
         if role != Qt.EditRole or orientation != Qt.Horizontal:
@@ -165,44 +179,33 @@ class TreeModel(QAbstractItemModel):
         return result
 
     def setupModelData(self, metadata_model: EzMetadataModel, parent):
-        treeDict = metadata_model.to_file_tree_dict()
+        # treeDict = metadata_model.to_file_tree_dict()
 
-        visited = {}
-        queue = []
-        grandParents = {}
+        for entry in metadata_model.entries:
+            if entry.source_type is not EzMetadataEntry.SourceType.FILE:
+                continue
 
-        for key in treeDict.keys():
-            visited[(parent.itemData[0])] = [key]
-            queue.append((key, parent, ""))
-            grandParents[key] = (treeDict[key], parent)
-        curDict = treeDict
-        tempSource = ""
-        while queue:
-            poppedItem = queue.pop(0)
-            child = poppedItem[0]
-            parentOfChild = poppedItem[1]
-            childSource = poppedItem[2]
-            parent = parentOfChild
-            parent.insertChildren(parent.childCount(), 1,
-                                  self.rootItem.columnCount())
-            parent.child(parent.childCount() - 1).setData(0, child)
-
-            if child in grandParents:
-
-                curDict = grandParents[child][0]
-                tempSource = childSource+child+"/"
-                for curChild in range(grandParents[child][1].childCount()):
-                    if child == grandParents[child][1].child(curChild).itemData[0]:
-                        parent = grandParents[child][1].child(curChild)
-                        visited[(parent.itemData[0])] = []
-
-            if isinstance(curDict, dict):
-                for key in curDict.keys():
-                    if key not in visited[(parent.itemData[0])]:
-                        visited[(parent.itemData[0])].append(key)
-                        queue.append((key, parent, tempSource))
-                        if (isinstance(curDict[key], dict)):
-                            grandParents[key] = (curDict[key], parent)
+            source_path = entry.source_path
+            source_tokens = source_path.split('/')
+            tree_item = self.rootItem
+            tree_index = QModelIndex()
+            for i in range(len(source_tokens)):
+                token = source_tokens[i]
+                child_item = tree_item.child_by_name(token)
+                if child_item is None:
+                    if entry.enabled is True:
+                        check_state = Qt.Checked
+                    else:
+                        check_state = Qt.Unchecked
+                    self.insertRows(tree_item.childCount(), 1, tree_index)
+                    index = self.index(tree_item.childCount() - 1,
+                                       0, tree_index)
+                    self.setData(index, token, role=Qt.EditRole)
+                    self.setData(index, check_state, role=Qt.CheckStateRole)
+                    child_item = tree_item.child(tree_item.childCount() - 1)
+                tree_index = self.index(tree_item.childCount() - 1,
+                                        0, parent=tree_index)
+                tree_item = child_item
 
     def uncheckChildren(self, index, value):
         if not index.isValid():
