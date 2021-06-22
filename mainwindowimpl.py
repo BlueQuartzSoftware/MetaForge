@@ -357,6 +357,7 @@ class MainWindow(QMainWindow):
             self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
             self.treeModel.checkChanged.connect(self.filterModel.checkList)
             self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
+            self.ui.TabWidget.setCurrentIndex(0)
 
     def removeRowfromUsefileType(self, index):
         if self.ui.useTemplateListView.width() - 64 < self.ui.useTemplateListView.mapFromGlobal(QCursor.pos()).x():
