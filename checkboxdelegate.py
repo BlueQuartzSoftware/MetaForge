@@ -16,7 +16,9 @@ class CheckBoxDelegate(QItemDelegate):
         QItemDelegate.paint(self, painter, option, index)
 
     def editorEvent(self, event, model, option, index):
-        flags = model.flags(index)
+        flags = index.flags()
+        if int(flags & Qt.ItemIsEnabled) == 0:
+            return False
         value = index.data(Qt.CheckStateRole)
         if (event.type() == QEvent.MouseButtonRelease):
              checkRect = option.rect.adjusted((option.rect.width()/2)+ 20,(option.rect.height()/2),0,0)

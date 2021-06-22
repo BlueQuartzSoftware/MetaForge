@@ -203,27 +203,27 @@ class TableModelC(QAbstractTableModel):
         if not index.isValid():
             return Qt.NoItemFlags
         if index.column() == self.K_HTNAME_COL_INDEX:
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+            return QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable
         elif index.column() == self.K_HTVALUE_COL_INDEX:
             if self.metadataList[index.row()]["Default"] == 2:
-                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
+                return QAbstractTableModel.flags(self, index) & ~Qt.ItemIsEnabled
             elif self.metadataList[index.row()]["Default"] == 0:
-                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable | Qt.ItemIsEnabled)
+                return QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable | Qt.ItemIsEnabled
         elif index.column() == self.K_REMOVE_COL_INDEX:
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+            return QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable
         elif index.column() == self.K_SORT_COL_INDEX:
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-        elif index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
-            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable)
+            return QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable
+        elif index.column() == self.K_EDITABLE_COL_INDEX:
+            return QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable
         elif index.column() == self.K_HTUNITS_COL_INDEX or index.column() == self.K_HTANNOTATION_COL_INDEX:
-             return Qt.ItemFlags(Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable))
+             return QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable
         elif index.column() == self.K_USESOURCE_COL_INDEX:
             if "Custom Input" in self.metadataList[index.row()][self.K_SOURCE_META_KEY]:
-                return Qt.ItemFlags(Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled))
+                return QAbstractTableModel.flags(self, index) & ~Qt.ItemIsEnabled
             else:
-                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable)
+                return QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable | Qt.ItemIsEnabled
         else:
-            return Qt.ItemFlags(Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled))
+            return QAbstractTableModel.flags(self, index) & ~Qt.ItemIsEnabled
 
 
     def addRow(self, dataDict, source, value):
