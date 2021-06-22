@@ -239,17 +239,19 @@ class MainWindow(QMainWindow):
         self.ui.hyperthoughtLocationLineEdit.setText(remoteDirPath)
         self.toggleButtons()
 
-    def handleRemoveCreate(self, source):
-        if "Custom Input" in source:
-            for i in range(len(self.create_ez_table_model.metadataList)):
-                if self.create_ez_table_model.metadataList[i]["Source"] == source:
-                    self.create_ez_table_model.beginRemoveRows(
-                        QModelIndex(), i, i)
-                    del self.create_ez_table_model.metadataList[i]
-                    self.create_ez_table_model.endRemoveRows()
-                    break
-        else:
-            self.treeModel.changeLeafCheck(source)
+    def handleRemoveCreate(self, source_row:int):
+        entry = self.create_ez_table_model.metadata_model.entry(source_row)
+        # Remove Custom Entries from the mode or just mark FILE sources as disabled.
+        if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+            self.create_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
+            self.create_ez_table_model.metadata_model.remove_by_index(source_row)
+            self.create_ez_table_model.endRemoveRows()
+        elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
+            entry.enabled = False
+        
+        index0 = self.create_ez_table_model.index(0, 0)
+        index1 = self.create_ez_table_model.index(self.create_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
+        self.create_ez_table_model.dataChanged.emit(index0, index1)
 
     def handleRemoveUse(self, source):
         for i in range(len(self.usetablemodel.metadataList)):
