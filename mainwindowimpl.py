@@ -306,6 +306,8 @@ class MainWindow(QMainWindow):
                 self.uselistmodel.addRow(fileList[i])
             self.toggleButtons()
             infile.close()
+            self.ui.TabWidget.setCurrentIndex(1)
+
 
     def restoreTemplate(self):
         #Clear data on create side
