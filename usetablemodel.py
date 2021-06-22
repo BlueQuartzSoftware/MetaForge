@@ -225,7 +225,16 @@ class TableModelU(QAbstractTableModel):
     def addExistingRow(self, row):
         self.beginInsertRows(self.index(len(self.metadataList), 0), len(
             self.metadataList), len(self.metadataList))
-        if row[self.K_USESOURCE_META_KEY] == 0:
+        if self.K_CUSTOM_INPUT in row[self.K_SOURCE_META_KEY]:
+            self.metadataList.append(
+             {self.K_KEY_META_KEY: row[self.K_HTNAME_META_KEY],
+             self.K_VALUE_META_KEY: row[self.K_HTVALUE_META_KEY],
+             self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
+             self.K_UNITS_META_KEY: row[self.K_UNITS_META_KEY],
+             self.K_ANNOTATION_META_KEY: row[self.K_ANNOTATION_META_KEY],
+             self.K_EDITABLE_META_KEY: row[self.K_EDITABLE_META_KEY],
+             self.K_USESOURCE_META_KEY: row[self.K_USESOURCE_META_KEY]} )
+        elif row[self.K_USESOURCE_META_KEY] == 0:
             self.metadataList.append(
              {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
              self.K_VALUE_META_KEY: row[self.K_HTVALUE_META_KEY],

@@ -666,10 +666,8 @@
     </property>
     <addaction name="actionOpenPackage"/>
     <addaction name="actionOpen_Template"/>
-    <addaction name="actionOpen_Recent"/>
     <addaction name="separator"/>
     <addaction name="actionSave_Package"/>
-    <addaction name="actionSave_Package_As"/>
     <addaction name="separator"/>
     <addaction name="actionSave_Template"/>
     <addaction name="separator"/>

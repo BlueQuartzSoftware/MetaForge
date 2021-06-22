@@ -37,10 +37,8 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.ui.TabWidget.setCurrentWidget(self.ui.CreateTemplateTab)
         self.ui.actionHelp.triggered.connect(self.help)
-        self.ui.actionOpen_Recent.triggered.connect(self.openRecent)
         self.ui.actionOpenPackage.triggered.connect(self.openPackage)
         self.ui.actionSave_Package.triggered.connect(self.savePackage)
-        self.ui.actionSave_Package_As.triggered.connect(self.savePackageAs)
         self.ui.actionClose.triggered.connect(self.close)
         self.ui.actionSave_Template.triggered.connect(self.saveTemplate)
         self.ui.actionOpen_Template.triggered.connect(self.restoreTemplate)
@@ -52,6 +50,7 @@ class MainWindow(QMainWindow):
         self.setAcceptDrops(True)
         self.numCustoms = 0
         self.customInputs = []
+        self.templateFilePath = ""
 
         aTree={}
         self.createtablemodel = TableModelC(aTree,self)
@@ -288,31 +287,23 @@ class MainWindow(QMainWindow):
     def movethedamnbutton(self):
         self.appendSourceFilesButton.move(self.ui.useTemplateListView.width() - self.appendSourceFilesButton.width() - 15,self.ui.useTemplateListView.height() - self.appendSourceFilesButton.height())
 
-    def openRecent(self):
-        print("Clicked Open Recent.")
-
     def openPackage(self):
         linetext=QFileDialog.getOpenFileName(self,self.tr("Select File"),QStandardPaths.displayName(
-        QStandardPaths.HomeLocation),self.tr("Files (*.ez)"))[0]
+        QStandardPaths.HomeLocation),self.tr("Files (*.ezpak)"))[0]
         if linetext != "":
-            self.currentTemplate= linetext.split("/")[-1]
-            self.ui.displayedFileLabel.setText(linetext.split("/")[-1])
+
             infile = open(linetext,"r")
-            self.templatedata = infile.readline()
-            self.templatedata = json.loads(self.templatedata)
-            templatesources = json.loads(infile.readline())
-            self.fileType = json.loads(infile.readline())
-            fileType = infile.readline()
-            fileType = json.loads(fileType)
-            editables = infile.readline()
-            self.editable = json.loads(editables)
-            self.usetablemodel = TableModelU(self,[],self.editable)
-            self.usetablemodel.templatelist = self.templatedata
-            self.usetablemodel.templatesources = templatesources
-            self.ui.hyperthoughtTemplateLineEdit.setText(linetext)
-            self.ui.useTemplateTableView.setModel(self.usetablemodel)
-            self.uselistmodel = ListModel(self, self.usetablemodel, fileType)
+            self.loadTemplateFile(infile.readline()[1:-2])
+            extractedFile = infile.readline()[1:-2]
+            fileList = infile.readline()
+            fileList = json.loads(fileList)
+            self.fileList = fileList[:]
+            self.uselistmodel = ListModel(self, self.usetablemodel, self.fileList)
             self.ui.useTemplateListView.setModel(self.uselistmodel)
+            self.extractFile(extractedFile)
+            self.uselistmodel.removeAllRows()
+            for i in range(len(fileList)):
+                self.uselistmodel.addRow(fileList[i])
             self.toggleButtons()
             infile.close()
 
@@ -378,45 +369,40 @@ class MainWindow(QMainWindow):
     def savePackage(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
                                    "/Packages/",
-                                   "Packages (*.ez)")
+                                   "Packages (*.ezpak)")[0]
         if fileName != "":
             myDir= QDir()
-            myDir.mkpath(fileName[0])
+            myDir.mkpath(fileName)
             for file in self.uselistmodel.metadataList:
-                QFile.copy( file, fileName[0]+"/"+file.split("/")[-1])
-            with open(fileName[0]+"/"+self.currentTemplate, 'w') as outfile:
-                json.dump(self.usetablemodel.templatelist, outfile)
+                QFile.copy( file, fileName+"/"+file.split("/")[-1])
+
+
+            oldtemplate = open(self.templateFilePath,'r')
+            oldtemplatelist = oldtemplate.readline()
+            filetype = oldtemplate.readline()
+            oldtemplate.readline()
+            oldlist = oldtemplate.readline()
+            oldtree = oldtemplate.readline()
+            oldtemplate.close()
+            with open(fileName+"/"+self.currentTemplate, 'w') as outfile:
+                outfile.write(oldtemplatelist)
+                outfile.write(filetype)
+                json.dump(self.editableKeys, outfile)
                 outfile.write("\n")
-                json.dump(self.usetablemodel.templatesources, outfile)
+                outfile.write(oldlist)
+                outfile.write(oldtree)
+
+            with open(fileName+"/"+self.currentTemplate+"pak", 'w') as outfile:
+                json.dump(fileName+"/"+self.currentTemplate, outfile)
                 outfile.write("\n")
-                json.dump(self.fileType, outfile)
+                json.dump(self.ui.otherDataFileLineEdit.text(), outfile)
                 outfile.write("\n")
                 json.dump(self.uselistmodel.metadataList, outfile)
-                outfile.write("\n")
-                json.dump(self.editableKeys, outfile)
+
+
 
     def savePackageAs(self):
-        fileName = QFileDialog.getSaveFileName(self, "Save File",
-                                   "/Packages/",
-                                   "Packages (*)")
-#        dialog.setDefaultSuffix(".ezpak")
-        if fileName != "":
-            myDir= QDir()
-            myDir.mkpath(fileName[0])
-            for file in self.uselistmodel.metadataList:
-                QFile.copy( file, fileName[0]+"/"+file.split("/")[-1])
-            with open(fileName[0]+"/"+self.currentTemplate, 'w') as outfile:
-                json.dump(self.usetablemodel.templatelist, outfile)
-                outfile.write("\n")
-                json.dump(self.usetablemodel.templatesources, outfile)
-                outfile.write("\n")
-                son.dump(self.createtablemodel.editableList, outfile)
-                outfile.write("\n")
-                json.dump(self.fileType, outfile)
-                outfile.write("\n")
-                json.dump(self.uselistmodel.metadataList, outfile)
-                outfile.write("\n")
-                json.dump(self.editableKeys, outfile)
+        pass
 
     def saveTemplate(self):
         dialog = QFileDialog(self, "Save File","", "Templates (*.ez)")
@@ -502,7 +488,7 @@ class MainWindow(QMainWindow):
     def loadTemplateFile(self, templateFilePath = None):
         if templateFilePath == "":
             return False
-
+        self.templateFilePath = templateFilePath
         self.usetablemodel.metadataList = []
         self.usefilterModel.displayed = []
         self.currentTemplate= templateFilePath.split("/")[-1]
