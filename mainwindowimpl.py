@@ -76,6 +76,7 @@ class MainWindow(QMainWindow):
         self.ui.appendCreateTableRowButton.clicked.connect(
             self.addCustomRowToCreateTable)
         self.ui.removeCreateTableRowButton.clicked.connect(self.handleRemoveCreate)
+        self.ui.removeUseTableRowButton.clicked.connect(self.handleRemoveUse)
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
         self.ui.hyperthoughtLocationButton.clicked.connect(
             self.hyperthoughtui.exec)
@@ -255,18 +256,27 @@ class MainWindow(QMainWindow):
         # End stupid macOS Catalina workaround.
 
     def handleRemoveUse(self, source):
-        for i in range(len(self.use_ez_table_model.metadataList)):
-            if self.use_ez_table_model.metadataList[i]["Source"] == source:
-                self.use_ez_table_model.beginRemoveRows(QModelIndex(), i, i)
-                del self.use_ez_table_model.metadataList[i]
+        proxy_selected_rows = reversed(self.ui.useTemplateTableView.selectionModel().selectedRows())
+        source_row = -1
+        for index in proxy_selected_rows:
+            source_row = (index.model().mapToSource(index)).row()
+            entry = self.use_ez_table_model.metadata_model.entry(source_row)
+            if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                self.use_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
+                self.use_ez_table_model.metadata_model.remove_by_index(source_row)
                 self.use_ez_table_model.endRemoveRows()
-                break
-        for i in range(len(self.use_ez_table_model_proxy.displayed)):
-            if self.use_ez_table_model_proxy.displayed[i]["Source"] == source:
-                self.use_ez_table_model_proxy.beginRemoveRows(QModelIndex(), i, i)
-                del self.use_ez_table_model_proxy.displayed[i]
-                self.use_ez_table_model_proxy.endRemoveRows()
-                break
+            elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
+                entry.enabled = False
+        
+        index0 = self.use_ez_table_model.index(0, 0)
+        index1 = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
+        self.use_ez_table_model.dataChanged.emit(index0, index1)
+        # This toggle is for macOS Catalina to actual visually show the updated checkboxes.
+        self.ui.useTemplateTableView.setVisible(False)
+        self.ui.useTemplateTableView.setVisible(True)
+        self.ui.useTemplateTableView.update()
+        # End stupid macOS Catalina workaround.
+
 
     def help(self):
         QDesktopServices.openUrl("http://www.bluequartz.net/")

@@ -375,7 +375,7 @@ class Ui_MainWindow(object):
         self.useTemplateTableView = QTableView(self.UseTemplateTab)
         self.useTemplateTableView.setObjectName(u"useTemplateTableView")
         self.useTemplateTableView.setAlternatingRowColors(True)
-        self.useTemplateTableView.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.useTemplateTableView.setSelectionBehavior(QAbstractItemView.SelectItems)
         self.useTemplateTableView.horizontalHeader().setStretchLastSection(False)
         self.useTemplateTableView.verticalHeader().setMinimumSectionSize(15)
 

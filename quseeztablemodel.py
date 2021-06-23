@@ -58,6 +58,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
 
         # All other use cases
         if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE and match:
+            print(f'filterAcceptsRow: {metadata_entry.source_path} {metadata_entry.ht_name} {metadata_entry.enabled}')
             return metadata_entry.enabled
         else:
             return False
@@ -101,6 +102,40 @@ class QUseEzTableModel(QSortFilterProxyModel):
                     else:
                         return Qt.Unchecked
         return None
+
+    
+    def setData(self, index, value, role):
+        if not index.isValid():
+            return False
+    
+        src_model = self.sourceModel()
+        if src_model is None:
+            return None
+
+        src_index = self.mapToSource(index)
+        metadata_entry: EzMetadataEntry = src_model.metadata_model.entry(src_index.row())
+            
+        if role == Qt.EditRole:
+
+            if index.column() == self.K_HTNAME_COL_INDEX:
+                metadata_entry.ht_name = value
+                self.dataChanged.emit(index, index)
+                return True
+            elif index.column() == self.K_HTVALUE_COL_INDEX:
+                if metadata_entry.override_source_value is True:
+                    metadata_entry.ht_value = value
+                    self.dataChanged.emit(index, index)
+                    return True
+            elif index.column() == self.K_HTANNOTATION_COL_INDEX:
+                metadata_entry.ht_annotation = value
+                self.dataChanged.emit(index, index)
+                return True
+            elif index.column() == self.K_HTUNITS_COL_INDEX:
+                metadata_entry.ht_units = value
+                self.dataChanged.emit(index, index)
+                return True
+
+        return False
 
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
