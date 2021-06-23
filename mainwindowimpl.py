@@ -79,7 +79,7 @@ class MainWindow(QMainWindow):
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
         self.ui.hyperthoughtLocationButton.clicked.connect(
             self.hyperthoughtui.exec)
-        self.ui.usetableSearchBar.textChanged.connect(self.filterUseTable)
+        self.ui.useTemplateListSearchBar.textChanged.connect(self.filter_use_table)
         self.ui.createTemplateListSearchBar.textChanged.connect(
             self.filter_create_table)
         self.ui.createTemplateTreeSearchBar.textChanged.connect(
@@ -105,17 +105,13 @@ class MainWindow(QMainWindow):
         self.create_ez_table_model_proxy = self.init_create_table_model_proxy(self.create_ez_table_model)
         self.ui.metadataTableView.setModel(self.create_ez_table_model_proxy)
         self.filter_create_table()
-        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
-            self.create_ez_table_model.K_SOURCE_COL_INDEX, QHeaderView.ResizeToContents)
-        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
-            self.create_ez_table_model.K_HTNAME_COL_INDEX, QHeaderView.ResizeToContents)
-        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
-            self.create_ez_table_model.K_SOURCEVAL_COL_INDEX, QHeaderView.ResizeToContents)
-        self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
-            self.create_ez_table_model.K_HTVALUE_COL_INDEX, QHeaderView.ResizeToContents)
-        self.ui.metadataTableView.setColumnWidth(
-            self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width() * .1)
     
+    def setup_use_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
+        self.use_ez_table_model = QEzTableModel(metadata_model, parent=self)
+        self.use_ez_table_model_proxy = self.init_use_table_model_proxy(self.use_ez_table_model)
+        self.ui.useTemplateTableView.setModel(self.use_ez_table_model_proxy)
+        self.filter_use_table()
+
     def setup_create_ez_tree(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         headers = [self.K_CREATE_TREE_HEADER]
         self.treeModel = TreeModel(headers, metadata_model, self)
@@ -128,10 +124,6 @@ class MainWindow(QMainWindow):
         self.ui.metadataTreeView.expandAll()
         refresh_func = self.create_ez_table_model.refresh_entry
         self.treeModel.checkChanged.connect(refresh_func)
-    
-    def setup_use_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
-        self.usetablemodel = QEzTableModel(metadata_model, parent=self)
-        self.init_use_table_model_proxy(self.usetablemodel)
     
     def setup_use_ez_list(self, file_list: list = []):
         self.uselistmodel = ListModel(file_list, self)
@@ -164,7 +156,7 @@ class MainWindow(QMainWindow):
         icon = QApplication.style().standardIcon(QStyle.SP_FileIcon)
 
     def addUseTableRow(self):
-        self.usetablemodel.addEmptyRow()
+        self.use_ez_table_model.addCustomRow(1)
 
     def closeEvent(self, event):
         self.mThread.quit()
@@ -178,7 +170,7 @@ class MainWindow(QMainWindow):
             if (event.type() == QEvent.Drop):
                 if str(event.mimeData().urls()[0])[-5:-2] == ".ez":
                     event.acceptProposedAction()
-                    self.ui.hyperthoughtTemplateLineEditl.setText(event.mimeData().urls()[0].toLocalFile())
+                    self.ui.hyperthoughtTemplateLineEdit.setText(event.mimeData().urls()[0].toLocalFile())
                     self.loadTemplateFile()
         if object == self.ui.otherDataFileLineEdit:
             if event.type() == QEvent.DragEnter:
@@ -205,6 +197,11 @@ class MainWindow(QMainWindow):
         text = self.ui.createTemplateListSearchBar.text()
         self.filter_proxy(proxy, text)
 
+    def filter_use_table(self):
+        proxy = self.use_ez_table_model_proxy
+        text = self.ui.useTemplateListSearchBar.text()
+        self.filter_proxy(proxy, text)
+
     def filter_proxy(self, proxy_model: QSortFilterProxyModel, filter_text: str):
         proxy_model.invalidate()
         proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
@@ -217,10 +214,6 @@ class MainWindow(QMainWindow):
         self.createTreeSearchFilterModel.setFilterWildcard(
             "*"+self.ui.createTemplateTreeSearchBar.text()+"*")
 
-    def filterUseTable(self):
-        self.use_ez_table_model_proxy.invalidate()
-        self.use_ez_table_model_proxy.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        self.use_ez_table_model_proxy.setFilterWildcard("*"+self.ui.usetableSearchBar.text()+"*")
 
     def getLocation(self):
         remoteDirPath = self.hyperthoughtui.getUploadDirectory()
@@ -256,11 +249,11 @@ class MainWindow(QMainWindow):
         # End stupid macOS Catalina workaround.
 
     def handleRemoveUse(self, source):
-        for i in range(len(self.usetablemodel.metadataList)):
-            if self.usetablemodel.metadataList[i]["Source"] == source:
-                self.usetablemodel.beginRemoveRows(QModelIndex(), i, i)
-                del self.usetablemodel.metadataList[i]
-                self.usetablemodel.endRemoveRows()
+        for i in range(len(self.use_ez_table_model.metadataList)):
+            if self.use_ez_table_model.metadataList[i]["Source"] == source:
+                self.use_ez_table_model.beginRemoveRows(QModelIndex(), i, i)
+                del self.use_ez_table_model.metadataList[i]
+                self.use_ez_table_model.endRemoveRows()
                 break
         for i in range(len(self.use_ez_table_model_proxy.displayed)):
             if self.use_ez_table_model_proxy.displayed[i]["Source"] == source:
@@ -294,12 +287,12 @@ class MainWindow(QMainWindow):
             fileType = json.loads(fileType)
             editables = infile.readline()
             self.editable = json.loads(editables)
-            self.usetablemodel = TableModelU(self, [])
-            self.usetablemodel.templatelist = self.templatedata
-            self.usetablemodel.templatesources = templatesources
+            self.use_ez_table_model = TableModelU(self, [])
+            self.use_ez_table_model.templatelist = self.templatedata
+            self.use_ez_table_model.templatesources = templatesources
             self.ui.hyperthoughtTemplateLineEdit.setText(linetext)
-            self.ui.useTemplateTableView.setModel(self.usetablemodel)
-            self.uselistmodel = ListModel(self, self.usetablemodel, fileType)
+            self.ui.useTemplateTableView.setModel(self.use_ez_table_model)
+            self.uselistmodel = ListModel(self, self.use_ez_table_model, fileType)
             self.ui.useTemplateListView.setModel(self.uselistmodel)
             self.toggleButtons()
             infile.close()
@@ -336,14 +329,12 @@ class MainWindow(QMainWindow):
         proxy.setDynamicSortFilter(True)
         return proxy
     
-    def init_use_table_model_proxy(self, source_model: QEzTableModel):
-        self.use_ez_table_model_proxy = QUseEzTableModel(self)
-        self.use_ez_table_model_proxy.displayed = []
-        self.use_ez_table_model_proxy.setSourceModel(source_model)
-        self.use_ez_table_model_proxy.setFilterKeyColumn(1)
-        self.use_ez_table_model_proxy.setDynamicSortFilter(True)
-
-        self.filterUseTable()       
+    def init_use_table_model_proxy(self, source_model: QEzTableModel) -> QUseEzTableModel:
+        proxy = QUseEzTableModel(self)
+        proxy.setSourceModel(source_model)
+        proxy.setFilterKeyColumn(1)
+        proxy.setDynamicSortFilter(True)
+        return proxy   
 
     def removeRowfromUsefileType(self, index):
         if self.ui.useTemplateListView.width() - 64 < self.ui.useTemplateListView.mapFromGlobal(QCursor.pos()).x():
@@ -364,9 +355,9 @@ class MainWindow(QMainWindow):
             for file in self.uselistmodel.metadataList:
                 QFile.copy(file, fileName[0]+"/"+file.split("/")[-1])
             with open(fileName[0]+"/"+self.currentTemplate, 'w') as outfile:
-                json.dump(self.usetablemodel.templatelist, outfile)
+                json.dump(self.use_ez_table_model.templatelist, outfile)
                 outfile.write("\n")
-                json.dump(self.usetablemodel.templatesources, outfile)
+                json.dump(self.use_ez_table_model.templatesources, outfile)
                 outfile.write("\n")
                 json.dump(self.fileType, outfile)
                 outfile.write("\n")
@@ -384,9 +375,9 @@ class MainWindow(QMainWindow):
             for file in self.uselistmodel.metadataList:
                 QFile.copy(file, fileName[0]+"/"+file.split("/")[-1])
             with open(fileName[0]+"/"+self.currentTemplate, 'w') as outfile:
-                json.dump(self.usetablemodel.templatelist, outfile)
+                json.dump(self.use_ez_table_model.templatelist, outfile)
                 outfile.write("\n")
-                json.dump(self.usetablemodel.templatesources, outfile)
+                json.dump(self.use_ez_table_model.templatesources, outfile)
                 outfile.write("\n")
                 json.dump(self.create_ez_table_model.editableList, outfile)
                 outfile.write("\n")
@@ -452,10 +443,9 @@ class MainWindow(QMainWindow):
 
         # Load the EzMetadataModel from the json file (Template file)
         metadata_model = EzMetadataModel.from_json_file(templateFilePath)
-        self.use_ez_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
-        self.init_use_table_model_proxy(self.use_ez_table_model)
+        self.setup_use_ez_table(metadata_model)
 
-        self.ui.useTemplateTableView.setModel(self.use_ez_table_model_proxy)
+
 
         self.currentTemplate = templateFilePath.split("/")[-1]
         self.ui.displayedFileLabel.setText(templateFilePath.split("/")[-1])

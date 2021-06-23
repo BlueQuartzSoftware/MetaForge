@@ -125,7 +125,10 @@ class QUseEzTableModel(QSortFilterProxyModel):
             elif section == self.K_HTUNITS_COL_INDEX:
                 return self.K_HTUNITS_COL_NAME
 
-            return None
+        if orientation == Qt.Vertical:
+            return "     "
+
+        return None
 
 
     def flags(self, index):

@@ -18,7 +18,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1216, 724)
+        MainWindow.resize(1333, 724)
         MainWindow.setMinimumSize(QSize(0, 0))
         self.actionOpenPackage = QAction(MainWindow)
         self.actionOpenPackage.setObjectName(u"actionOpenPackage")
@@ -212,7 +212,7 @@ class Ui_MainWindow(object):
         self.metadataTableView.setSortingEnabled(True)
         self.metadataTableView.setCornerButtonEnabled(False)
         self.metadataTableView.horizontalHeader().setStretchLastSection(False)
-        self.metadataTableView.verticalHeader().setVisible(True)
+        self.metadataTableView.verticalHeader().setVisible(False)
         self.metadataTableView.verticalHeader().setMinimumSectionSize(15)
 
         self.gridLayout.addWidget(self.metadataTableView, 1, 1, 1, 1)
@@ -329,16 +329,16 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_12 = QHBoxLayout()
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
-        self.usetableSearchBar = QLineEdit(self.UseTemplateTab)
-        self.usetableSearchBar.setObjectName(u"usetableSearchBar")
+        self.useTemplateListSearchBar = QLineEdit(self.UseTemplateTab)
+        self.useTemplateListSearchBar.setObjectName(u"useTemplateListSearchBar")
         sizePolicy7 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
         sizePolicy7.setHorizontalStretch(0)
         sizePolicy7.setVerticalStretch(0)
-        sizePolicy7.setHeightForWidth(self.usetableSearchBar.sizePolicy().hasHeightForWidth())
-        self.usetableSearchBar.setSizePolicy(sizePolicy7)
-        self.usetableSearchBar.setReadOnly(False)
+        sizePolicy7.setHeightForWidth(self.useTemplateListSearchBar.sizePolicy().hasHeightForWidth())
+        self.useTemplateListSearchBar.setSizePolicy(sizePolicy7)
+        self.useTemplateListSearchBar.setReadOnly(False)
 
-        self.horizontalLayout_12.addWidget(self.usetableSearchBar)
+        self.horizontalLayout_12.addWidget(self.useTemplateListSearchBar)
 
         self.displayedFileLabel = QLabel(self.UseTemplateTab)
         self.displayedFileLabel.setObjectName(u"displayedFileLabel")
@@ -355,6 +355,13 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_12.addWidget(self.appendUseTableRowButton)
 
+        self.removeUseTableRowButton = QToolButton(self.UseTemplateTab)
+        self.removeUseTableRowButton.setObjectName(u"removeUseTableRowButton")
+        self.removeUseTableRowButton.setIcon(icon1)
+        self.removeUseTableRowButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+
+        self.horizontalLayout_12.addWidget(self.removeUseTableRowButton)
+
 
         self.verticalLayout.addLayout(self.horizontalLayout_12)
 
@@ -362,7 +369,8 @@ class Ui_MainWindow(object):
         self.useTemplateTableView.setObjectName(u"useTemplateTableView")
         self.useTemplateTableView.setAlternatingRowColors(True)
         self.useTemplateTableView.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.useTemplateTableView.horizontalHeader().setStretchLastSection(True)
+        self.useTemplateTableView.horizontalHeader().setStretchLastSection(False)
+        self.useTemplateTableView.verticalHeader().setMinimumSectionSize(15)
 
         self.verticalLayout.addWidget(self.useTemplateTableView)
 
@@ -417,7 +425,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1216, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1333, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuHelp = QMenu(self.menubar)
@@ -443,7 +451,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(0)
+        self.TabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -482,7 +490,7 @@ class Ui_MainWindow(object):
 #if QT_CONFIG(tooltip)
         self.removeCreateTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a custom value to the template", None))
 #endif // QT_CONFIG(tooltip)
-        self.removeCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Remove Row", None))
+        self.removeCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Remove Value", None))
         self.createTemplateTreeSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.createTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.saveTemplateButton.setText(QCoreApplication.translate("MainWindow", u"Save Template as ...", None))
@@ -498,12 +506,16 @@ class Ui_MainWindow(object):
         self.otherDataFileSelect.setToolTip(QCoreApplication.translate("MainWindow", u"Select a data file to extract meta-data", None))
 #endif // QT_CONFIG(tooltip)
         self.otherDataFileSelect.setText(QCoreApplication.translate("MainWindow", u"Select", None))
-        self.usetableSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search For HT Key", None))
+        self.useTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search For HT Key", None))
         self.displayedFileLabel.setText(QCoreApplication.translate("MainWindow", u"No File Selected", None))
 #if QT_CONFIG(tooltip)
         self.appendUseTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a Custom Value that is only going to be used for this upload", None))
 #endif // QT_CONFIG(tooltip)
         self.appendUseTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Add Custom Value", None))
+#if QT_CONFIG(tooltip)
+        self.removeUseTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a Custom Value that is only going to be used for this upload", None))
+#endif // QT_CONFIG(tooltip)
+        self.removeUseTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Remove Value", None))
         self.label_3.setText(QCoreApplication.translate("MainWindow", u"HyperThought Uploader Folder", None))
         self.hyperthoughtLocationLineEdit.setText("")
         self.hyperthoughtLocationLineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Use the 'Select Remote Folder' button to set the remote location for the data --->", None))
