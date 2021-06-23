@@ -143,6 +143,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.appendCreateTableRowButton)
 
+        self.removeCreateTableRowButton = QToolButton(self.CreateTemplateTab)
+        self.removeCreateTableRowButton.setObjectName(u"removeCreateTableRowButton")
+        self.removeCreateTableRowButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+
+        self.horizontalLayout.addWidget(self.removeCreateTableRowButton)
+
 
         self.horizontalLayout_3.addLayout(self.horizontalLayout)
 
@@ -154,8 +160,8 @@ class Ui_MainWindow(object):
         self.widget_3.setMinimumSize(QSize(0, 0))
         self.horizontalLayout_9 = QHBoxLayout(self.widget_3)
         self.horizontalLayout_9.setSpacing(0)
-        self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
         self.horizontalLayout_9.setObjectName(u"horizontalLayout_9")
+        self.horizontalLayout_9.setContentsMargins(0, 0, 0, 0)
 
         self.gridLayout_5.addWidget(self.widget_3, 2, 0, 1, 1)
 
@@ -196,8 +202,15 @@ class Ui_MainWindow(object):
         sizePolicy4.setHeightForWidth(self.metadataTableView.sizePolicy().hasHeightForWidth())
         self.metadataTableView.setSizePolicy(sizePolicy4)
         self.metadataTableView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.metadataTableView.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked)
+        self.metadataTableView.setProperty("showDropIndicator", False)
+        self.metadataTableView.setDragDropOverwriteMode(False)
         self.metadataTableView.setAlternatingRowColors(True)
-        self.metadataTableView.horizontalHeader().setStretchLastSection(True)
+        self.metadataTableView.setSortingEnabled(True)
+        self.metadataTableView.setCornerButtonEnabled(False)
+        self.metadataTableView.horizontalHeader().setStretchLastSection(False)
+        self.metadataTableView.verticalHeader().setVisible(True)
+        self.metadataTableView.verticalHeader().setMinimumSectionSize(15)
 
         self.gridLayout.addWidget(self.metadataTableView, 1, 1, 1, 1)
 
@@ -209,14 +222,14 @@ class Ui_MainWindow(object):
         self.widget.setMinimumSize(QSize(0, 0))
         self.horizontalLayout_11 = QHBoxLayout(self.widget)
         self.horizontalLayout_11.setSpacing(2)
-        self.horizontalLayout_11.setContentsMargins(2, 2, 2, 2)
         self.horizontalLayout_11.setObjectName(u"horizontalLayout_11")
+        self.horizontalLayout_11.setContentsMargins(2, 2, 2, 2)
         self.widget_2 = QWidget(self.widget)
         self.widget_2.setObjectName(u"widget_2")
         self.widget_2.setMinimumSize(QSize(0, 0))
         self.horizontalLayout_10 = QHBoxLayout(self.widget_2)
-        self.horizontalLayout_10.setContentsMargins(4, 4, 4, 4)
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
+        self.horizontalLayout_10.setContentsMargins(4, 4, 4, 4)
         self.horizontalSpacer_5 = QSpacerItem(1227, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_10.addItem(self.horizontalSpacer_5)
@@ -237,8 +250,8 @@ class Ui_MainWindow(object):
         self.UseTemplateTab.setObjectName(u"UseTemplateTab")
         self.gridLayout_3 = QGridLayout(self.UseTemplateTab)
         self.gridLayout_3.setSpacing(2)
-        self.gridLayout_3.setContentsMargins(4, 4, 4, 4)
         self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.gridLayout_3.setContentsMargins(4, 4, 4, 4)
         self.horizontalLayout_13 = QHBoxLayout()
         self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
         self.useTemplateListView = QListView(self.UseTemplateTab)
@@ -345,6 +358,7 @@ class Ui_MainWindow(object):
         self.useTemplateTableView = QTableView(self.UseTemplateTab)
         self.useTemplateTableView.setObjectName(u"useTemplateTableView")
         self.useTemplateTableView.setAlternatingRowColors(True)
+        self.useTemplateTableView.setSelectionBehavior(QAbstractItemView.SelectRows)
         self.useTemplateTableView.horizontalHeader().setStretchLastSection(True)
 
         self.verticalLayout.addWidget(self.useTemplateTableView)
@@ -457,11 +471,15 @@ class Ui_MainWindow(object):
         self.fileParserCombo.setItemText(1, QCoreApplication.translate("MainWindow", u"ANG Parser", None))
         self.fileParserCombo.setItemText(2, QCoreApplication.translate("MainWindow", u"Custom Parser", None))
 
-        self.fileParserCombo.setProperty("currentText", QCoreApplication.translate("MainWindow", u"CTF Parser", None))
+        self.fileParserCombo.setCurrentText(QCoreApplication.translate("MainWindow", u"CTF Parser", None))
 #if QT_CONFIG(tooltip)
         self.appendCreateTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a custom value to the template", None))
 #endif // QT_CONFIG(tooltip)
         self.appendCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Add Custom Value", None))
+#if QT_CONFIG(tooltip)
+        self.removeCreateTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a custom value to the template", None))
+#endif // QT_CONFIG(tooltip)
+        self.removeCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Remove Row", None))
         self.createTemplateTreeSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.createTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.saveTemplateButton.setText(QCoreApplication.translate("MainWindow", u"Save Template as ...", None))

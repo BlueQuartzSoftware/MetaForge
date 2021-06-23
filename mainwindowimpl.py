@@ -77,6 +77,7 @@ class MainWindow(QMainWindow):
         self.appendSourceFilesButton.clicked.connect(self.addFile)
         self.ui.appendCreateTableRowButton.clicked.connect(
             self.addCustomRowToCreateTable)
+        self.ui.removeCreateTableRowButton.clicked.connect(self.handleRemoveCreate)
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
         self.ui.hyperthoughtLocationButton.clicked.connect(
             self.hyperthoughtui.exec)
@@ -119,16 +120,16 @@ class MainWindow(QMainWindow):
 
         # self.checkboxDelegate = CheckBoxDelegate()
         self.createtrashDelegate = TrashDelegate()
-        self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
+        # self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
         # self.ui.metadataTableView.setItemDelegateForColumn(
         #     self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
         # self.ui.metadataTableView.setItemDelegateForColumn(
         #     self.create_ez_table_model.K_EDITABLE_COL_INDEX, self.checkboxDelegate)
-        self.ui.metadataTableView.setItemDelegateForColumn(
-            self.create_ez_table_model.K_REMOVE_COL_INDEX, self.createtrashDelegate)
-        self.ui.metadataTableView.setColumnWidth(
-            self.create_ez_table_model.K_REMOVE_COL_INDEX, self.width() * .05)
-        self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
+        # self.ui.metadataTableView.setItemDelegateForColumn(
+        #     self.create_ez_table_model.K_REMOVE_COL_INDEX, self.createtrashDelegate)
+        # self.ui.metadataTableView.setColumnWidth(
+        #     self.create_ez_table_model.K_REMOVE_COL_INDEX, self.width() * .05)
+        # self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
     
     def setup_create_ez_tree(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         headers = [self.K_CREATE_TREE_HEADER]
@@ -158,9 +159,8 @@ class MainWindow(QMainWindow):
             self.usefilterModel.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width()*.1)
         self.ui.useTemplateTableView.setColumnWidth(
             self.usefilterModel.K_HTANNOTATION_COL_INDEX, self.width()*.1)
+
         self.usetrashDelegate = TrashDelegate()
-        # self.ui.useTemplateTableView.setItemDelegateForColumn(
-        #     self.usefilterModel.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
         self.ui.useTemplateTableView.setItemDelegateForColumn(
             self.usefilterModel.K_REMOVE_COL_INDEX, self.usetrashDelegate)
         self.ui.useTemplateTableView.setColumnWidth(
@@ -263,15 +263,21 @@ class MainWindow(QMainWindow):
         self.ui.hyperthoughtLocationLineEdit.setText(remoteDirPath)
         self.toggleButtons()
 
-    def handleRemoveCreate(self, source_row:int):
-        entry = self.create_ez_table_model.metadata_model.entry(source_row)
-        # Remove Custom Entries from the mode or just mark FILE sources as disabled.
-        if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-            self.create_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
-            self.create_ez_table_model.metadata_model.remove_by_index(source_row)
-            self.create_ez_table_model.endRemoveRows()
-        elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
-            entry.enabled = False
+    def handleRemoveCreate(self):
+        proxy_selected_rows = reversed(self.ui.metadataTableView.selectionModel().selectedRows())
+        source_row = -1
+        for index in proxy_selected_rows:
+            source_row = (index.model().mapToSource(index)).row()
+            print(f'Handling Removal of Row: {source_row}')
+
+            entry = self.create_ez_table_model.metadata_model.entry(source_row)
+            # Remove Custom Entries from the mode or just mark FILE sources as disabled.
+            if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                self.create_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
+                self.create_ez_table_model.metadata_model.remove_by_index(source_row)
+                self.create_ez_table_model.endRemoveRows()
+            elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
+                self.treeModel.changeLeafCheck(entry.source_path)
         
         index0 = self.create_ez_table_model.index(0, 0)
         index1 = self.create_ez_table_model.index(self.create_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)

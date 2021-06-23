@@ -14,7 +14,7 @@ class QEzTableModel(QAbstractTableModel):
     """
 
     # Total Number of Columns
-    K_COL_COUNT = 10
+    K_COL_COUNT = 9
 
     # These are some misc strings that are used.
     K_FROM_SOURCE = "--SOURCE--"
@@ -48,9 +48,6 @@ class QEzTableModel(QAbstractTableModel):
     K_EDITABLE_COL_NAME = "Editable"
     K_EDITABLE_COL_INDEX = 8
 
-    K_REMOVE_COL_NAME = "Remove Row"
-    K_REMOVE_COL_INDEX = 9
-
     def __init__(self, metadata_model: EzMetadataModel, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadata_model = metadata_model
@@ -69,7 +66,7 @@ class QEzTableModel(QAbstractTableModel):
 
         metadata_entry: EzMetadataEntry = self.metadata_model.entry(index.row())
 
-        if role == Qt.DisplayRole:
+        if role == Qt.DisplayRole or role == Qt.EditRole:
             if index.column() == self.K_SORT_COL_INDEX:
                 return index.row() + 1
             elif index.column() == self.K_HTNAME_COL_INDEX:
@@ -105,6 +102,7 @@ class QEzTableModel(QAbstractTableModel):
                         return Qt.Checked
                     else:
                         return Qt.Unchecked
+
 
         return None
     
@@ -176,13 +174,13 @@ class QEzTableModel(QAbstractTableModel):
                 return self.K_USESOURCE_COL_NAME
             elif section == self.K_EDITABLE_COL_INDEX:
                 return self.K_EDITABLE_COL_NAME
-            elif section == self.K_REMOVE_COL_INDEX:
-                return self.K_REMOVE_COL_NAME
             elif section == self.K_HTANNOTATION_COL_INDEX:
                 return self.K_HTANNOTATION_COL_NAME
             elif section == self.K_HTUNITS_COL_INDEX:
                 return self.K_HTUNITS_COL_NAME
             return None
+        if orientation == Qt.Vertical:
+            return "    "
     
     def flags(self, index):
         if not index.isValid():

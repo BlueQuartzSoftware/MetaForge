@@ -1,5 +1,6 @@
 from PySide2.QtCore import QSortFilterProxyModel, Qt
 
+from ezmodel.ezmetadatamodel import EzMetadataModel
 from ezmodel.ezmetadataentry import EzMetadataEntry
 
 class QCreateEzTableModel(QSortFilterProxyModel):
@@ -11,9 +12,6 @@ class QCreateEzTableModel(QSortFilterProxyModel):
     def data(self, index, role):
         if not index.isValid():
             return None
-
-        # src_index = self.mapToSource(index)
-        # metadata_entry: EzMetadataEntry = self.metadata_model.entry(src_index.row())
 
         if role == Qt.DisplayRole:
             if index.column() == self.sourceModel().K_SORT_COL_INDEX:
