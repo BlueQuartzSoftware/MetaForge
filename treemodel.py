@@ -99,7 +99,7 @@ class TreeModel(QAbstractItemModel):
         childItem = self.getItem(index)
         parentItem = childItem.parent()
 
-        if parentItem == self.rootItem:
+        if parentItem is None or parentItem == self.rootItem:
             return QModelIndex()
 
         return self.createIndex(parentItem.childNumber(), 0, parentItem)
