@@ -227,8 +227,6 @@ class MainWindow(QMainWindow):
         source_row = -1
         for index in proxy_selected_rows:
             source_row = (index.model().mapToSource(index)).row()
-            print(f'Handling Removal of Row: {source_row}')
-
             entry = self.create_ez_table_model.metadata_model.entry(source_row)
             # Remove Custom Entries from the mode or just mark FILE sources as disabled.
             if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
@@ -431,11 +429,9 @@ class MainWindow(QMainWindow):
             "Select File"), startLocation, self.tr("Files (*.ez)"))[0]
 
         self.ui.hyperthoughtTemplateLineEdit.setText(templateFilePath)
-
         self.loadTemplateFile()
 
     def loadTemplateFile(self):
-
         templateFilePath = self.ui.hyperthoughtTemplateLineEdit.text()
 
         if templateFilePath == "":
@@ -444,12 +440,8 @@ class MainWindow(QMainWindow):
         # Load the EzMetadataModel from the json file (Template file)
         metadata_model = EzMetadataModel.from_json_file(templateFilePath)
         self.setup_use_ez_table(metadata_model)
-
-
-
         self.currentTemplate = templateFilePath.split("/")[-1]
         self.ui.displayedFileLabel.setText(templateFilePath.split("/")[-1])
-        
         self.updateUseTableModel()
 
     def loadOtherDataFile(self):
@@ -459,9 +451,7 @@ class MainWindow(QMainWindow):
         self.importMetadataFromDataFile()
 
     def importMetadataFromDataFile(self):
-        
         filePath = self.ui.otherDataFileLineEdit.text()
-
         self.setWindowTitle(filePath)
         self.ui.dataTypeText.setText(filePath.split(".")[1].upper())
         self.updateUseTableModel()
@@ -506,10 +496,9 @@ class MainWindow(QMainWindow):
             self.ui.hyperthoughtUploadButton.setEnabled(True)
 
     def uploadToHyperthought(self):
-        auth_control = htauthcontroller.HTAuthorizationController(
-            self.accessKey)
-        metadataJson = ht_utilities.dict_to_ht_metadata(
-            self.use_ez_table_model_proxy.displayed)
+        auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)
+
+        metadataJson = ht_utilities.ezmodel_to_ht_metadata(self.use_ez_table_model.metadata_model)
         progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(
             self.uselistmodel.metadataList), self)
 
