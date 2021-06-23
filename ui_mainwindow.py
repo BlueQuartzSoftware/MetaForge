@@ -269,6 +269,7 @@ class Ui_MainWindow(object):
         self.horizontalLayout_13.addWidget(self.useTemplateListView)
 
         self.verticalLayout = QVBoxLayout()
+        self.verticalLayout.setSpacing(4)
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
@@ -339,6 +340,12 @@ class Ui_MainWindow(object):
         self.useTemplateListSearchBar.setReadOnly(False)
 
         self.horizontalLayout_12.addWidget(self.useTemplateListSearchBar)
+
+        self.addMetadataFileCheckBox = QCheckBox(self.UseTemplateTab)
+        self.addMetadataFileCheckBox.setObjectName(u"addMetadataFileCheckBox")
+        self.addMetadataFileCheckBox.setChecked(True)
+
+        self.horizontalLayout_12.addWidget(self.addMetadataFileCheckBox)
 
         self.displayedFileLabel = QLabel(self.UseTemplateTab)
         self.displayedFileLabel.setObjectName(u"displayedFileLabel")
@@ -507,6 +514,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.otherDataFileSelect.setText(QCoreApplication.translate("MainWindow", u"Select", None))
         self.useTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search For HT Key", None))
+        self.addMetadataFileCheckBox.setText(QCoreApplication.translate("MainWindow", u"Add Extracted Metadata File To File List", None))
         self.displayedFileLabel.setText(QCoreApplication.translate("MainWindow", u"No File Selected", None))
 #if QT_CONFIG(tooltip)
         self.appendUseTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a Custom Value that is only going to be used for this upload", None))

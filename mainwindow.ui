@@ -456,6 +456,9 @@
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout">
+            <property name="spacing">
+             <number>4</number>
+            </property>
             <item>
              <layout class="QHBoxLayout" name="horizontalLayout_5">
               <item>
@@ -557,6 +560,16 @@
                 </property>
                 <property name="placeholderText">
                  <string>Search For HT Key</string>
+                </property>
+               </widget>
+              </item>
+              <item>
+               <widget class="QCheckBox" name="addMetadataFileCheckBox">
+                <property name="text">
+                 <string>Add Extracted Metadata File To File List</string>
+                </property>
+                <property name="checked">
+                 <bool>true</bool>
                 </property>
                </widget>
               </item>

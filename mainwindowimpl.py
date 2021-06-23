@@ -2,7 +2,7 @@
 
 from ezmodel.ezmetadataentry import EzMetadataEntry
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QHeaderView, QToolButton, QStyle, QProgressDialog
-from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent
+from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QFileInfo, QUrl
 from PySide2.QtGui import QCursor, QDesktopServices
 from ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
@@ -84,6 +84,7 @@ class MainWindow(QMainWindow):
             self.filter_create_table)
         self.ui.createTemplateTreeSearchBar.textChanged.connect(
             self.filterCreateTree)
+        self.ui.addMetadataFileCheckBox.stateChanged.connect(self.checkFileList)
 
         self.fileType = ""
         self.accessKey = ""
@@ -158,6 +159,15 @@ class MainWindow(QMainWindow):
     def addUseTableRow(self):
         self.use_ez_table_model.addCustomRow(1)
 
+    def checkFileList(self, checked):
+        if checked == Qt.Checked:
+          if self.ui.otherDataFileLineEdit.text() != "":
+              self.uselistmodel.addRow(self.ui.otherDataFileLineEdit.text())
+        elif checked == Qt.Unchecked:
+            if self.ui.otherDataFileLineEdit.text() in self.uselistmodel.metadataList:
+                rowIndex = self.uselistmodel.metadataList.index(self.ui.otherDataFileLineEdit.text())
+                self.uselistmodel.removeRow(rowIndex)
+
     def closeEvent(self, event):
         self.mThread.quit()
         self.mThread.wait(250)
@@ -174,13 +184,11 @@ class MainWindow(QMainWindow):
                     self.loadTemplateFile()
         if object == self.ui.otherDataFileLineEdit:
             if event.type() == QEvent.DragEnter:
-                if str(event.mimeData().urls()[0])[-6:-2] == self.fileType:
-                    event.acceptProposedAction()
+                event.acceptProposedAction()
             if (event.type() == QEvent.Drop):
-                if str(event.mimeData().urls()[0])[-6:-2] == self.fileType:
-                    event.acceptProposedAction()
-                    self.ui.otherDataFileLineEdit.setText(event.mimeData().urls()[0].toLocalFile())
-                    self.importMetadataFromDataFile()
+                event.acceptProposedAction()
+                self.ui.otherDataFileLineEdit.setText(event.mimeData().urls()[0].toLocalFile())
+                self.importMetadataFromDataFile()
         if object == self.ui.dataFileLineEdit:
             if event.type() == QEvent.DragEnter:
                 if str(event.mimeData().urls()[0])[-6:-2] == ".ctf" or str(event.mimeData().urls()[0])[-6:-2] == ".ang":
@@ -454,6 +462,10 @@ class MainWindow(QMainWindow):
         filePath = self.ui.otherDataFileLineEdit.text()
         self.setWindowTitle(filePath)
         self.ui.dataTypeText.setText(filePath.split(".")[1].upper())
+        if self.ui.addMetadataFileCheckBox.checkState() == Qt.Checked:
+            self.uselistmodel.removeAllRows()
+            self.uselistmodel.addRow(filePath)
+            self.toggleButtons()
         self.updateUseTableModel()
 
 
