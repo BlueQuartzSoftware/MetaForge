@@ -18,6 +18,7 @@ class QEzTableModel(QAbstractTableModel):
 
     # These are some misc strings that are used.
     K_FROM_SOURCE = "--SOURCE--"
+    K_CUSTOM_VALUE = "--CUSTOM VALUE--"
 
     # These are the user facing header and the index of each column in the table.
     K_SORT_COL_NAME = "#^"
@@ -74,9 +75,15 @@ class QEzTableModel(QAbstractTableModel):
             elif index.column() == self.K_HTNAME_COL_INDEX:
                 return metadata_entry.ht_name
             elif index.column() == self.K_SOURCEVAL_COL_INDEX:
-                return metadata_entry.source_value
+                if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                    return self.K_CUSTOM_VALUE
+                else:
+                    return metadata_entry.source_value
             elif index.column() == self.K_SOURCE_COL_INDEX:
-                return metadata_entry.source_path
+                if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                    return self.K_CUSTOM_VALUE
+                else:
+                    return metadata_entry.source_path
             elif index.column() == self.K_HTVALUE_COL_INDEX:
                 if metadata_entry.override_source_value is True:
                     return metadata_entry.ht_value
