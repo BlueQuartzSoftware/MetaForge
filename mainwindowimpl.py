@@ -58,13 +58,54 @@ class MainWindow(QMainWindow):
             self.uploadToHyperthought)
         self.setAcceptDrops(True)
         self.numCustoms = 0
+        self.editableKeys = []
 
-        self.create_ez_table_model = QEzTableModel(
-            metadata_model=EzMetadataModel(), parent=self)
-        self.create_ez_table_model_proxy = QCreateEzTableModel(self)
-        self.create_ez_table_model_proxy.setSourceModel(
-            self.create_ez_table_model)
+        # Setup the blank Create Template table
+        self.setup_create_ez_table()
+
+        # Setup the blank Create Template tree
+        self.setup_create_ez_tree()
+
+        # Setup the blank Use Template table
+        self.setup_use_ez_table()
+
+        # Setup the blank Use Template file list
+        self.setup_use_ez_list()
+
+        self.addAppendButton()
+        self.ui.TabWidget.currentChanged.connect(self.movethedamnbutton)
+        self.appendSourceFilesButton.clicked.connect(self.addFile)
+        self.ui.appendCreateTableRowButton.clicked.connect(
+            self.addCustomRowToCreateTable)
+        self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
+        self.ui.hyperthoughtLocationButton.clicked.connect(
+            self.hyperthoughtui.exec)
+        self.ui.usetableSearchBar.textChanged.connect(self.filterUseTable)
+        self.ui.createTemplateListSearchBar.textChanged.connect(
+            self.filter_create_table)
+        self.ui.createTemplateTreeSearchBar.textChanged.connect(
+            self.filterCreateTree)
+
+        self.fileType = ""
+        self.accessKey = ""
+        self.folderuuid = ""
+        self.mThread = QThread()
+        self.uploader = Uploader()
+        self.uploader.moveToThread(self.mThread)
+        self.mThread.start()
+
+        self.createUpload.connect(self.uploader.performUpload)
+        self.hyperthoughtui.apiSubmitted.connect(self.acceptKey)
+        self.hyperthoughtui.finished.connect(self.getLocation)
+        self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
+        self.ui.otherDataFileLineEdit.installEventFilter(self)
+        self.ui.dataFileLineEdit.installEventFilter(self)
+    
+    def setup_create_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
+        self.create_ez_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
+        self.create_ez_table_model_proxy = self.init_create_table_model_proxy(self.create_ez_table_model)
         self.ui.metadataTableView.setModel(self.create_ez_table_model_proxy)
+        self.filter_create_table()
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
             self.create_ez_table_model.K_SOURCE_COL_INDEX, QHeaderView.ResizeToContents)
         self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
@@ -78,6 +119,7 @@ class MainWindow(QMainWindow):
 
         # self.checkboxDelegate = CheckBoxDelegate()
         self.createtrashDelegate = TrashDelegate()
+        self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
         # self.ui.metadataTableView.setItemDelegateForColumn(
         #     self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
         # self.ui.metadataTableView.setItemDelegateForColumn(
@@ -86,16 +128,23 @@ class MainWindow(QMainWindow):
             self.create_ez_table_model.K_REMOVE_COL_INDEX, self.createtrashDelegate)
         self.ui.metadataTableView.setColumnWidth(
             self.create_ez_table_model.K_REMOVE_COL_INDEX, self.width() * .05)
-
-        self.treeModel = TreeModel(
-            [self.K_CREATE_TREE_HEADER], EzMetadataModel(), self.create_ez_table_model)
-        self.ui.metadataTreeView.setModel(self.treeModel)
-        self.treeModel.checkChanged.connect(
-            self.create_ez_table_model.refresh_entry)
         self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
-        self.editableKeys = []
-
-        self.usetablemodel = QEzTableModel(EzMetadataModel(), parent=self)
+    
+    def setup_create_ez_tree(self, metadata_model: EzMetadataModel = EzMetadataModel()):
+        headers = [self.K_CREATE_TREE_HEADER]
+        self.treeModel = TreeModel(headers, metadata_model, self)
+        self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
+        self.createTreeSearchFilterModel.setSourceModel(self.treeModel)
+        self.createTreeSearchFilterModel.setFilterKeyColumn(0)
+        self.createTreeSearchFilterModel.setDynamicSortFilter(True)
+        self.createTreeSearchFilterModel.setRecursiveFilteringEnabled(True)
+        self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
+        self.ui.metadataTreeView.expandAll()
+        refresh_func = self.create_ez_table_model.refresh_entry
+        self.treeModel.checkChanged.connect(refresh_func)
+    
+    def setup_use_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
+        self.usetablemodel = QEzTableModel(metadata_model, parent=self)
         self.usefilterModel = QUseEzTableModel(self)
         self.usefilterModel.setSourceModel(self.usetablemodel)
         self.ui.useTemplateTableView.setModel(self.usefilterModel)
@@ -117,8 +166,9 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateTableView.setColumnWidth(
             self.usefilterModel.K_REMOVE_COL_INDEX, self.width()*.075)
         self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
-
-        self.uselistmodel = ListModel(self, self.usetablemodel, [])
+    
+    def setup_use_ez_list(self, file_list: list = []):
+        self.uselistmodel = ListModel(file_list, self)
         self.ui.useTemplateListView.setModel(self.uselistmodel)
         self.uselistmodel.rowRemoved.connect(self.toggleButtons)
         self.uselistmodel.rowAdded.connect(self.toggleButtons)
@@ -128,35 +178,6 @@ class MainWindow(QMainWindow):
 
         self.ui.useTemplateListView.clicked.connect(
             self.removeRowfromUsefileType)
-
-        self.addAppendButton()
-        self.ui.TabWidget.currentChanged.connect(self.movethedamnbutton)
-        self.appendSourceFilesButton.clicked.connect(self.addFile)
-        self.ui.appendCreateTableRowButton.clicked.connect(
-            self.addCustomRowToCreateTable)
-        self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
-        self.ui.hyperthoughtLocationButton.clicked.connect(
-            self.hyperthoughtui.exec)
-        self.ui.usetableSearchBar.textChanged.connect(self.filterUseTable)
-        self.ui.createTemplateListSearchBar.textChanged.connect(
-            self.filterCreateTable)
-        self.ui.createTemplateTreeSearchBar.textChanged.connect(
-            self.filterCreateTree)
-
-        self.fileType = ""
-        self.accessKey = ""
-        self.folderuuid = ""
-        self.mThread = QThread()
-        self.uploader = Uploader()
-        self.uploader.moveToThread(self.mThread)
-        self.mThread.start()
-
-        self.createUpload.connect(self.uploader.performUpload)
-        self.hyperthoughtui.apiSubmitted.connect(self.acceptKey)
-        self.hyperthoughtui.finished.connect(self.getLocation)
-        self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
-        self.ui.otherDataFileLineEdit.installEventFilter(self)
-        self.ui.dataFileLineEdit.installEventFilter(self)
 
     def acceptKey(self, apikey):
         self.accessKey = apikey
@@ -213,10 +234,15 @@ class MainWindow(QMainWindow):
 
         return QMainWindow.eventFilter(self, object,  event)
 
-    def filterCreateTable(self):
-        self.create_ez_table_model_proxy.invalidate()
-        self.create_ez_table_model_proxy.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        self.create_ez_table_model_proxy.setFilterWildcard("*"+self.ui.createTemplateListSearchBar.text()+"*")
+    def filter_create_table(self):
+        proxy = self.create_ez_table_model_proxy
+        text = self.ui.createTemplateListSearchBar.text()
+        self.filter_proxy(proxy, text)
+
+    def filter_proxy(self, proxy_model: QSortFilterProxyModel, filter_text: str):
+        proxy_model.invalidate()
+        proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
+        proxy_model.setFilterWildcard(f'*{filter_text}*')
 
     def filterCreateTree(self):
         self.createTreeSearchFilterModel.invalidate()
@@ -319,41 +345,18 @@ class MainWindow(QMainWindow):
         if template_file_path != "":
             metadata_model = EzMetadataModel.from_json_file(template_file_path)
 
-            self.create_ez_table_model = QEzTableModel(metadata_model=metadata_model,
-                                                       parent=self)
+            # Setup the Create Template table
+            self.setup_create_ez_table(metadata_model=metadata_model)
 
-            self.treeModel = TreeModel(
-                [self.K_CREATE_TREE_HEADER], metadata_model)
-            self.ui.metadataTreeView.setModel(self.treeModel)
-            self.ui.metadataTreeView.expandAll()
+            # Setup the Create Template tree
+            self.setup_create_ez_tree(metadata_model=metadata_model)
 
-            self.init_create_table_model_proxy(
-                self.create_ez_table_model, template_file_path)
-
-            self.ui.metadataTableView.setModel(
-                self.create_ez_table_model_proxy)
-
-            self.treeModel.checkChanged.connect(
-                self.create_ez_table_model.refresh_entry)
-            self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
-                self.create_ez_table_model.K_SOURCE_COL_INDEX, QHeaderView.ResizeToContents)
-            self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
-                self.create_ez_table_model.K_HTNAME_COL_INDEX, QHeaderView.ResizeToContents)
-            self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
-                self.create_ez_table_model.K_SOURCEVAL_COL_INDEX, QHeaderView.ResizeToContents)
-            self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
-                self.create_ez_table_model.K_HTVALUE_COL_INDEX, QHeaderView.ResizeToContents)
-            self.ui.metadataTableView.setColumnWidth(
-                self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width() * .1)
-
-    def init_create_table_model_proxy(self, source_model: QEzTableModel, linetext: str):
-        self.create_ez_table_model_proxy = QCreateEzTableModel(self)
-        self.create_ez_table_model_proxy.displayed = []
-        self.create_ez_table_model_proxy.setSourceModel(source_model)
-        self.create_ez_table_model_proxy.fileType.append(linetext)
-        self.create_ez_table_model_proxy.setFilterKeyColumn(1)
-        self.create_ez_table_model_proxy.setDynamicSortFilter(True)
-        self.filterCreateTable()
+    def init_create_table_model_proxy(self, source_model: QEzTableModel) -> QCreateEzTableModel:
+        proxy = QCreateEzTableModel(self)
+        proxy.setSourceModel(source_model)
+        proxy.setFilterKeyColumn(1)
+        proxy.setDynamicSortFilter(True)
+        return proxy
     
     def init_use_table_model_proxy(self, source_model: QEzTableModel):
         self.use_ez_table_model_proxy = QUseEzTableModel(self)
@@ -439,22 +442,12 @@ class MainWindow(QMainWindow):
             metadata_model = EzMetadataModel.create_model(headerDict,
                                                           linetext,
                                                           source_type=EzMetadataEntry.SourceType.FILE)
-            self.create_ez_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
-            self.init_create_table_model_proxy(self.create_ez_table_model, linetext)
+            
+            # Setup the Create Template table
+            self.setup_create_ez_table(metadata_model=metadata_model)
 
-            self.ui.metadataTableView.setModel(self.create_ez_table_model_proxy)
-            self.treeModel = TreeModel(
-                [self.K_CREATE_TREE_HEADER], metadata_model=metadata_model, parent=self.create_ez_table_model)
-            self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
-            self.createTreeSearchFilterModel.setSourceModel(self.treeModel)
-            self.createTreeSearchFilterModel.setFilterKeyColumn(0)
-            self.createTreeSearchFilterModel.setDynamicSortFilter(True)
-            self.createTreeSearchFilterModel.setRecursiveFilteringEnabled(True)
-            self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
-            self.ui.metadataTreeView.expandAll()
-            self.treeModel.checkChanged.connect(
-                self.create_ez_table_model.refresh_entry)
-            self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
+            # Setup the Create Template tree
+            self.setup_create_ez_tree(metadata_model=metadata_model)
 
         self.toggleButtons()
         return True

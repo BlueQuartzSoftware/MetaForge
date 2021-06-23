@@ -1,14 +1,25 @@
-from PySide2.QtCore import QSortFilterProxyModel
+from PySide2.QtCore import QSortFilterProxyModel, Qt
 
 from ezmodel.ezmetadataentry import EzMetadataEntry
 
 class QCreateEzTableModel(QSortFilterProxyModel):
     def __init__(self, data, parent=None):
         QSortFilterProxyModel.__init__(self, parent)
-        self.displayed = []
-        self.fileType = []
         self.setDynamicSortFilter(True)
         self.sort(0)
+
+    def data(self, index, role):
+        if not index.isValid():
+            return None
+
+        # src_index = self.mapToSource(index)
+        # metadata_entry: EzMetadataEntry = self.metadata_model.entry(src_index.row())
+
+        if role == Qt.DisplayRole:
+            if index.column() == self.sourceModel().K_SORT_COL_INDEX:
+                return index.row() + 1
+
+        return super().data(index, role)
 
     def filterAcceptsRow(self, source_row, source_parent):
         if self.sourceModel() is None:

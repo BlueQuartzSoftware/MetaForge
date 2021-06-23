@@ -70,7 +70,7 @@ class QEzTableModel(QAbstractTableModel):
 
         if role == Qt.DisplayRole:
             if index.column() == self.K_SORT_COL_INDEX:
-                return index.row()
+                return index.row() + 1
             elif index.column() == self.K_HTNAME_COL_INDEX:
                 return metadata_entry.ht_name
             elif index.column() == self.K_SOURCEVAL_COL_INDEX:
@@ -144,7 +144,9 @@ class QEzTableModel(QAbstractTableModel):
                     metadata_entry.override_source_value = True
                 else:
                     metadata_entry.override_source_value = False
+                value_index = self.index(index.row(), self.K_HTVALUE_COL_INDEX)
                 self.dataChanged.emit(index, index)
+                self.dataChanged.emit(value_index, value_index)
                 return True
 
         return False
@@ -200,13 +202,13 @@ class QEzTableModel(QAbstractTableModel):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
             if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsUserCheckable
+                return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
             elif metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
                 return Qt.NoItemFlags
             else:
                 return Qt.NoItemFlags
         elif index.column() == self.K_EDITABLE_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsUserCheckable
+            return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
         elif index.column() == self.K_REMOVE_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         else:
