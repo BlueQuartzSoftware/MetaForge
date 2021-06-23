@@ -25,16 +25,19 @@ class TreeModelU(TreeModel):
 
     def checkList(self):
         missingSources = []
+        displayMessage = False
         for i in range(len(self.tablemodel.templatesources)):
             if "Custom Input" not in self.tablemodel.templatesources[i]:
                 if self.tablemodel.templatesources[i] not in self.tablemodel.newmetadatasources:
                     missingSources.append(self.tablemodel.templatesources[i])
+                    displayMessage = True
 
         for i in range(len(self.tablemodel.newmetadataList)):
             self.tablemodel.addRow(self.tablemodel.newmetadataList[i])
 
+        if displayMessage:
+            QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + "The file extracted is missing Source: \n\n"+ str(missingSources))
 
-        QMessageBox.warning(None, QApplication.applicationDisplayName(), "Bad stuff happens. " + "The file extracted is missing Source: \n\n"+ str(missingSources))
         self.tablemodel.newmetadataList = []
         self.tablemodel.newmetadatasources = []
 
