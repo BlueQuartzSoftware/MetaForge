@@ -11,19 +11,6 @@ class QUseEzTableModel(QSortFilterProxyModel):
     # Total Number of Columns
     K_COL_COUNT = 7
 
-    # These are some misc strings that are used.
-    K_CUSTOM_INPUT = "Custom Input"
-    K_FROM_SOURCE = "--SOURCE--"
-
-    # These are the keys to the Meta Data Dictionary that stores each row of data in the table.
-    K_KEY_META_KEY = "Key"
-    K_VALUE_META_KEY = "Value"
-    K_SOURCE_META_KEY = "Source"
-    K_ANNOTATION_META_KEY = "Annotation"
-    K_UNITS_META_KEY = "Units"
-    K_EDITABLE_META_KEY = "Editable"
-    K_USESOURCE_META_KEY = "Default"
-
     # These are the user facing header and the index of each column in the table.
     K_SOURCE_COL_NAME = "Source"
     K_SOURCE_COL_INDEX = 0
@@ -31,8 +18,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_USESOURCE_COL_NAME = "Override Source Value"
     K_OVERRIDESOURCEVALUE_COL_INDEX = 1
 
-    K_HTKEY_COL_NAME = "HT Name"
-    K_HTKEY_COL_INDEX = 2
+    K_HTNAME_COL_NAME = "HT Name"
+    K_HTNAME_COL_INDEX = 2
 
     K_HTVALUE_COL_NAME = "HT Value"
     K_HTVALUE_COL_INDEX = 3
@@ -45,10 +32,6 @@ class QUseEzTableModel(QSortFilterProxyModel):
 
     K_REMOVE_COL_NAME = "Remove Row"
     K_REMOVE_COL_INDEX = 6
-
-
-#    K_EDITABLE_COL_NAME = "Editable"
-#    K_EDITABLE_COL_INDEX = 7
 
     def __init__(self, data, parent=None):
         QSortFilterProxyModel.__init__(self, parent)
@@ -89,7 +72,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 self.mapToSource
                 return self.sourceModel().metadata_model.entry(source_row).source_path
 
-            elif index.column() == self.K_HTKEY_COL_INDEX:
+            elif index.column() == self.K_HTNAME_COL_INDEX:
                 return self.sourceModel().metadata_model.entry(source_row).ht_name
 
             elif index.column() == self.K_HTVALUE_COL_INDEX:
@@ -121,8 +104,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
             elif section == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 return self.K_USESOURCE_COL_NAME
 
-            if section == self.K_HTKEY_COL_INDEX:
-                return self.K_HTKEY_COL_NAME
+            if section == self.K_HTNAME_COL_INDEX:
+                return self.K_HTNAME_COL_NAME
 
             elif section == self.K_HTVALUE_COL_INDEX:
                 return self.K_HTVALUE_COL_NAME
@@ -150,7 +133,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
             return Qt.NoItemFlags
         elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
             return Qt.NoItemFlags
-        elif index.column() == self.K_HTKEY_COL_INDEX:
+        elif index.column() == self.K_HTNAME_COL_INDEX:
             if metadata_entry.editable is True:
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
             else:

@@ -12,24 +12,12 @@ class QEzTableModel(QAbstractTableModel):
     Define all of the column indices and column names in addition to any other strings
     in this section. This will make it easier to move columns around and rename items.
     """
+
     # Total Number of Columns
     K_COL_COUNT = 10
 
     # These are some misc strings that are used.
-    K_CUSTOM_INPUT = "Custom Input"
     K_FROM_SOURCE = "--SOURCE--"
-
-    # These are the keys to the Meta Data Dictionary that stores each row of data in the table.
-    K_NAME_META_KEY = "Key"
-    K_VALUE_META_KEY = "Value"
-    K_HTNAME_META_KEY = "HT Name"
-    K_HTVALUE_META_KEY = "HT Value"
-    K_SOURCE_META_KEY = "Source"
-    K_CHECKED_META_KEY = "Checked"
-    K_EDITABLE_META_KEY = "Editable"
-    K_DEFAULT_META_KEY = "Default"
-    K_HTANNOTATION_META_KEY = "HT Annotation"
-    K_HTUNITS_META_KEY = "HT Units"
 
     # These are the user facing header and the index of each column in the table.
     K_SORT_COL_NAME = "#^"
@@ -70,33 +58,96 @@ class QEzTableModel(QAbstractTableModel):
     def rowCount(self, parent=QModelIndex()):
         model_row_count = self.metadata_model.size()
         return model_row_count
-
+    
     def columnCount(self, parent=QModelIndex()):
         return self.K_COL_COUNT
-
+    
     def data(self, index, role):
+        if not index.isValid():
+            return None
+
+        metadata_entry: EzMetadataEntry = self.metadata_model.entry(index.row())
+
         if role == Qt.DisplayRole:
             if index.column() == self.K_SORT_COL_INDEX:
                 return index.row()
             elif index.column() == self.K_HTNAME_COL_INDEX:
-                return self.metadata_model.entry(index.row()).ht_name
+                return metadata_entry.ht_name
             elif index.column() == self.K_SOURCEVAL_COL_INDEX:
-                return self.metadata_model.entry(index.row()).source_value
+                return metadata_entry.source_value
             elif index.column() == self.K_SOURCE_COL_INDEX:
-                return self.metadata_model.entry(index.row()).source_path
+                return metadata_entry.source_path
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                return self.metadata_model.entry(index.row()).ht_value
+                if metadata_entry.override_source_value is True:
+                    return metadata_entry.source_value
+                else:
+                    return self.K_FROM_SOURCE
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
-                return self.metadata_model.entry(index.row()).ht_annotation
+                return metadata_entry.ht_annotation
             elif index.column() == self.K_HTUNITS_COL_INDEX:
-                return self.metadata_model.entry(index.row()).ht_units
+                return metadata_entry.ht_units
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_EDITABLE_COL_INDEX:
-                return self.metadata_model.entry(index.row()).editable
+                if metadata_entry.editable is True:
+                    return Qt.Checked
+                else:
+                    return Qt.Unchecked
             elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
-                return self.metadata_model.entry(index.row()).override_source_value
+                if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+                    if metadata_entry.override_source_value is True:
+                        return Qt.Checked
+                    else:
+                        return Qt.Unchecked
 
         return None
+    
+    def setData(self, index, value, role):
+        if not index.isValid():
+            return False
+        
+        if self.metadata_model is None:
+            return False
+        
+        metadata_entry: EzMetadataEntry = self.metadata_model.entry(index.row())
+            
+        if role == Qt.EditRole:
+            if index.column() == self.K_SORT_COL_INDEX:
+                # Move row to a different location!
+                pass
+            elif index.column() == self.K_HTNAME_COL_INDEX:
+                metadata_entry.ht_name = value
+                self.dataChanged.emit(index, index)
+                return True
+            elif index.column() == self.K_HTVALUE_COL_INDEX:
+                if metadata_entry.override_source_value is True:
+                    metadata_entry.ht_value = value
+                    self.dataChanged.emit(index, index)
+                    return True
+            elif index.column() == self.K_HTANNOTATION_COL_INDEX:
+                metadata_entry.ht_annotation = value
+                self.dataChanged.emit(index, index)
+                return True
+            elif index.column() == self.K_HTUNITS_COL_INDEX:
+                metadata_entry.ht_units = value
+                self.dataChanged.emit(index, index)
+                return True
+        elif role == Qt.CheckStateRole:
+            if index.column() == self.K_EDITABLE_COL_INDEX:
+                if value == Qt.Checked:
+                    metadata_entry.editable = True
+                else:
+                    metadata_entry.editable = False
+                self.dataChanged.emit(index, index)
+                return True
+            elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
+                if value == Qt.Checked:
+                    metadata_entry.override_source_value = True
+                else:
+                    metadata_entry.override_source_value = False
+                self.dataChanged.emit(index, index)
+                return True
+
+        return False
 
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role != Qt.DisplayRole:
@@ -123,77 +174,43 @@ class QEzTableModel(QAbstractTableModel):
             elif section == self.K_HTUNITS_COL_INDEX:
                 return self.K_HTUNITS_COL_NAME
             return None
-
-    def setData(self, index, value, role):
-        if not index.isValid():
-            return False
-            
-        if role == Qt.EditRole:
-            # if index.column() == self.K_SORT_COL_INDEX:
-            #     if int(value) > -1 and int(value) < len(<<<self.metadataList>>>):
-            #         temp = <<<self.metadataList>>>[int(value)]
-            #         <<<self.metadataList>>>[int(value)] = <<<self.metadataList>>>[index.row()]
-            #         <<<self.metadataList>>>[index.row()] = temp
-            if index.column() == self.K_HTNAME_COL_INDEX:
-                self.metadata_model.entry(index.row()).ht_name = value
-                self.dataChanged.emit(index, index)
-            elif index.column() == self.K_HTVALUE_COL_INDEX:
-                self.metadata_model.entry(index.row()).ht_value = value
-                self.dataChanged.emit(index, index)
-            elif index.column() == self.K_HTANNOTATION_COL_INDEX:
-                self.metadata_model.entry(index.row()).ht_annotation = value
-                self.dataChanged.emit(index, index)
-            elif index.column() == self.K_HTUNITS_COL_INDEX:
-                self.metadata_model.entry(index.row()).ht_units = value
-                self.dataChanged.emit(index, index)
-            else:
-                return False
-            return True
-        elif role == Qt.CheckStateRole:
-            if index.column() == self.K_EDITABLE_COL_INDEX or index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
-                self.changeChecked(index)
-            return True
-
-        return False
-
-    def changeChecked(self, index):
-        pass
-        # if index.column() == self.K_EDITABLE_COL_INDEX:
-        #     if <<<self.metadataList>>>[index.row()][self.K_EDITABLE_COL_NAME] == 0:
-        #         <<<self.metadataList>>>[index.row()][self.K_EDITABLE_COL_NAME] = 2
-        #     else:
-        #         <<<self.metadataList>>>[index.row()][self.K_EDITABLE_COL_NAME] = 0
-        #     self.dataChanged.emit(index, index)
-        # elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
-        #     if <<<self.metadataList>>>[index.row()][self.K_DEFAULT_META_KEY] == 0:
-        #         <<<self.metadataList>>>[index.row()][self.K_HTVALUE_META_KEY] = self.K_FROM_SOURCE
-        #         <<<self.metadataList>>>[index.row()][self.K_DEFAULT_META_KEY] = 2
-        #     else:
-        #         <<<self.metadataList>>>[index.row()][self.K_HTVALUE_META_KEY] = <<<self.metadataList>>>[index.row()][self.K_VALUE_META_KEY]
-        #         <<<self.metadataList>>>[index.row()][self.K_DEFAULT_META_KEY] = 0
-        #     anIndex = self.index(index.row(),self.K_HTVALUE_COL_INDEX)
-        #     self.dataChanged.emit(anIndex,index)
-
+    
     def flags(self, index):
-        return Qt.NoItemFlags
-        # if not index.isValid():
-        #     return Qt.NoItemFlags
-        # if index.column() == self.K_HTNAME_COL_INDEX:
-        #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-        # elif index.column() == self.K_HTVALUE_COL_INDEX:
-        #     if <<<self.metadataList>>>[index.row()]["Default"] == 2:
-        #         return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
-        #     elif <<<self.metadataList>>>[index.row()]["Default"] == 0:
-        #         return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable | Qt.ItemIsEnabled)
-        # elif index.column() == self.K_REMOVE_COL_INDEX:
-        #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-        # elif index.column() == self.K_SORT_COL_INDEX:
-        #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-        # elif index.column() == self.K_EDIDEX or index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
-        #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsUserCheckable)
-        # else:
-        #     return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+        if not index.isValid():
+            return Qt.NoItemFlags
 
+        metadata_entry: EzMetadataEntry = self.metadata_model.entry(index.row())
+
+        if index.column() == self.K_SORT_COL_INDEX:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        elif index.column() == self.K_SOURCE_COL_INDEX:
+            return Qt.NoItemFlags
+        elif index.column() == self.K_SOURCEVAL_COL_INDEX:
+            return Qt.NoItemFlags
+        elif index.column() == self.K_HTNAME_COL_INDEX:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        elif index.column() == self.K_HTVALUE_COL_INDEX:
+            if metadata_entry.override_source_value is True:
+                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            else:
+                return Qt.NoItemFlags
+        elif index.column() == self.K_HTANNOTATION_COL_INDEX:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        elif index.column() == self.K_HTUNITS_COL_INDEX:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
+            if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsUserCheckable
+            elif metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                return Qt.NoItemFlags
+            else:
+                return Qt.NoItemFlags
+        elif index.column() == self.K_EDITABLE_COL_INDEX:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsUserCheckable
+        elif index.column() == self.K_REMOVE_COL_INDEX:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        else:
+            return Qt.NoItemFlags
 
     def addRow(self, dataDict, source, value):
         pass
@@ -201,7 +218,6 @@ class QEzTableModel(QAbstractTableModel):
         # self.endInsertRows()
 
     def addCustomRow(self, numCustom):
-        
         self.beginInsertRows(self.index(len(self.metadata_model.entries), 0), len(
             self.metadata_model.entries), len(self.metadata_model.entries))
         custom = EzMetadataEntry()
@@ -220,3 +236,11 @@ class QEzTableModel(QAbstractTableModel):
         self.metadata_model.append(custom)
 
         self.endInsertRows()
+    
+    def refresh_entry(self, source):
+        metadata_entry: EzMetadataEntry = self.metadata_model.entry_by_source(source)
+        if metadata_entry is not None:
+            row = self.metadata_model.index_from_source(source)
+            left_index = self.index(row, 0)
+            right_index = self.index(row, self.columnCount() - 1)
+            self.dataChanged.emit(left_index, right_index)

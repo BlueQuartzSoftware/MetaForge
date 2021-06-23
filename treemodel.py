@@ -10,7 +10,7 @@ from ezmodel.ezmetadataentry import EzMetadataEntry
 
 
 class TreeModel(QAbstractItemModel):
-    checkChanged = Signal(int, str)
+    checkChanged = Signal(str)
 
     def __init__(self, header, metadata_model: EzMetadataModel, parent=None):
         super(TreeModel, self).__init__(parent)
@@ -148,7 +148,7 @@ class TreeModel(QAbstractItemModel):
         index = self.get_index_from_item(item)
         self.dataChanged.emit(index, index)
         item_path = self._get_item_path(item)
-        self.checkChanged.emit(item.get_check_state(), item_path)
+        self.checkChanged.emit(item_path)
 
     # def _sync_check_states(self, item: TreeItem):
     #     if item is not None:

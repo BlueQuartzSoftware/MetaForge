@@ -10,11 +10,9 @@ from qeztablemodel import QEzTableModel
 from usetablemodel import TableModelU
 from uselistmodel import ListModel
 from treemodel import TreeModel
-from treemodelrestore import TreeModelR
-from usetreemodel import TreeModelU
 from qcreateeztablemodel import QCreateEzTableModel
 from quseeztablemodel import QUseEzTableModel
-from checkboxdelegate import CheckBoxDelegate
+# from checkboxdelegate import CheckBoxDelegate
 from usefiledelegate import UseFileDelegate
 from trashdelegate import TrashDelegate
 
@@ -78,12 +76,12 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.setColumnWidth(
             self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width() * .1)
 
-        self.checkboxDelegate = CheckBoxDelegate()
+        # self.checkboxDelegate = CheckBoxDelegate()
         self.createtrashDelegate = TrashDelegate()
-        self.ui.metadataTableView.setItemDelegateForColumn(
-            self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
-        self.ui.metadataTableView.setItemDelegateForColumn(
-            self.create_ez_table_model.K_EDITABLE_COL_INDEX, self.checkboxDelegate)
+        # self.ui.metadataTableView.setItemDelegateForColumn(
+        #     self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
+        # self.ui.metadataTableView.setItemDelegateForColumn(
+        #     self.create_ez_table_model.K_EDITABLE_COL_INDEX, self.checkboxDelegate)
         self.ui.metadataTableView.setItemDelegateForColumn(
             self.create_ez_table_model.K_REMOVE_COL_INDEX, self.createtrashDelegate)
         self.ui.metadataTableView.setColumnWidth(
@@ -93,7 +91,7 @@ class MainWindow(QMainWindow):
             [self.K_CREATE_TREE_HEADER], EzMetadataModel(), self.create_ez_table_model)
         self.ui.metadataTreeView.setModel(self.treeModel)
         self.treeModel.checkChanged.connect(
-            self.create_ez_table_model_proxy.checkList)
+            self.create_ez_table_model.refresh_entry)
         self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
         self.editableKeys = []
 
@@ -102,22 +100,22 @@ class MainWindow(QMainWindow):
         self.usefilterModel.setSourceModel(self.usetablemodel)
         self.ui.useTemplateTableView.setModel(self.usefilterModel)
         self.ui.useTemplateTableView.setColumnWidth(
-            self.usetablemodel.K_HTNAME_COL_INDEX, self.width()*.25)
+            self.usefilterModel.K_HTNAME_COL_INDEX, self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(
-            self.usetablemodel.K_HTVALUE_COL_INDEX, self.width()*.25)
+            self.usefilterModel.K_HTVALUE_COL_INDEX, self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(
-            self.usetablemodel.K_SOURCE_COL_INDEX, self.width()*.25)
+            self.usefilterModel.K_SOURCE_COL_INDEX, self.width()*.25)
         self.ui.useTemplateTableView.setColumnWidth(
-            self.usetablemodel.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width()*.1)
+            self.usefilterModel.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width()*.1)
         self.ui.useTemplateTableView.setColumnWidth(
-            self.usetablemodel.K_HTANNOTATION_COL_INDEX, self.width()*.1)
+            self.usefilterModel.K_HTANNOTATION_COL_INDEX, self.width()*.1)
         self.usetrashDelegate = TrashDelegate()
+        # self.ui.useTemplateTableView.setItemDelegateForColumn(
+        #     self.usefilterModel.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
         self.ui.useTemplateTableView.setItemDelegateForColumn(
-            self.usetablemodel.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
-        self.ui.useTemplateTableView.setItemDelegateForColumn(
-            self.usetablemodel.K_REMOVE_COL_INDEX, self.usetrashDelegate)
+            self.usefilterModel.K_REMOVE_COL_INDEX, self.usetrashDelegate)
         self.ui.useTemplateTableView.setColumnWidth(
-            self.usetablemodel.K_REMOVE_COL_INDEX, self.width()*.075)
+            self.usefilterModel.K_REMOVE_COL_INDEX, self.width()*.075)
         self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
 
         self.uselistmodel = ListModel(self, self.usetablemodel, [])
@@ -327,6 +325,7 @@ class MainWindow(QMainWindow):
             self.treeModel = TreeModel(
                 [self.K_CREATE_TREE_HEADER], metadata_model)
             self.ui.metadataTreeView.setModel(self.treeModel)
+            self.ui.metadataTreeView.expandAll()
 
             self.init_create_table_model_proxy(
                 self.create_ez_table_model, template_file_path)
@@ -335,7 +334,7 @@ class MainWindow(QMainWindow):
                 self.create_ez_table_model_proxy)
 
             self.treeModel.checkChanged.connect(
-                self.create_ez_table_model_proxy.checkList)
+                self.create_ez_table_model.refresh_entry)
             self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
                 self.create_ez_table_model.K_SOURCE_COL_INDEX, QHeaderView.ResizeToContents)
             self.ui.metadataTableView.horizontalHeader().setSectionResizeMode(
@@ -452,8 +451,9 @@ class MainWindow(QMainWindow):
             self.createTreeSearchFilterModel.setDynamicSortFilter(True)
             self.createTreeSearchFilterModel.setRecursiveFilteringEnabled(True)
             self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
+            self.ui.metadataTreeView.expandAll()
             self.treeModel.checkChanged.connect(
-                self.create_ez_table_model_proxy.checkList)
+                self.create_ez_table_model.refresh_entry)
             self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
 
         self.toggleButtons()
