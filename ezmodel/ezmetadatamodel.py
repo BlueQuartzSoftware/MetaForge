@@ -35,7 +35,7 @@ class EzMetadataModel:
                                                  source_value=value,
                                                  source_type=source_type,
                                                  ht_name=key,
-                                                 ht_value='',
+                                                 ht_value=value,
                                                  ht_annotation='',
                                                  ht_units='')
                 model.append(metadata_entry)

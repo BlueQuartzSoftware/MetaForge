@@ -79,7 +79,7 @@ class QEzTableModel(QAbstractTableModel):
                 return metadata_entry.source_path
             elif index.column() == self.K_HTVALUE_COL_INDEX:
                 if metadata_entry.override_source_value is True:
-                    return metadata_entry.source_value
+                    return metadata_entry.ht_value
                 else:
                     return self.K_FROM_SOURCE
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
