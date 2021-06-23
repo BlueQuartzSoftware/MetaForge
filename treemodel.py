@@ -63,7 +63,7 @@ class TreeModel(QAbstractItemModel):
 
     def get_index_from_item(self, item: TreeItem) -> QModelIndex:
         if item is not None:
-            self.createIndex(item.childNumber(), 0, item)
+            return self.createIndex(item.childNumber(), 0, item)
 
         return QModelIndex()
 
