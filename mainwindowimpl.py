@@ -1,9 +1,9 @@
 # This Python file uses the following encoding: utf-8
 
 from ezmodel.ezmetadataentry import EzMetadataEntry
-from PySide2.QtWidgets import QApplication, QButtonGroup, QWidget, QMainWindow, QFileSystemModel, QFileDialog, QStyleOptionFrame, QHeaderView, QToolButton, QStyle, QProgressDialog, QDialog
-from PySide2.QtCore import QFile, QDir, QIODevice, Qt, QStandardPaths, QSortFilterProxyModel, QObject, Signal, Slot, QRegExp, QThread, QModelIndex, QEvent
-from PySide2.QtGui import QCloseEvent, QCursor, QDesktopServices
+from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QHeaderView, QToolButton, QStyle, QProgressDialog
+from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent
+from PySide2.QtGui import QCursor, QDesktopServices
 from ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
 from qeztablemodel import QEzTableModel
@@ -12,9 +12,7 @@ from uselistmodel import ListModel
 from treemodel import TreeModel
 from qcreateeztablemodel import QCreateEzTableModel
 from quseeztablemodel import QUseEzTableModel
-# from checkboxdelegate import CheckBoxDelegate
 from usefiledelegate import UseFileDelegate
-from trashdelegate import TrashDelegate
 
 from ht_requests.ht_requests import ht_utilities
 from ht_requests.ht_requests import htauthcontroller
@@ -117,19 +115,6 @@ class MainWindow(QMainWindow):
             self.create_ez_table_model.K_HTVALUE_COL_INDEX, QHeaderView.ResizeToContents)
         self.ui.metadataTableView.setColumnWidth(
             self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width() * .1)
-
-        # self.checkboxDelegate = CheckBoxDelegate()
-        self.createtrashDelegate = TrashDelegate()
-        # self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
-        # self.ui.metadataTableView.setItemDelegateForColumn(
-        #     self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
-        # self.ui.metadataTableView.setItemDelegateForColumn(
-        #     self.create_ez_table_model.K_EDITABLE_COL_INDEX, self.checkboxDelegate)
-        # self.ui.metadataTableView.setItemDelegateForColumn(
-        #     self.create_ez_table_model.K_REMOVE_COL_INDEX, self.createtrashDelegate)
-        # self.ui.metadataTableView.setColumnWidth(
-        #     self.create_ez_table_model.K_REMOVE_COL_INDEX, self.width() * .05)
-        # self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
     
     def setup_create_ez_tree(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         headers = [self.K_CREATE_TREE_HEADER]
@@ -146,26 +131,7 @@ class MainWindow(QMainWindow):
     
     def setup_use_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         self.usetablemodel = QEzTableModel(metadata_model, parent=self)
-        self.usefilterModel = QUseEzTableModel(self)
-        self.usefilterModel.setSourceModel(self.usetablemodel)
-        self.ui.useTemplateTableView.setModel(self.usefilterModel)
-        self.ui.useTemplateTableView.setColumnWidth(
-            self.usefilterModel.K_HTNAME_COL_INDEX, self.width()*.25)
-        self.ui.useTemplateTableView.setColumnWidth(
-            self.usefilterModel.K_HTVALUE_COL_INDEX, self.width()*.25)
-        self.ui.useTemplateTableView.setColumnWidth(
-            self.usefilterModel.K_SOURCE_COL_INDEX, self.width()*.25)
-        self.ui.useTemplateTableView.setColumnWidth(
-            self.usefilterModel.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width()*.1)
-        self.ui.useTemplateTableView.setColumnWidth(
-            self.usefilterModel.K_HTANNOTATION_COL_INDEX, self.width()*.1)
-
-        self.usetrashDelegate = TrashDelegate()
-        self.ui.useTemplateTableView.setItemDelegateForColumn(
-            self.usefilterModel.K_REMOVE_COL_INDEX, self.usetrashDelegate)
-        self.ui.useTemplateTableView.setColumnWidth(
-            self.usefilterModel.K_REMOVE_COL_INDEX, self.width()*.075)
-        self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
+        self.init_use_table_model_proxy(self.usetablemodel)
     
     def setup_use_ez_list(self, file_list: list = []):
         self.uselistmodel = ListModel(file_list, self)
@@ -296,11 +262,11 @@ class MainWindow(QMainWindow):
                 del self.usetablemodel.metadataList[i]
                 self.usetablemodel.endRemoveRows()
                 break
-        for i in range(len(self.usefilterModel.displayed)):
-            if self.usefilterModel.displayed[i]["Source"] == source:
-                self.usefilterModel.beginRemoveRows(QModelIndex(), i, i)
-                del self.usefilterModel.displayed[i]
-                self.usefilterModel.endRemoveRows()
+        for i in range(len(self.use_ez_table_model_proxy.displayed)):
+            if self.use_ez_table_model_proxy.displayed[i]["Source"] == source:
+                self.use_ez_table_model_proxy.beginRemoveRows(QModelIndex(), i, i)
+                del self.use_ez_table_model_proxy.displayed[i]
+                self.use_ez_table_model_proxy.endRemoveRows()
                 break
 
     def help(self):
@@ -374,9 +340,9 @@ class MainWindow(QMainWindow):
         self.use_ez_table_model_proxy = QUseEzTableModel(self)
         self.use_ez_table_model_proxy.displayed = []
         self.use_ez_table_model_proxy.setSourceModel(source_model)
-        # self.use_ez_table_model_proxy.fileType.append(linetext)
         self.use_ez_table_model_proxy.setFilterKeyColumn(1)
         self.use_ez_table_model_proxy.setDynamicSortFilter(True)
+
         self.filterUseTable()       
 
     def removeRowfromUsefileType(self, index):
@@ -531,6 +497,7 @@ class MainWindow(QMainWindow):
             print("XML Parser used")
 
         self.use_ez_table_model.metadata_model.update_model_values_from_dict(headerDict)
+        self.use_ez_table_model_proxy.metadata_file_chosen = True
 
         index0 = self.use_ez_table_model.index(0, 0)
         index1 = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
@@ -552,7 +519,7 @@ class MainWindow(QMainWindow):
         auth_control = htauthcontroller.HTAuthorizationController(
             self.accessKey)
         metadataJson = ht_utilities.dict_to_ht_metadata(
-            self.usefilterModel.displayed)
+            self.use_ez_table_model_proxy.displayed)
         progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(
             self.uselistmodel.metadataList), self)
 

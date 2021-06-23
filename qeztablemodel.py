@@ -21,7 +21,7 @@ class QEzTableModel(QAbstractTableModel):
     K_CUSTOM_VALUE = "--CUSTOM VALUE--"
 
     # These are the user facing header and the index of each column in the table.
-    K_SORT_COL_NAME = "#^"
+    K_SORT_COL_NAME = "#"
     K_SORT_COL_INDEX = 0
 
     K_SOURCE_COL_NAME = "Source"
@@ -102,8 +102,6 @@ class QEzTableModel(QAbstractTableModel):
                         return Qt.Checked
                     else:
                         return Qt.Unchecked
-
-
         return None
     
     def setData(self, index, value, role):

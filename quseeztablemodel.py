@@ -9,7 +9,10 @@ class QUseEzTableModel(QSortFilterProxyModel):
     in this section. This will make it easier to move columns around and rename items.
     """
     # Total Number of Columns
-    K_COL_COUNT = 7
+    K_COL_COUNT = 6
+
+    # These are some misc strings that are used.
+    K_SOURCE_NOT_LOADED = "--SOURCE NOT LOADED--"
 
     # These are the user facing header and the index of each column in the table.
     K_SOURCE_COL_NAME = "Source"
@@ -30,15 +33,11 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_HTUNITS_COL_NAME = "HT Units"
     K_HTUNITS_COL_INDEX = 5
 
-    K_REMOVE_COL_NAME = "Remove Row"
-    K_REMOVE_COL_INDEX = 6
-
     def __init__(self, data, parent=None):
         QSortFilterProxyModel.__init__(self, parent)
-        self.displayed = []
-        self.fileType = []
         self.setDynamicSortFilter(True)
         self.sort(0)
+        self.metadata_file_chosen = False
 
     def columnCount(self, parent=QModelIndex()):
         return self.K_COL_COUNT
@@ -65,32 +64,42 @@ class QUseEzTableModel(QSortFilterProxyModel):
 
 
     def data(self, index, role):
-        metadata_model = self.sourceModel().metadata_model
-        source_row = self.mapToSource(index).row()
-        if role == Qt.DisplayRole:
-            if index.column() == self.K_SOURCE_COL_INDEX:
-                self.mapToSource
-                return self.sourceModel().metadata_model.entry(source_row).source_path
+        if not index.isValid():
+            return None
 
-            elif index.column() == self.K_HTNAME_COL_INDEX:
-                return self.sourceModel().metadata_model.entry(source_row).ht_name
+        src_model = self.sourceModel()
+        if src_model is None:
+            return None
+        
+        src_index = self.mapToSource(index)
+        metadata_entry: EzMetadataEntry = src_model.metadata_model.entry(src_index.row())
 
+        if role == Qt.DisplayRole or role == Qt.EditRole:
+            if index.column() == self.K_HTNAME_COL_INDEX:
+                return metadata_entry.ht_name
+            elif index.column() == self.K_SOURCE_COL_INDEX:
+                if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                    return src_model.K_CUSTOM_VALUE
+                else:
+                    return metadata_entry.source_path
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                return self.sourceModel().metadata_model.entry(source_row).ht_value
-
+                if metadata_entry.override_source_value is True:
+                    return metadata_entry.ht_value
+                elif self.metadata_file_chosen is True:
+                    return metadata_entry.ht_value
+                else:
+                    return self.K_SOURCE_NOT_LOADED
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
-                return self.sourceModel().metadata_model.entry(source_row).ht_annotation
-
+                return metadata_entry.ht_annotation
             elif index.column() == self.K_HTUNITS_COL_INDEX:
-                return self.sourceModel().metadata_model.entry(source_row).ht_units
-
+                return metadata_entry.ht_units
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
-                return self.sourceModel().metadata_model.entry(source_row).override_source_value
-                
-            if index.column() == self.K_REMOVE_COL_INDEX:
-                #return self.sourceModel().metadata_model.entry(source_row).override_source_value
-                return "Remove This Row"
+                if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+                    if metadata_entry.override_source_value is True:
+                        return Qt.Checked
+                    else:
+                        return Qt.Unchecked
         return None
 
 
@@ -116,9 +125,6 @@ class QUseEzTableModel(QSortFilterProxyModel):
             elif section == self.K_HTUNITS_COL_INDEX:
                 return self.K_HTUNITS_COL_NAME
 
-            elif section == self.K_REMOVE_COL_INDEX:
-                return self.K_REMOVE_COL_NAME
-
             return None
 
 
@@ -139,7 +145,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
             else:
                 return Qt.NoItemFlags
         elif index.column() == self.K_HTVALUE_COL_INDEX:
-            if metadata_entry.editable is True:
+            if self.metadata_file_chosen is True and metadata_entry.editable is True:
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
             else:
                 return Qt.NoItemFlags
@@ -153,8 +159,6 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
             else:
                 return Qt.NoItemFlags
-        elif index.column() == self.K_REMOVE_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         else:
             return Qt.NoItemFlags
 
