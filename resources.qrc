@@ -14,5 +14,8 @@
         
         <file>resources/plus@2x.png</file>
         <file>resources/plus.png</file>
+            
+        <file>resources/delete@2x.png</file>
+        <file>resources/delete.png</file>
     </qresource>
 </RCC>

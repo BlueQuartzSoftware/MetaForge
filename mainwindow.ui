@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1216</width>
+    <width>1333</width>
     <height>724</height>
    </rect>
   </property>
@@ -39,7 +39,7 @@
     <item row="0" column="1">
      <widget class="QTabWidget" name="TabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="CreateTemplateTab">
        <attribute name="title">
@@ -214,6 +214,10 @@
               <property name="text">
                <string>Remove Row</string>
               </property>
+              <property name="icon">
+               <iconset resource="resources.qrc">
+                <normaloff>:/resources/delete@2x.png</normaloff>:/resources/delete@2x.png</iconset>
+              </property>
               <property name="toolButtonStyle">
                <enum>Qt::ToolButtonTextBesideIcon</enum>
               </property>
@@ -321,7 +325,7 @@
              <bool>false</bool>
             </attribute>
             <attribute name="verticalHeaderVisible">
-             <bool>true</bool>
+             <bool>false</bool>
             </attribute>
             <attribute name="verticalHeaderMinimumSectionSize">
              <number>15</number>
@@ -583,6 +587,23 @@
                 </property>
                </widget>
               </item>
+              <item>
+               <widget class="QToolButton" name="removeUseTableRowButton">
+                <property name="toolTip">
+                 <string>Add a Custom Value that is only going to be used for this upload</string>
+                </property>
+                <property name="text">
+                 <string>Remove Row</string>
+                </property>
+                <property name="icon">
+                 <iconset resource="resources.qrc">
+                  <normaloff>:/resources/delete@2x.png</normaloff>:/resources/delete@2x.png</iconset>
+                </property>
+                <property name="toolButtonStyle">
+                 <enum>Qt::ToolButtonTextBesideIcon</enum>
+                </property>
+               </widget>
+              </item>
              </layout>
             </item>
             <item>
@@ -680,7 +701,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1216</width>
+     <width>1333</width>
      <height>22</height>
     </rect>
    </property>

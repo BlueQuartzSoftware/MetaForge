@@ -145,6 +145,9 @@ class Ui_MainWindow(object):
 
         self.removeCreateTableRowButton = QToolButton(self.CreateTemplateTab)
         self.removeCreateTableRowButton.setObjectName(u"removeCreateTableRowButton")
+        icon1 = QIcon()
+        icon1.addFile(u":/resources/delete@2x.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.removeCreateTableRowButton.setIcon(icon1)
         self.removeCreateTableRowButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
         self.horizontalLayout.addWidget(self.removeCreateTableRowButton)
@@ -345,9 +348,9 @@ class Ui_MainWindow(object):
 
         self.appendUseTableRowButton = QToolButton(self.UseTemplateTab)
         self.appendUseTableRowButton.setObjectName(u"appendUseTableRowButton")
-        icon1 = QIcon()
-        icon1.addFile(u":/resources/plus.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.appendUseTableRowButton.setIcon(icon1)
+        icon2 = QIcon()
+        icon2.addFile(u":/resources/plus.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.appendUseTableRowButton.setIcon(icon2)
         self.appendUseTableRowButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
         self.horizontalLayout_12.addWidget(self.appendUseTableRowButton)

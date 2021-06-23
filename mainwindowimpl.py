@@ -282,6 +282,12 @@ class MainWindow(QMainWindow):
         index0 = self.create_ez_table_model.index(0, 0)
         index1 = self.create_ez_table_model.index(self.create_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
         self.create_ez_table_model.dataChanged.emit(index0, index1)
+        # This toggle is for macOS Catalina to actual visually show the updated checkboxes.
+        self.ui.metadataTreeView.setVisible(False)
+        self.ui.metadataTreeView.setVisible(True)
+        self.ui.metadataTreeView.update()
+        self.ui.metadataTableView.update()
+        # End stupid macOS Catalina workaround.
 
     def handleRemoveUse(self, source):
         for i in range(len(self.usetablemodel.metadataList)):
