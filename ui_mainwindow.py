@@ -197,7 +197,7 @@ class Ui_MainWindow(object):
         self.metadataTableView.setSortingEnabled(True)
         self.metadataTableView.setCornerButtonEnabled(False)
         self.metadataTableView.horizontalHeader().setStretchLastSection(False)
-        self.metadataTableView.verticalHeader().setVisible(False)
+        self.metadataTableView.verticalHeader().setVisible(True)
         self.metadataTableView.verticalHeader().setMinimumSectionSize(15)
 
         self.gridLayout.addWidget(self.metadataTableView, 1, 1, 1, 1)
@@ -511,7 +511,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(1)
+        self.TabWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
