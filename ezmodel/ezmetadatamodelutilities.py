@@ -10,22 +10,28 @@ from ht_requests.ht_requests import ht_requests
 import json
 from typing import List
 
-# Set the path of the data file to use to build the EzMetadataModel
-data_file_path = '011.ang'
+
+
 # Set teh path of the file to store the JSON of the model
-json_file_path = 'Unit_Test.ez'
+ez_file_path = 'Unit_Test.ez'
 
 # Read the EzMetadataModel from the json file
-model = EzMetadataModel.from_json_file(json_file_path)
+model = EzMetadataModel.from_json_file(ez_file_path)
 
-# Convert the ANG file into a dictionary and save the dictionary to a json file
-model_dict = parse_header_as_dict(data_file_path)
+# Set the path of the data file to use to build the EzMetadataModel
+data_file_path = '011.ang'
+
+# Convert the ANG file into a dictionary
+ang_dict = parse_header_as_dict(data_file_path)
 
 
-# Create a EzMetadataModel from the header dictionary
-# model = EzMetadataModel.create_model(model_dict, data_file_path, EzMetadataEntry.SourceType.FILE)
-
-missing_entries: List[EzMetadataEntry] = model.update_model_values_from_dict(model_dict)
+# Sync the the EzMetadataModel from the ANG header dictionary
+missing_entries: List[EzMetadataEntry] = model.update_model_values_from_dict(ang_dict)
+if len(missing_entries) != 0:
+  print('Not all values that appear in the Template file were in the input data file.')
+  for e in missing_entries:
+    print(f'{e.source_path}')
+  exit()
 
 unit_test_model = EzMetadataModel()
 # Grab a "Source.FILE" from the ANG model
@@ -63,7 +69,7 @@ unit_test_model.append(custom)
 
 
 # Write the EzMetadataModel to the json file
-unit_test_model.to_json_file(json_file_path)
+unit_test_model.to_json_file(ez_file_path)
 
 
 # Use the template to upload to HyperThought
@@ -93,7 +99,7 @@ if not remote_exists:
   remote_folder_uuid = ht_requests.create_folder(auth_control, folder_name = remoteDirPath, ht_id_path= path)
 
 # Extract the Meta-Data from the Template/Model
-metadataJson = ht_utilities.ezmodel_to_ht_metadata(reloaded_model)
+metadataJson = ht_utilities.ezmodel_to_ht_metadata(unit_test_model)
 
 # Pick your data files to upload
 filelist = "/Users/mjackson/Downloads/011.ang"
