@@ -225,9 +225,11 @@ class MainWindow(QMainWindow):
 
     def getLocation(self):
         remoteDirPath = self.hyperthoughtui.getUploadDirectory()
-        self.folderuuid = ht_requests.get_ht_id_path_from_ht_path(
-            self.hyperthoughtui.authcontrol, ht_path=remoteDirPath)
-        self.ui.hyperthoughtLocationLineEdit.setText(remoteDirPath)
+        
+        self.folderuuid = ht_requests.get_ht_id_path_from_ht_path(self.hyperthoughtui.authcontrol, 
+                                                    ht_path=remoteDirPath, 
+                                                    ht_space = 'project', ht_space_id=self.hyperthoughtui.current_project["content"]["pk"])
+        self.ui.hyperThoughtUploadPath.setText(remoteDirPath)
         self.toggleButtons()
 
     def handleRemoveCreate(self):
@@ -505,7 +507,7 @@ class MainWindow(QMainWindow):
         if (self.ui.hyperthoughtTemplateLineEdit.text() != "" and
             self.ui.otherDataFileLineEdit.text() != "" and
             self.ui.useTemplateListView.model().rowCount() > 0 and
-                self.ui.hyperthoughtLocationLineEdit.text() != ""):
+                self.ui.hyperThoughtUploadPath.text() != ""):
 
             self.ui.hyperthoughtUploadButton.setEnabled(True)
 
@@ -533,9 +535,9 @@ class MainWindow(QMainWindow):
 
         htUrl = self.hyperthoughtui.ui.ht_server_url.text()
         if htUrl == "":
-            self.ui.hyperThoughtUrl.setText("https://hyperthought.url")
+            self.ui.hyperThoughtServer.setText("https://hyperthought.url")
         else:
-            self.ui.hyperThoughtUrl.setText(htUrl)
-
-        
+            self.ui.hyperThoughtServer.setText(htUrl)
+            self.ui.hyperThoughtProject.setText(self.hyperthoughtui.current_project["content"]["title"])
+            self.ui.hyperThoughtUploadPath.setText(self.hyperthoughtui.getUploadDirectory())
 

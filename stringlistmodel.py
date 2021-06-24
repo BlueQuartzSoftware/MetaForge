@@ -11,7 +11,7 @@ class StringListModel(QAbstractListModel):
         self.hyperthoughtimpl = hyperthoughtimpl
         self.directoryList = []
         self.uuidList = []
-
+        self.typeList = []
 
 
 
@@ -20,12 +20,15 @@ class StringListModel(QAbstractListModel):
             self.beginRemoveRows(self.index(len(self.directoryList),0), len(self.directoryList),len(self.directoryList))
             self.directoryList = []
             self.uuidList = []
+            self.typeList = []
             self.endRemoveRows()
+
         for i in range(len(folderlist)):
             self.beginInsertRows(self.index(len(self.directoryList),0), len(self.directoryList),len(self.directoryList))
-            self.directoryList.append(folderlist[i]["content"]["name"])
+            self.directoryList.append(folderlist[i]["Name"])
+            self.uuidList.append(folderlist[i]["UUID"])
+            self.typeList.append(folderlist[i]["Type"])
             self.endInsertRows()
-            self.uuidList.append(folderlist[i]["content"]["pk"])
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.directoryList)
@@ -42,9 +45,6 @@ class StringListModel(QAbstractListModel):
             if not index.isValid():
                 return False
             return index.row()
-
-
-
 
     def addRow(self, filename):
         self.beginInsertRows(self.index(len(self.directoryList),0), len(self.directoryList),len(self.directoryList))

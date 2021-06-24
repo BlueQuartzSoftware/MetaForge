@@ -39,7 +39,7 @@
     <item row="0" column="1">
      <widget class="QTabWidget" name="TabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="CreateTemplateTab">
        <attribute name="title">
@@ -305,7 +305,7 @@
              <bool>false</bool>
             </attribute>
             <attribute name="verticalHeaderVisible">
-             <bool>true</bool>
+             <bool>false</bool>
             </attribute>
             <attribute name="verticalHeaderMinimumSectionSize">
              <number>15</number>
@@ -731,32 +731,91 @@
           </property>
           <item>
            <widget class="QLabel" name="label_3">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
             <property name="text">
-             <string>Remote HyperThought Folder Path:</string>
+             <string>Server:</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLabel" name="hyperThoughtUrl">
+           <widget class="QLabel" name="hyperThoughtServer">
             <property name="font">
              <font>
               <italic>true</italic>
              </font>
             </property>
             <property name="text">
-             <string>https://hyperthought.url</string>
+             <string>Server Not Selected</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="QLineEdit" name="hyperthoughtLocationLineEdit">
-            <property name="text">
-             <string/>
+           <widget class="QLabel" name="label_4">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
             </property>
-            <property name="placeholderText">
-             <string>Use the 'Select Remote Folder' button to set the remote location for the data ---&gt;</string>
+            <property name="text">
+             <string>Project:</string>
             </property>
            </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="hyperThoughtProject">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Project Not Selected</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="label_5">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Project Directory Path:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="hyperThoughtUploadPath">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Folder Not Selected</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <spacer name="horizontalSpacer_6">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="sizeHint" stdset="0">
+             <size>
+              <width>40</width>
+              <height>20</height>
+             </size>
+            </property>
+           </spacer>
           </item>
           <item>
            <widget class="QPushButton" name="hyperthoughtLocationButton">

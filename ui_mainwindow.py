@@ -197,7 +197,7 @@ class Ui_MainWindow(object):
         self.metadataTableView.setSortingEnabled(True)
         self.metadataTableView.setCornerButtonEnabled(False)
         self.metadataTableView.horizontalHeader().setStretchLastSection(False)
-        self.metadataTableView.verticalHeader().setVisible(True)
+        self.metadataTableView.verticalHeader().setVisible(False)
         self.metadataTableView.verticalHeader().setMinimumSectionSize(15)
 
         self.gridLayout.addWidget(self.metadataTableView, 1, 1, 1, 1)
@@ -437,21 +437,48 @@ class Ui_MainWindow(object):
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
         self.label_3 = QLabel(self.UseTemplateTab)
         self.label_3.setObjectName(u"label_3")
+        font = QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_3.setFont(font)
 
         self.horizontalLayout_7.addWidget(self.label_3)
 
-        self.hyperThoughtUrl = QLabel(self.UseTemplateTab)
-        self.hyperThoughtUrl.setObjectName(u"hyperThoughtUrl")
-        font = QFont()
-        font.setItalic(True)
-        self.hyperThoughtUrl.setFont(font)
+        self.hyperThoughtServer = QLabel(self.UseTemplateTab)
+        self.hyperThoughtServer.setObjectName(u"hyperThoughtServer")
+        font1 = QFont()
+        font1.setItalic(True)
+        self.hyperThoughtServer.setFont(font1)
 
-        self.horizontalLayout_7.addWidget(self.hyperThoughtUrl)
+        self.horizontalLayout_7.addWidget(self.hyperThoughtServer)
 
-        self.hyperthoughtLocationLineEdit = QLineEdit(self.UseTemplateTab)
-        self.hyperthoughtLocationLineEdit.setObjectName(u"hyperthoughtLocationLineEdit")
+        self.label_4 = QLabel(self.UseTemplateTab)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setFont(font)
 
-        self.horizontalLayout_7.addWidget(self.hyperthoughtLocationLineEdit)
+        self.horizontalLayout_7.addWidget(self.label_4)
+
+        self.hyperThoughtProject = QLabel(self.UseTemplateTab)
+        self.hyperThoughtProject.setObjectName(u"hyperThoughtProject")
+        self.hyperThoughtProject.setFont(font1)
+
+        self.horizontalLayout_7.addWidget(self.hyperThoughtProject)
+
+        self.label_5 = QLabel(self.UseTemplateTab)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setFont(font)
+
+        self.horizontalLayout_7.addWidget(self.label_5)
+
+        self.hyperThoughtUploadPath = QLabel(self.UseTemplateTab)
+        self.hyperThoughtUploadPath.setObjectName(u"hyperThoughtUploadPath")
+        self.hyperThoughtUploadPath.setFont(font1)
+
+        self.horizontalLayout_7.addWidget(self.hyperThoughtUploadPath)
+
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_7.addItem(self.horizontalSpacer_6)
 
         self.hyperthoughtLocationButton = QPushButton(self.UseTemplateTab)
         self.hyperthoughtLocationButton.setObjectName(u"hyperthoughtLocationButton")
@@ -511,7 +538,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(0)
+        self.TabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -580,10 +607,12 @@ class Ui_MainWindow(object):
         self.removeUseTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a Custom Value that is only going to be used for this upload", None))
 #endif // QT_CONFIG(tooltip)
         self.removeUseTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Remove Value", None))
-        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Remote HyperThought Folder Path:", None))
-        self.hyperThoughtUrl.setText(QCoreApplication.translate("MainWindow", u"https://hyperthought.url", None))
-        self.hyperthoughtLocationLineEdit.setText("")
-        self.hyperthoughtLocationLineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Use the 'Select Remote Folder' button to set the remote location for the data --->", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Server:", None))
+        self.hyperThoughtServer.setText(QCoreApplication.translate("MainWindow", u"Server Not Selected", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Project:", None))
+        self.hyperThoughtProject.setText(QCoreApplication.translate("MainWindow", u"Project Not Selected", None))
+        self.label_5.setText(QCoreApplication.translate("MainWindow", u"Project Directory Path:", None))
+        self.hyperThoughtUploadPath.setText(QCoreApplication.translate("MainWindow", u"Folder Not Selected", None))
 #if QT_CONFIG(tooltip)
         self.hyperthoughtLocationButton.setToolTip(QCoreApplication.translate("MainWindow", u"Allows user to set their API key from HyperThought and set a remote location on the HyperThought server to upload the data files", None))
 #endif // QT_CONFIG(tooltip)
