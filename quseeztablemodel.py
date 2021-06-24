@@ -1,5 +1,5 @@
 from PySide2.QtCore import QSortFilterProxyModel, Qt, QRegExp, QModelIndex
-from PySide2.QtGui import QColor, QIcon
+from PySide2.QtGui import QColor, QIcon, QFont
 
 
 from ezmodel.ezmetadataentry import EzMetadataEntry
@@ -11,32 +11,31 @@ class QUseEzTableModel(QSortFilterProxyModel):
     in this section. This will make it easier to move columns around and rename items.
     """
     # Total Number of Columns
-    K_COL_COUNT = 7
+    K_COL_COUNT = 6
 
     # These are some misc strings that are used.
     K_SOURCE_NOT_LOADED = "--SOURCE NOT LOADED--"
+    K_OVERRIDDEN = 'Value overridden from source'
+    K_MISSING = "Missing from data file"
 
     # These are the user facing header and the index of each column in the table.
     K_SOURCE_COL_NAME = "Source"
     K_SOURCE_COL_INDEX = 0
 
-    K_USESOURCE_COL_NAME = "Override Source Value"
-    K_OVERRIDESOURCEVALUE_COL_INDEX = 1
-
     K_HTNAME_COL_NAME = "HT Name"
-    K_HTNAME_COL_INDEX = 2
+    K_HTNAME_COL_INDEX = 1
 
     K_HTVALUE_COL_NAME = "HT Value"
-    K_HTVALUE_COL_INDEX = 3
+    K_HTVALUE_COL_INDEX = 2
 
     K_HTANNOTATION_COL_NAME = "HT Annotation"
-    K_HTANNOTATION_COL_INDEX = 4
+    K_HTANNOTATION_COL_INDEX = 3
 
     K_HTUNITS_COL_NAME = "HT Units"
-    K_HTUNITS_COL_INDEX = 5
+    K_HTUNITS_COL_INDEX = 4
 
     K_ICON_COL_NAME = "Parsing Messages"
-    K_ICON_COL_INDEX = 6
+    K_ICON_COL_INDEX = 5
 
     def __init__(self, data, parent=None):
         QSortFilterProxyModel.__init__(self, parent)
@@ -103,19 +102,22 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 return metadata_entry.ht_units
             elif index.column() == self.K_ICON_COL_INDEX:
                 if metadata_entry in self.missing_entries:
-                    return "Missing from data file"
+                    return self.K_MISSING
+                elif metadata_entry.override_source_value is True:
+                    return self.K_OVERRIDDEN
                 else:
-                    return ""    
-        elif role == Qt.CheckStateRole:
-            if index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
-                if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
-                    if metadata_entry.override_source_value is True:
-                        return Qt.Checked
-                    else:
-                        return Qt.Unchecked
+                    return None
         elif role == Qt.BackgroundRole:
             if metadata_entry in self.missing_entries:
                 return QColor(255, 190, 194)
+            elif metadata_entry.override_source_value is True:
+                return QColor(253, 255, 190)
+        elif role == Qt.FontRole:
+            flags = self.flags(index)
+            if not (flags & Qt.ItemIsEditable):
+                italic_font = QFont()
+                italic_font.setItalic(True)
+                return italic_font
         return None
 
     
@@ -156,25 +158,18 @@ class QUseEzTableModel(QSortFilterProxyModel):
     def headerData(self, section, orientation, role=Qt.DisplayRole):
         if role != Qt.DisplayRole:
             return
+
         if orientation == Qt.Horizontal:
             if section == self.K_SOURCE_COL_INDEX:
                 return self.K_SOURCE_COL_NAME
-
-            elif section == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
-                return self.K_USESOURCE_COL_NAME
-
             if section == self.K_HTNAME_COL_INDEX:
                 return self.K_HTNAME_COL_NAME
-
             elif section == self.K_HTVALUE_COL_INDEX:
                 return self.K_HTVALUE_COL_NAME
-
             elif section == self.K_HTANNOTATION_COL_INDEX:
                 return self.K_HTANNOTATION_COL_NAME
-
             elif section == self.K_HTUNITS_COL_INDEX:
                 return self.K_HTUNITS_COL_NAME
-            
             elif section == self.K_ICON_COL_INDEX:
                 return self.K_ICON_COL_NAME
 
@@ -192,14 +187,12 @@ class QUseEzTableModel(QSortFilterProxyModel):
         metadata_entry: EzMetadataEntry = self.sourceModel().metadata_model.entry(source_row)
         
         if index.column() == self.K_SOURCE_COL_INDEX:
-            return Qt.NoItemFlags
-        elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
-            return Qt.NoItemFlags
+            return Qt.ItemIsEnabled
         elif index.column() == self.K_HTNAME_COL_INDEX:
             if metadata_entry.editable is True:
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
             else:
-                return Qt.NoItemFlags
+                return Qt.ItemIsEnabled
         elif index.column() == self.K_HTVALUE_COL_INDEX:
             if metadata_entry.source_type is not EzMetadataEntry.SourceType.FILE:
                 if metadata_entry.editable is True:
@@ -211,17 +204,19 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 elif self.metadata_file_chosen is True:
                     if metadata_entry.editable is True:
                         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-            return Qt.NoItemFlags
+            return Qt.ItemIsEnabled
         elif index.column() == self.K_HTANNOTATION_COL_INDEX:
             if metadata_entry.editable is True:
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
             else:
-                return Qt.NoItemFlags
+                return Qt.ItemIsEnabled
         elif index.column() == self.K_HTUNITS_COL_INDEX:
             if metadata_entry.editable is True:
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
             else:
-                return Qt.NoItemFlags
+                return Qt.ItemIsEnabled
+        elif index.column() == self.K_ICON_COL_INDEX:
+            return Qt.ItemIsEnabled
         else:
             return Qt.NoItemFlags
 

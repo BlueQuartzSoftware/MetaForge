@@ -1,7 +1,5 @@
-from PySide2.QtNetwork import QNetworkReply
 from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex
-from PySide2.QtGui import QIcon, QColor
-from PySide2.QtWidgets import QApplication, QStyle
+from PySide2.QtGui import QFont
 
 from ezmodel.ezmetadataentry import EzMetadataEntry
 from ezmodel.ezmetadatamodel import EzMetadataModel
@@ -82,10 +80,13 @@ class QEzTableModel(QAbstractTableModel):
                 else:
                     return metadata_entry.source_path
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                if metadata_entry.override_source_value is True:
+                if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
                     return metadata_entry.ht_value
                 else:
-                    return self.K_FROM_SOURCE
+                    if metadata_entry.override_source_value is True:
+                        return metadata_entry.ht_value
+                    else:
+                        return self.K_FROM_SOURCE
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
                 return metadata_entry.ht_annotation
             elif index.column() == self.K_HTUNITS_COL_INDEX:
@@ -102,6 +103,12 @@ class QEzTableModel(QAbstractTableModel):
                         return Qt.Checked
                     else:
                         return Qt.Unchecked
+        elif role == Qt.FontRole:
+            flags = self.flags(index)
+            if not (flags & Qt.ItemIsEditable):
+                italic_font = QFont()
+                italic_font.setItalic(True)
+                return italic_font
         return None
     
     def setData(self, index, value, role):
@@ -122,7 +129,7 @@ class QEzTableModel(QAbstractTableModel):
                 self.dataChanged.emit(index, index)
                 return True
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                if metadata_entry.override_source_value is True:
+                if metadata_entry.source_type == EzMetadataEntry.SourceType.CUSTOM or metadata_entry.override_source_value is True:
                     metadata_entry.ht_value = value
                     self.dataChanged.emit(index, index)
                     return True
@@ -189,16 +196,19 @@ class QEzTableModel(QAbstractTableModel):
         if index.column() == self.K_SORT_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         elif index.column() == self.K_SOURCE_COL_INDEX:
-            return Qt.NoItemFlags
+            return Qt.ItemIsEnabled
         elif index.column() == self.K_SOURCEVAL_COL_INDEX:
-            return Qt.NoItemFlags
+            return Qt.ItemIsEnabled
         elif index.column() == self.K_HTNAME_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         elif index.column() == self.K_HTVALUE_COL_INDEX:
-            if metadata_entry.override_source_value is True:
+            if metadata_entry.source_type == EzMetadataEntry.SourceType.CUSTOM:
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
             else:
-                return Qt.NoItemFlags
+                if metadata_entry.override_source_value is True:
+                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+                else:
+                    return Qt.ItemIsEnabled
         elif index.column() == self.K_HTANNOTATION_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         elif index.column() == self.K_HTUNITS_COL_INDEX:
@@ -207,15 +217,15 @@ class QEzTableModel(QAbstractTableModel):
             if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
                 return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
             elif metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                return Qt.NoItemFlags
+                return Qt.ItemIsEnabled
             else:
-                return Qt.NoItemFlags
+                return Qt.ItemIsEnabled
         elif index.column() == self.K_EDITABLE_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
         elif index.column() == self.K_REMOVE_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         else:
-            return Qt.NoItemFlags
+            return Qt.ItemIsEnabled
 
     def addRow(self, dataDict, source, value):
         pass
@@ -233,7 +243,7 @@ class QEzTableModel(QAbstractTableModel):
         custom.ht_value  = "Custom HT Value"
         custom.ht_annotation  = ""
         custom.ht_units  = ""
-        custom.override_source_value  = True
+        custom.override_source_value  = False
         custom.editable  = True
         custom.required  = True
         custom.enabled  = True
