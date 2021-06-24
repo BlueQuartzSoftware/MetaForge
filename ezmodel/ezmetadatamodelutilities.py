@@ -13,13 +13,13 @@ from typing import List
 
 
 # Set teh path of the file to store the JSON of the model
-ez_file_path = 'Unit_Test.ez'
+ez_file_path = '/Users/mjackson/Desktop/MultiPhase.ez'
 
 # Read the EzMetadataModel from the json file
 model = EzMetadataModel.from_json_file(ez_file_path)
 
 # Set the path of the data file to use to build the EzMetadataModel
-data_file_path = '011.ang'
+data_file_path = '/Volumes/970-1/Data/Ang_Data/12_strain/Scan_10074.ang'
 
 # Convert the ANG file into a dictionary
 ang_dict = parse_header_as_dict(data_file_path)
@@ -31,7 +31,7 @@ if len(missing_entries) != 0:
   print('Not all values that appear in the Template file were in the input data file.')
   for e in missing_entries:
     print(f'{e.source_path}')
-  exit()
+
 
 unit_test_model = EzMetadataModel()
 # Grab a "Source.FILE" from the ANG model
@@ -74,7 +74,7 @@ unit_test_model.to_json_file(ez_file_path)
 
 # Use the template to upload to HyperThought
 # Set your API Access Key which you would get from HyperThought Web site
-accessKey = 'eyJhY2Nlc3NUb2tlbiI6ICI1ZWYwZGQ2ZDI5Nzc0YzliOWYxZjMyYzI5MmRiYWZmMyIsICJyZWZyZXNoVG9rZW4iOiAiNDdkMGQ4NzM4NWUyNDhiM2I0OTgxNWYyZWZkY2M2ODIiLCAiZXhwaXJlc0luIjogMjc3MiwgImV4cGlyZXNBdCI6ICIyMDIxLTA2LTIyVDExOjM3OjEwLTA0OjAwIiwgImJhc2VVcmwiOiAiaHR0cHM6Ly9odC5ibHVlcXVhcnR6Lm5ldCIsICJjbGllbnRJZCI6ICIwODc3NjAiLCAiY2xpZW50U2VjcmV0IjogIjJjMzJhYmYyMDBlZGE3MTkxNDQxM2YyYTEwNTE5YmI0YzAzMWZmYjgxOTYwNDQ5OTVlODgxOWVjIn0='
+accessKey = 'eyJhY2Nlc3NUb2tlbiI6ICJkYjg0YTU3MmEwOWI0N2Y1YTM4ODcxZjA3NmZmZDYyOCIsICJyZWZyZXNoVG9rZW4iOiAiZWY0MWVlNzY0NTYyNGY4MWI4MGIzMGQ1ZjhlYzJiNWEiLCAiZXhwaXJlc0luIjogMjU3MiwgImV4cGlyZXNBdCI6ICIyMDIxLTA2LTI0VDE1OjI4OjI2LTA0OjAwIiwgImJhc2VVcmwiOiAiaHR0cHM6Ly9odC5ibHVlcXVhcnR6Lm5ldCIsICJjbGllbnRJZCI6ICIwODc3NjAiLCAiY2xpZW50U2VjcmV0IjogIjJjMzJhYmYyMDBlZGE3MTkxNDQxM2YyYTEwNTE5YmI0YzAzMWZmYjgxOTYwNDQ5OTVlODgxOWVjIn0='
 # Create an HtAuthController to hold the API key
 auth_control = htauthcontroller.HTAuthorizationController(accessKey)
 
@@ -84,7 +84,22 @@ path = ","
 # Set the remote directory to create. This DOES NOT check if that folder already exists
 remoteDirPath = "Unit_Test"
 
+project_json = ht_requests.list_projects(auth_control)
+
+# Just get the first Folder from the projects
+folder_json = project_json[1]
+project_folder_0_pk = folder_json["content"]["pk"]
+project_folder_0_title = folder_json["content"]["title"]
+
+sub_folder_list = ht_requests.get_item_dict_from_ht_path(auth_control, 
+              ht_path='/',
+              ht_space = 'project',
+              ht_space_id=project_folder_0_pk)
+
 folderlist = ht_requests._list_location_contents(auth_control, ht_id_path = path)
+for j in folderlist:
+  print(j)
+
 remote_exists = False
 remote_folder_uuid = ""
 print("Checking if remote folder {remoteDirPath} exists")

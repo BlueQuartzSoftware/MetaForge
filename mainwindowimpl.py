@@ -512,7 +512,7 @@ class MainWindow(QMainWindow):
     def uploadToHyperthought(self):
         auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)
 
-        metadataJson = ht_utilities.ezmodel_to_ht_metadata(self.use_ez_table_model.metadata_model)
+        metadataJson = ht_utilities.ezmodel_to_ht_metadata(self.use_ez_table_model.metadata_model, self.use_ez_table_model_proxy.missing_entries)
         progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(
             self.uselistmodel.metadataList), self)
 

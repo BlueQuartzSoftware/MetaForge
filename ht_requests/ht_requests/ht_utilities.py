@@ -1,6 +1,8 @@
 import os
 import json
 
+from typing import List
+
 from ezmodel.ezmetadatamodel import EzMetadataModel
 from ezmodel.ezmetadataentry import EzMetadataEntry
 
@@ -66,7 +68,7 @@ def dict_to_ht_metadata(metadata_dict):
     return metadataJson
 
 
-def ezmodel_to_ht_metadata(model: EzMetadataModel):
+def ezmodel_to_ht_metadata(model: EzMetadataModel, missing_entries: List[EzMetadataEntry]):
     """
 
     """
@@ -74,7 +76,7 @@ def ezmodel_to_ht_metadata(model: EzMetadataModel):
     metadataJson = []
     entries = model.entries
     for e in entries:
-        if e.enabled:
+        if e.enabled and e not in missing_entries:
             metadataJson.append(
                 {"keyName": e.ht_name,
                     "value":
