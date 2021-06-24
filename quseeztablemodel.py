@@ -86,6 +86,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
             elif index.column() == self.K_HTVALUE_COL_INDEX:
                 if metadata_entry.override_source_value is True:
                     return metadata_entry.ht_value
+                elif metadata_entry.source_type is not EzMetadataEntry.SourceType.FILE:
+                    return metadata_entry.ht_value
                 elif self.metadata_file_chosen is True:
                     return metadata_entry.ht_value
                 else:
@@ -171,7 +173,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
             return Qt.NoItemFlags
 
         source_row = self.mapToSource(index).row()
-        metadata_entry = self.sourceModel().metadata_model.entry(source_row)
+        metadata_entry: EzMetadataEntry = self.sourceModel().metadata_model.entry(source_row)
         
         if index.column() == self.K_SOURCE_COL_INDEX:
             return Qt.NoItemFlags
@@ -183,10 +185,17 @@ class QUseEzTableModel(QSortFilterProxyModel):
             else:
                 return Qt.NoItemFlags
         elif index.column() == self.K_HTVALUE_COL_INDEX:
-            if self.metadata_file_chosen is True and metadata_entry.editable is True:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            if metadata_entry.source_type is not EzMetadataEntry.SourceType.FILE:
+                if metadata_entry.editable is True:
+                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
             else:
-                return Qt.NoItemFlags
+                if metadata_entry.override_source_value is True:
+                    if metadata_entry.editable is True:
+                        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+                elif self.metadata_file_chosen is True:
+                    if metadata_entry.editable is True:
+                        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            return Qt.NoItemFlags
         elif index.column() == self.K_HTANNOTATION_COL_INDEX:
             if metadata_entry.editable is True:
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable

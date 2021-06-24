@@ -465,8 +465,9 @@ class MainWindow(QMainWindow):
     def loadOtherDataFile(self):
         datafile_input_path = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(
                 QStandardPaths.HomeLocation), self.tr("Files (*"+self.fileType+")"))[0]
-        self.ui.otherDataFileLineEdit.setText(datafile_input_path)
-        self.importMetadataFromDataFile()
+        if datafile_input_path != "":
+            self.ui.otherDataFileLineEdit.setText(datafile_input_path)
+            self.importMetadataFromDataFile()
 
     def importMetadataFromDataFile(self):
         filePath = self.ui.otherDataFileLineEdit.text()
@@ -484,6 +485,10 @@ class MainWindow(QMainWindow):
         filePath = self.ui.otherDataFileLineEdit.text()
 
         if filePath == "" or templateFilePath == "":
+            self.use_ez_table_model_proxy.metadata_file_chosen = False
+            index0 = self.use_ez_table_model.index(0, 0)
+            index1 = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
+            self.use_ez_table_model.dataChanged.emit(index0, index1)
             return
         
         # Load the dictionary from the newly inserted datafile
