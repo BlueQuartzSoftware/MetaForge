@@ -11,7 +11,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
     in this section. This will make it easier to move columns around and rename items.
     """
     # Total Number of Columns
-    K_COL_COUNT = 6
+    K_COL_COUNT = 7
 
     # These are some misc strings that are used.
     K_SOURCE_NOT_LOADED = "--SOURCE NOT LOADED--"
@@ -34,6 +34,9 @@ class QUseEzTableModel(QSortFilterProxyModel):
 
     K_HTUNITS_COL_NAME = "HT Units"
     K_HTUNITS_COL_INDEX = 5
+
+    K_ICON_COL_NAME = "Parsing Messages"
+    K_ICON_COL_INDEX = 6
 
     def __init__(self, data, parent=None):
         QSortFilterProxyModel.__init__(self, parent)
@@ -98,6 +101,11 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 return metadata_entry.ht_annotation
             elif index.column() == self.K_HTUNITS_COL_INDEX:
                 return metadata_entry.ht_units
+            elif index.column() == self.K_ICON_COL_INDEX:
+                if metadata_entry in self.missing_entries:
+                    return "Missing from data file"
+                else:
+                    return ""    
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
@@ -108,12 +116,6 @@ class QUseEzTableModel(QSortFilterProxyModel):
         elif role == Qt.BackgroundRole:
             if metadata_entry in self.missing_entries:
                 return QColor(255, 190, 194)
-        elif role == Qt.DecorationRole:
-            if index.column() == self.K_SOURCE_COL_INDEX:
-                if metadata_entry in self.missing_entries:
-                    return QIcon(':/warning@2x.png')
-                else:
-                    return QIcon(':/check_plain@2x.png')
         return None
 
     
@@ -172,6 +174,9 @@ class QUseEzTableModel(QSortFilterProxyModel):
 
             elif section == self.K_HTUNITS_COL_INDEX:
                 return self.K_HTUNITS_COL_NAME
+            
+            elif section == self.K_ICON_COL_INDEX:
+                return self.K_ICON_COL_NAME
 
         if orientation == Qt.Vertical:
             return "     "
