@@ -18,7 +18,7 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(1333, 724)
+        MainWindow.resize(1400, 754)
         MainWindow.setMinimumSize(QSize(0, 0))
         self.actionOpenPackage = QAction(MainWindow)
         self.actionOpenPackage.setObjectName(u"actionOpenPackage")
@@ -170,28 +170,13 @@ class Ui_MainWindow(object):
 
         self.gridLayout = QGridLayout()
         self.gridLayout.setObjectName(u"gridLayout")
-        self.createTemplateTreeSearchBar = QLineEdit(self.CreateTemplateTab)
-        self.createTemplateTreeSearchBar.setObjectName(u"createTemplateTreeSearchBar")
-
-        self.gridLayout.addWidget(self.createTemplateTreeSearchBar, 0, 0, 1, 1)
-
-        self.createTemplateListSearchBar = QLineEdit(self.CreateTemplateTab)
-        self.createTemplateListSearchBar.setObjectName(u"createTemplateListSearchBar")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        sizePolicy2.setHorizontalStretch(1)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.createTemplateListSearchBar.sizePolicy().hasHeightForWidth())
-        self.createTemplateListSearchBar.setSizePolicy(sizePolicy2)
-
-        self.gridLayout.addWidget(self.createTemplateListSearchBar, 0, 1, 1, 1)
-
         self.metadataTreeView = QTreeView(self.CreateTemplateTab)
         self.metadataTreeView.setObjectName(u"metadataTreeView")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.metadataTreeView.sizePolicy().hasHeightForWidth())
-        self.metadataTreeView.setSizePolicy(sizePolicy3)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.metadataTreeView.sizePolicy().hasHeightForWidth())
+        self.metadataTreeView.setSizePolicy(sizePolicy2)
         self.metadataTreeView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.metadataTreeView.setAlternatingRowColors(True)
 
@@ -199,11 +184,11 @@ class Ui_MainWindow(object):
 
         self.metadataTableView = QTableView(self.CreateTemplateTab)
         self.metadataTableView.setObjectName(u"metadataTableView")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
-        sizePolicy4.setHorizontalStretch(1)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.metadataTableView.sizePolicy().hasHeightForWidth())
-        self.metadataTableView.setSizePolicy(sizePolicy4)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Expanding)
+        sizePolicy3.setHorizontalStretch(1)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.metadataTableView.sizePolicy().hasHeightForWidth())
+        self.metadataTableView.setSizePolicy(sizePolicy3)
         self.metadataTableView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.metadataTableView.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked)
         self.metadataTableView.setProperty("showDropIndicator", False)
@@ -212,10 +197,25 @@ class Ui_MainWindow(object):
         self.metadataTableView.setSortingEnabled(True)
         self.metadataTableView.setCornerButtonEnabled(False)
         self.metadataTableView.horizontalHeader().setStretchLastSection(False)
-        self.metadataTableView.verticalHeader().setVisible(True)
+        self.metadataTableView.verticalHeader().setVisible(False)
         self.metadataTableView.verticalHeader().setMinimumSectionSize(15)
 
         self.gridLayout.addWidget(self.metadataTableView, 1, 1, 1, 1)
+
+        self.createTemplateListSearchBar = QLineEdit(self.CreateTemplateTab)
+        self.createTemplateListSearchBar.setObjectName(u"createTemplateListSearchBar")
+        sizePolicy4 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy4.setHorizontalStretch(1)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.createTemplateListSearchBar.sizePolicy().hasHeightForWidth())
+        self.createTemplateListSearchBar.setSizePolicy(sizePolicy4)
+
+        self.gridLayout.addWidget(self.createTemplateListSearchBar, 0, 1, 1, 1)
+
+        self.createTemplateTreeSearchBar = QLineEdit(self.CreateTemplateTab)
+        self.createTemplateTreeSearchBar.setObjectName(u"createTemplateTreeSearchBar")
+
+        self.gridLayout.addWidget(self.createTemplateTreeSearchBar, 0, 0, 1, 1)
 
 
         self.gridLayout_5.addLayout(self.gridLayout, 3, 1, 1, 1)
@@ -256,17 +256,60 @@ class Ui_MainWindow(object):
         self.gridLayout_3.setObjectName(u"gridLayout_3")
         self.gridLayout_3.setContentsMargins(4, 4, 4, 4)
         self.horizontalLayout_13 = QHBoxLayout()
+        self.horizontalLayout_13.setSpacing(10)
         self.horizontalLayout_13.setObjectName(u"horizontalLayout_13")
+        self.verticalLayout_2 = QVBoxLayout()
+        self.verticalLayout_2.setSpacing(2)
+        self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(-1, -1, 0, 0)
+        self.label = QLabel(self.UseTemplateTab)
+        self.label.setObjectName(u"label")
+
+        self.verticalLayout_2.addWidget(self.label)
+
         self.useTemplateListView = QListView(self.UseTemplateTab)
         self.useTemplateListView.setObjectName(u"useTemplateListView")
-        sizePolicy3.setHeightForWidth(self.useTemplateListView.sizePolicy().hasHeightForWidth())
-        self.useTemplateListView.setSizePolicy(sizePolicy3)
+        sizePolicy2.setHeightForWidth(self.useTemplateListView.sizePolicy().hasHeightForWidth())
+        self.useTemplateListView.setSizePolicy(sizePolicy2)
         self.useTemplateListView.setMinimumSize(QSize(325, 0))
         self.useTemplateListView.setAcceptDrops(True)
         self.useTemplateListView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.useTemplateListView.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.useTemplateListView.setAlternatingRowColors(False)
 
-        self.horizontalLayout_13.addWidget(self.useTemplateListView)
+        self.verticalLayout_2.addWidget(self.useTemplateListView)
+
+        self.horizontalLayout_14 = QHBoxLayout()
+        self.horizontalLayout_14.setSpacing(2)
+        self.horizontalLayout_14.setObjectName(u"horizontalLayout_14")
+        self.horizontalLayout_14.setContentsMargins(-1, -1, 0, 0)
+        self.addUploadFilesBtn = QPushButton(self.UseTemplateTab)
+        self.addUploadFilesBtn.setObjectName(u"addUploadFilesBtn")
+        sizePolicy5 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy5.setHorizontalStretch(0)
+        sizePolicy5.setVerticalStretch(0)
+        sizePolicy5.setHeightForWidth(self.addUploadFilesBtn.sizePolicy().hasHeightForWidth())
+        self.addUploadFilesBtn.setSizePolicy(sizePolicy5)
+        self.addUploadFilesBtn.setIcon(icon)
+
+        self.horizontalLayout_14.addWidget(self.addUploadFilesBtn)
+
+        self.horizontalSpacer_4 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_14.addItem(self.horizontalSpacer_4)
+
+        self.clearUploadFilesBtn = QPushButton(self.UseTemplateTab)
+        self.clearUploadFilesBtn.setObjectName(u"clearUploadFilesBtn")
+        sizePolicy5.setHeightForWidth(self.clearUploadFilesBtn.sizePolicy().hasHeightForWidth())
+        self.clearUploadFilesBtn.setSizePolicy(sizePolicy5)
+
+        self.horizontalLayout_14.addWidget(self.clearUploadFilesBtn)
+
+
+        self.verticalLayout_2.addLayout(self.horizontalLayout_14)
+
+
+        self.horizontalLayout_13.addLayout(self.verticalLayout_2)
 
         self.verticalLayout = QVBoxLayout()
         self.verticalLayout.setSpacing(4)
@@ -275,21 +318,21 @@ class Ui_MainWindow(object):
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.hyperthoughtTemplateLabel = QLabel(self.UseTemplateTab)
         self.hyperthoughtTemplateLabel.setObjectName(u"hyperthoughtTemplateLabel")
-        sizePolicy5 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
-        sizePolicy5.setHorizontalStretch(1)
-        sizePolicy5.setVerticalStretch(0)
-        sizePolicy5.setHeightForWidth(self.hyperthoughtTemplateLabel.sizePolicy().hasHeightForWidth())
-        self.hyperthoughtTemplateLabel.setSizePolicy(sizePolicy5)
+        sizePolicy6 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Preferred)
+        sizePolicy6.setHorizontalStretch(1)
+        sizePolicy6.setVerticalStretch(0)
+        sizePolicy6.setHeightForWidth(self.hyperthoughtTemplateLabel.sizePolicy().hasHeightForWidth())
+        self.hyperthoughtTemplateLabel.setSizePolicy(sizePolicy6)
 
         self.horizontalLayout_5.addWidget(self.hyperthoughtTemplateLabel)
 
         self.hyperthoughtTemplateLineEdit = QLineEdit(self.UseTemplateTab)
         self.hyperthoughtTemplateLineEdit.setObjectName(u"hyperthoughtTemplateLineEdit")
-        sizePolicy6 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy6.setHorizontalStretch(2)
-        sizePolicy6.setVerticalStretch(0)
-        sizePolicy6.setHeightForWidth(self.hyperthoughtTemplateLineEdit.sizePolicy().hasHeightForWidth())
-        self.hyperthoughtTemplateLineEdit.setSizePolicy(sizePolicy6)
+        sizePolicy7 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy7.setHorizontalStretch(2)
+        sizePolicy7.setVerticalStretch(0)
+        sizePolicy7.setHeightForWidth(self.hyperthoughtTemplateLineEdit.sizePolicy().hasHeightForWidth())
+        self.hyperthoughtTemplateLineEdit.setSizePolicy(sizePolicy7)
         self.hyperthoughtTemplateLineEdit.setReadOnly(True)
 
         self.horizontalLayout_5.addWidget(self.hyperthoughtTemplateLineEdit)
@@ -306,15 +349,15 @@ class Ui_MainWindow(object):
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.label_6 = QLabel(self.UseTemplateTab)
         self.label_6.setObjectName(u"label_6")
-        sizePolicy5.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
-        self.label_6.setSizePolicy(sizePolicy5)
+        sizePolicy6.setHeightForWidth(self.label_6.sizePolicy().hasHeightForWidth())
+        self.label_6.setSizePolicy(sizePolicy6)
 
         self.horizontalLayout_6.addWidget(self.label_6)
 
         self.otherDataFileLineEdit = QLineEdit(self.UseTemplateTab)
         self.otherDataFileLineEdit.setObjectName(u"otherDataFileLineEdit")
-        sizePolicy6.setHeightForWidth(self.otherDataFileLineEdit.sizePolicy().hasHeightForWidth())
-        self.otherDataFileLineEdit.setSizePolicy(sizePolicy6)
+        sizePolicy7.setHeightForWidth(self.otherDataFileLineEdit.sizePolicy().hasHeightForWidth())
+        self.otherDataFileLineEdit.setSizePolicy(sizePolicy7)
         self.otherDataFileLineEdit.setReadOnly(True)
 
         self.horizontalLayout_6.addWidget(self.otherDataFileLineEdit)
@@ -332,11 +375,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_12.setObjectName(u"horizontalLayout_12")
         self.useTemplateListSearchBar = QLineEdit(self.UseTemplateTab)
         self.useTemplateListSearchBar.setObjectName(u"useTemplateListSearchBar")
-        sizePolicy7 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
-        sizePolicy7.setHorizontalStretch(0)
-        sizePolicy7.setVerticalStretch(0)
-        sizePolicy7.setHeightForWidth(self.useTemplateListSearchBar.sizePolicy().hasHeightForWidth())
-        self.useTemplateListSearchBar.setSizePolicy(sizePolicy7)
+        sizePolicy8 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy8.setHorizontalStretch(0)
+        sizePolicy8.setVerticalStretch(0)
+        sizePolicy8.setHeightForWidth(self.useTemplateListSearchBar.sizePolicy().hasHeightForWidth())
+        self.useTemplateListSearchBar.setSizePolicy(sizePolicy8)
         self.useTemplateListSearchBar.setReadOnly(False)
 
         self.horizontalLayout_12.addWidget(self.useTemplateListSearchBar)
@@ -384,6 +427,8 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_13.addLayout(self.verticalLayout)
 
+        self.horizontalLayout_13.setStretch(0, 10)
+        self.horizontalLayout_13.setStretch(1, 100)
 
         self.gridLayout_3.addLayout(self.horizontalLayout_13, 0, 0, 1, 1)
 
@@ -394,6 +439,14 @@ class Ui_MainWindow(object):
         self.label_3.setObjectName(u"label_3")
 
         self.horizontalLayout_7.addWidget(self.label_3)
+
+        self.hyperThoughtUrl = QLabel(self.UseTemplateTab)
+        self.hyperThoughtUrl.setObjectName(u"hyperThoughtUrl")
+        font = QFont()
+        font.setItalic(True)
+        self.hyperThoughtUrl.setFont(font)
+
+        self.horizontalLayout_7.addWidget(self.hyperThoughtUrl)
 
         self.hyperthoughtLocationLineEdit = QLineEdit(self.UseTemplateTab)
         self.hyperthoughtLocationLineEdit.setObjectName(u"hyperthoughtLocationLineEdit")
@@ -432,7 +485,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1333, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1400, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuHelp = QMenu(self.menubar)
@@ -458,7 +511,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(0)
+        self.TabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -498,10 +551,13 @@ class Ui_MainWindow(object):
         self.removeCreateTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a custom value to the template", None))
 #endif // QT_CONFIG(tooltip)
         self.removeCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Remove Value", None))
-        self.createTemplateTreeSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.createTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
+        self.createTemplateTreeSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.saveTemplateButton.setText(QCoreApplication.translate("MainWindow", u"Save Template as ...", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.CreateTemplateTab), QCoreApplication.translate("MainWindow", u"Create Template", None))
+        self.label.setText(QCoreApplication.translate("MainWindow", u"Files to be Uploaded:", None))
+        self.addUploadFilesBtn.setText("")
+        self.clearUploadFilesBtn.setText(QCoreApplication.translate("MainWindow", u"Clear", None))
         self.hyperthoughtTemplateLabel.setText(QCoreApplication.translate("MainWindow", u"Template File: ", None))
         self.hyperthoughtTemplateLineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"example.ez", None))
 #if QT_CONFIG(tooltip)
@@ -524,7 +580,8 @@ class Ui_MainWindow(object):
         self.removeUseTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a Custom Value that is only going to be used for this upload", None))
 #endif // QT_CONFIG(tooltip)
         self.removeUseTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Remove Value", None))
-        self.label_3.setText(QCoreApplication.translate("MainWindow", u"HyperThought Uploader Folder", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Remote HyperThought Folder Path:", None))
+        self.hyperThoughtUrl.setText(QCoreApplication.translate("MainWindow", u"https://hyperthought.url", None))
         self.hyperthoughtLocationLineEdit.setText("")
         self.hyperthoughtLocationLineEdit.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Use the 'Select Remote Folder' button to set the remote location for the data --->", None))
 #if QT_CONFIG(tooltip)

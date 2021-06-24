@@ -15,30 +15,30 @@ class HyperthoughtDialogImpl(QDialog):
     apiSubmitted = Signal(str)
     def __init__(self, parent=None):
         super(HyperthoughtDialogImpl, self).__init__(parent)
-        self.promptui = Ui_HyperthoughtDialog()
+        self.ui = Ui_HyperthoughtDialog()
         self.accessKey = ""
         self.authcontrol = None
-        self.promptui.setupUi(self)
-        self.promptui.apiKeyButton.clicked.connect(self.acceptApiKey)
+        self.ui.setupUi(self)
+        self.ui.apiKeyButton.clicked.connect(self.acceptApiKey)
         self.stringlistmodel = StringListModel(self)
-        self.promptui.listView.clicked.connect(self.changeLocationText)
-        self.promptui.listView.doubleClicked.connect(self.ascendingDirectories)
+        self.ui.listView.clicked.connect(self.changeLocationText)
+        self.ui.listView.doubleClicked.connect(self.ascendingDirectories)
         self.path = ","
         self.parentName = "/"
-        self.promptui.directoryLabel.setText(self.parentName)
-        self.promptui.parentDirectoryButton.clicked.connect(self.parentDirectory)
+        self.ui.directoryLabel.setText(self.parentName)
+        self.ui.parentDirectoryButton.clicked.connect(self.parentDirectory)
         self.newfolderDialog = NewFolderDialogImpl()
-        self.promptui.newFolderButton.clicked.connect(self.newfolderDialog.exec)
+        self.ui.newFolderButton.clicked.connect(self.newfolderDialog.exec)
         self.newfolderDialog.nameSubmitted.connect(self.createNewFolder)
 
-        self.promptui.listView.selectionCleared.connect(self.clearLocationLineEdit)
+        self.ui.listView.selectionCleared.connect(self.clearLocationLineEdit)
 
     @Slot()    
     def clearLocationLineEdit(self):
-        self.promptui.locationLineEdit.setText("")
+        self.ui.locationLineEdit.setText("")
 
     def acceptApiKey(self):
-        self.accessKey = self.promptui.apiKeyLineEdit.text()
+        self.accessKey = self.ui.apiKeyLineEdit.text()
         if self.accessKey == "":
             QMessageBox.warning(None, QApplication.applicationDisplayName(), "Please set the API Access key.")
             return
@@ -46,29 +46,29 @@ class HyperthoughtDialogImpl(QDialog):
         self.apiSubmitted.emit(self.accessKey)
         try:
             self.authcontrol = htauthcontroller.HTAuthorizationController(self.accessKey)
-            self.promptui.ht_server_url.setText(self.authcontrol.base_url)
-            self.promptui.ht_username.setText(self.authcontrol.get_username())
-            self.promptui.token_expiration.setText(self.authcontrol.expires_at)
+            self.ui.ht_server_url.setText(self.authcontrol.base_url)
+            self.ui.ht_username.setText(self.authcontrol.get_username())
+            self.ui.token_expiration.setText(self.authcontrol.expires_at)
             folderlist = ht_requests._list_location_contents(self.authcontrol, ht_id_path = self.path)
             self.stringlistmodel.getLists(folderlist)
-            self.promptui.listView.setModel(self.stringlistmodel)
+            self.ui.listView.setModel(self.stringlistmodel)
         except Exception as e:
              QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error during the authentication process.\n" + str(e))
 
     def ascendingDirectories(self, myIndex):
        try:
            self.parentName += myIndex.data()+"/"
-           self.promptui.directoryLabel.setText(self.parentName)
+           self.ui.directoryLabel.setText(self.parentName)
            self.path += self.stringlistmodel.uuidList[self.stringlistmodel.directoryList.index(myIndex.data())]+","
            folderlist = ht_requests._list_location_contents(self.authcontrol, ht_id_path = self.path)
            self.stringlistmodel.getLists(folderlist)
-           self.promptui.locationLineEdit.setText("")
+           self.ui.locationLineEdit.setText("")
        except Exception as e:
            QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error during directory traversal.\n" + str(e))
 
     def changeLocationText(self,myIndex):
         if myIndex.isValid():
-            self.promptui.locationLineEdit.setText(myIndex.data())
+            self.ui.locationLineEdit.setText(myIndex.data())
 
     def createNewFolder(self, name):
         try:
@@ -83,7 +83,7 @@ class HyperthoughtDialogImpl(QDialog):
         try:
             self.parentName = self.parentName.split("/")
             self.parentName = "/".join(self.parentName[:-2]) + "/"
-            self.promptui.directoryLabel.setText(self.parentName)
+            self.ui.directoryLabel.setText(self.parentName)
             self.path = self.path.split(",")
             self.path = ",".join(self.path[:-2]) + ","
             folderlist = ht_requests._list_location_contents(self.authcontrol, ht_id_path = self.path)
@@ -92,4 +92,4 @@ class HyperthoughtDialogImpl(QDialog):
             QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error getting the parent directory.\n" + str(e))
 
     def getUploadDirectory(self):
-        return self.promptui.directoryLabel.text() + self.promptui.locationLineEdit.text()
+        return self.ui.directoryLabel.text() + self.ui.locationLineEdit.text()

@@ -71,16 +71,15 @@ class MainWindow(QMainWindow):
         # Setup the blank Use Template file list
         self.setup_use_ez_list()
 
-        self.addAppendButton()
-        self.ui.TabWidget.currentChanged.connect(self.movethedamnbutton)
-        self.appendSourceFilesButton.clicked.connect(self.addFile)
+        self.ui.addUploadFilesBtn.clicked.connect(self.addUploadFiles)
+        self.ui.clearUploadFilesBtn.clicked.connect(self.clearUploadFiles)
         self.ui.appendCreateTableRowButton.clicked.connect(
             self.addCustomRowToCreateTable)
         self.ui.removeCreateTableRowButton.clicked.connect(self.handleRemoveCreate)
         self.ui.removeUseTableRowButton.clicked.connect(self.handleRemoveUse)
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
-        self.ui.hyperthoughtLocationButton.clicked.connect(
-            self.hyperthoughtui.exec)
+        self.ui.hyperthoughtLocationButton.clicked.connect(self.authenticateToHyperThought)
+    
         self.ui.useTemplateListSearchBar.textChanged.connect(self.filter_use_table)
         self.ui.createTemplateListSearchBar.textChanged.connect(
             self.filter_create_table)
@@ -147,16 +146,15 @@ class MainWindow(QMainWindow):
         self.create_ez_table_model.addCustomRow(self.numCustoms)
         self.numCustoms += 1
 
-    def addFile(self):
+    def addUploadFiles(self):
         linetexts = QFileDialog.getOpenFileNames(self, self.tr("Select File"), QStandardPaths.displayName(
             QStandardPaths.HomeLocation), self.tr("Files (*.ctf *.xml *.ang)"))[0]
         for line in linetexts:
             self.uselistmodel.addRow(line)
         self.toggleButtons()
 
-    def addAppendButton(self):
-        self.appendSourceFilesButton = QToolButton(self.ui.useTemplateListView)
-        icon = QApplication.style().standardIcon(QStyle.SP_FileIcon)
+    def clearUploadFiles(self):
+        self.uselistmodel.removeAllRows()
 
     def addUseTableRow(self):
         self.use_ez_table_model.addCustomRow(1)
@@ -282,10 +280,6 @@ class MainWindow(QMainWindow):
     def help(self):
         QDesktopServices.openUrl("http://www.bluequartz.net/")
 
-    def movethedamnbutton(self):
-        self.appendSourceFilesButton.move(self.ui.useTemplateListView.width() - self.appendSourceFilesButton.width(
-        ) - 15, self.ui.useTemplateListView.height() - self.appendSourceFilesButton.height())
-
     def openRecent(self):
         print("Clicked Open Recent.")
 
@@ -357,10 +351,6 @@ class MainWindow(QMainWindow):
         if self.ui.useTemplateListView.width() - 64 < self.ui.useTemplateListView.mapFromGlobal(QCursor.pos()).x():
             # this is where to remove the row
             self.uselistmodel.removeRow(index.row())
-
-    def resizeEvent(self, event):
-        super().resizeEvent(event)
-        self.movethedamnbutton()
 
     def savePackage(self):
         fileName = QFileDialog.getSaveFileName(self, "Save File",
@@ -511,10 +501,6 @@ class MainWindow(QMainWindow):
         index1 = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
         self.use_ez_table_model.dataChanged.emit(index0, index1)
 
-    def showEvent(self, event):
-        super().showEvent(event)
-        self.movethedamnbutton()
-
     def toggleButtons(self):
         if (self.ui.hyperthoughtTemplateLineEdit.text() != "" and
             self.ui.otherDataFileLineEdit.text() != "" and
@@ -541,3 +527,15 @@ class MainWindow(QMainWindow):
         progress.canceled.connect(lambda: self.uploader.interruptUpload())
         progress.setFixedSize(500, 100)
         progress.exec()
+
+    def authenticateToHyperThought(self):
+        self.hyperthoughtui.exec()
+
+        htUrl = self.hyperthoughtui.ui.ht_server_url.text()
+        if htUrl == "":
+            self.ui.hyperThoughtUrl.setText("https://hyperthought.url")
+        else:
+            self.ui.hyperThoughtUrl.setText(htUrl)
+
+        
+
