@@ -40,14 +40,30 @@ class EzMetadataModel:
                                                  ht_units='')
                 model.append(metadata_entry)
 
-    def update_model_values_from_dict(self, item: dict, parent_path: str = ""):
+    def update_model_values_from_dict(self, item: dict, parent_path: str = "") -> List[EzMetadataEntry]:
+        visited = [False for _ in range (self.size())]
+        self._update_model_values_from_dict(item, parent_path, visited)
+
+        missing_entries: List[EzMetadataEntry] = []
+        for i in range(len(visited)):
+            metadata_entry: EzMetadataEntry = self.entries[i]
+            if visited[i] == False and metadata_entry.source_type == EzMetadataEntry.SourceType.FILE and metadata_entry.enabled:
+                missing_entries.append(metadata_entry)
+            
+        return missing_entries
+    
+    def _update_model_values_from_dict(self, item: dict, parent_path: str = "", visited: list = []):
         for key, value in item.items():
             if type(value) is dict:
                 new_parent_path = parent_path + key + '/'
-                self.update_model_values_from_dict(value, new_parent_path)
+                self._update_model_values_from_dict(value, new_parent_path, visited)
             else:
                 item_path = parent_path + key
                 entry = self.entry_by_source(item_path)
+                
+                idx = self.index_from_source(item_path)
+                if idx >= 0:
+                    visited[idx] = True
 
                 if entry is not None and entry.override_source_value is False:
                     entry.ht_value = value
@@ -95,12 +111,11 @@ class EzMetadataModel:
         return None
 
     def index_from_source(self, source: str) -> int:
-        index = 0
-        for e in self.entries:
+        for i in range(len(self.entries)):
+            e = self.entries[i]
             if e.source_path == source:
-                return index
-            index = index + 1
-        return index
+                return i
+        return -1
 
     def to_file_tree_dict(self) -> dict:
         tree_dict = {}

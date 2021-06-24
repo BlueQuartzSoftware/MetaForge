@@ -1,7 +1,9 @@
 from PySide2.QtCore import QSortFilterProxyModel, Qt, QRegExp, QModelIndex
+from PySide2.QtGui import QColor, QIcon
 
 
 from ezmodel.ezmetadataentry import EzMetadataEntry
+from typing import List
 
 class QUseEzTableModel(QSortFilterProxyModel):
     """
@@ -38,6 +40,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
         self.setDynamicSortFilter(True)
         self.sort(0)
         self.metadata_file_chosen = False
+        self.missing_entries: List[EzMetadataEntry] = []
 
     def columnCount(self, parent=QModelIndex()):
         return self.K_COL_COUNT
@@ -58,7 +61,6 @@ class QUseEzTableModel(QSortFilterProxyModel):
 
         # All other use cases
         if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE and match:
-            print(f'filterAcceptsRow: {metadata_entry.source_path} {metadata_entry.ht_name} {metadata_entry.enabled}')
             return metadata_entry.enabled
         else:
             return False
@@ -103,6 +105,15 @@ class QUseEzTableModel(QSortFilterProxyModel):
                         return Qt.Checked
                     else:
                         return Qt.Unchecked
+        elif role == Qt.BackgroundRole:
+            if metadata_entry in self.missing_entries:
+                return QColor(255, 190, 194)
+        elif role == Qt.DecorationRole:
+            if index.column() == self.K_SOURCE_COL_INDEX:
+                if metadata_entry in self.missing_entries:
+                    return QIcon(':/warning@2x.png')
+                else:
+                    return QIcon(':/check_plain@2x.png')
         return None
 
     

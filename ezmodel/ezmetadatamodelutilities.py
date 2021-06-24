@@ -8,18 +8,24 @@ from ht_requests.ht_requests import htauthcontroller
 from ht_requests.ht_requests import ht_requests
 
 import json
+from typing import List
 
 # Set the path of the data file to use to build the EzMetadataModel
 data_file_path = '011.ang'
 # Set teh path of the file to store the JSON of the model
 json_file_path = 'Unit_Test.ez'
 
+# Read the EzMetadataModel from the json file
+model = EzMetadataModel.from_json_file(json_file_path)
+
 # Convert the ANG file into a dictionary and save the dictionary to a json file
 model_dict = parse_header_as_dict(data_file_path)
 
 
 # Create a EzMetadataModel from the header dictionary
-model = EzMetadataModel.create_model(model_dict, data_file_path, EzMetadataEntry.SourceType.FILE)
+# model = EzMetadataModel.create_model(model_dict, data_file_path, EzMetadataEntry.SourceType.FILE)
+
+missing_entries: List[EzMetadataEntry] = model.update_model_values_from_dict(model_dict)
 
 unit_test_model = EzMetadataModel()
 # Grab a "Source.FILE" from the ANG model
@@ -58,9 +64,6 @@ unit_test_model.append(custom)
 
 # Write the EzMetadataModel to the json file
 unit_test_model.to_json_file(json_file_path)
-
-# Read the EzMetadataModel from the json file
-reloaded_model = EzMetadataModel.from_json_file(json_file_path)
 
 
 # Use the template to upload to HyperThought

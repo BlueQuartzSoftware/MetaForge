@@ -24,6 +24,7 @@ from uploader import Uploader
 import parsers.ctf as ctf
 import parsers.ang as ang
 import json
+from typing import List
 
 from ezmodel.ezmetadatamodel import EzMetadataModel
 
@@ -503,7 +504,7 @@ class MainWindow(QMainWindow):
         elif filePath.split(".")[1].upper() == "XML":
             print("XML Parser used")
 
-        self.use_ez_table_model.metadata_model.update_model_values_from_dict(headerDict)
+        self.use_ez_table_model_proxy.missing_entries = self.use_ez_table_model.metadata_model.update_model_values_from_dict(headerDict)
         self.use_ez_table_model_proxy.metadata_file_chosen = True
 
         index0 = self.use_ez_table_model.index(0, 0)

@@ -17,5 +17,11 @@
             
         <file>resources/delete@2x.png</file>
         <file>resources/delete.png</file>
+
+        <file>resources/check_plain@2x.png</file>
+        <file>resources/check_plain.png</file>
+
+        <file>resources/warning@2x.png</file>
+        <file>resources/warning.png</file>
     </qresource>
 </RCC>
