@@ -2,6 +2,8 @@ import os
 
 from PySide2.QtWidgets import QDialog, QMessageBox, QApplication, QStyle, QListView
 from PySide2.QtCore import Signal, QStringListModel, Qt, Slot
+from PySide2.QtGui import QClipboard, QGuiApplication
+
 from ht_requests.ht_requests import ht_utilities
 from ht_requests.ht_requests import htauthcontroller
 from ht_requests.ht_requests import ht_requests
@@ -33,10 +35,29 @@ class HyperthoughtDialogImpl(QDialog):
 
         self.ui.listView.selectionCleared.connect(self.clearLocationLineEdit)
 
+        self.ui.pasteFromClipboardBtn.clicked.connect(self.pasteAPIKey)
+
     @Slot()    
     def clearLocationLineEdit(self):
         self.ui.locationLineEdit.setText("")
 
+    @Slot()
+    def pasteAPIKey(self):
+        clipboard = QGuiApplication.clipboard()
+        mimeData = clipboard.mimeData()
+
+        #if mimeData.hasImage():
+            #setPixmap(mimeData.imageData())
+        #elif mimeData.hasHtml():
+            #setText(mimeData.html())
+            #setTextFormat(Qt.RichText)
+
+        if mimeData.hasText():
+            self.ui.apiKeyLineEdit.setText(mimeData.text())
+            #setTextFormat(Qt.PlainText)
+        # else:
+        #     setText(tr("Cannot display data"))
+        
     def acceptApiKey(self):
         self.accessKey = self.ui.apiKeyLineEdit.text()
         if self.accessKey == "":

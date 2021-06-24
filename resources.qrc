@@ -23,5 +23,8 @@
 
         <file>resources/warning@2x.png</file>
         <file>resources/warning.png</file>
+    
+        <file>resources/key@2x.png</file>
+        <file>resources/key.png</file>
     </qresource>
 </RCC>
