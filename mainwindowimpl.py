@@ -21,7 +21,7 @@ from ht_requests.ht_requests import ht_requests
 from tqdm import tqdm
 from uploader import Uploader
 
-import ctf
+import parsers.ctf as ctf
 import parsers.ang as ang
 import json
 
