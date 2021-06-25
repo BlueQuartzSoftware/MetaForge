@@ -260,6 +260,7 @@ class MainWindow(QMainWindow):
             elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
                 self.treeModel.changeLeafCheck(entry.source_path)
         
+        self.create_ez_table_model_proxy.invalidate()
         index0 = self.create_ez_table_model.index(0, 0)
         index1 = self.create_ez_table_model.index(self.create_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
         self.create_ez_table_model.dataChanged.emit(index0, index1)
@@ -283,9 +284,10 @@ class MainWindow(QMainWindow):
             elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
                 entry.enabled = False
         
-        index0 = self.use_ez_table_model.index(0, 0)
-        index1 = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
-        self.use_ez_table_model.dataChanged.emit(index0, index1)
+        self.use_ez_table_model_proxy.invalidate()
+        index0 = self.use_ez_table_model_proxy.index(0, 0)
+        index1 = self.use_ez_table_model_proxy.index(self.use_ez_table_model_proxy.rowCount() - 1, self.use_ez_table_model_proxy.K_COL_COUNT)
+        self.use_ez_table_model_proxy.dataChanged.emit(index0, index1)
         # This toggle is for macOS Catalina to actual visually show the updated checkboxes.
         self.ui.useTemplateTableView.setVisible(False)
         self.ui.useTemplateTableView.setVisible(True)
