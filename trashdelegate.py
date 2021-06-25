@@ -10,15 +10,14 @@ from resources_rc import *
 import usetablemodel
 
 class TrashDelegate(QItemDelegate):
-    pressed = Signal(str, QModelIndex, QModelIndex)
+    pressed = Signal(int)
     def __init__(self, parent=None):
         QItemDelegate.__init__(self, parent)
 
     def createEditor(self, parent, option, index):
-        sourceModelIndex = (index.model().mapToSource(index))
-        realSourceModelIndex = sourceModelIndex.model().mapToSource(sourceModelIndex)
-        #The index goes from the Proxy Model to the Table Model to look into the masterlist.
-        self.pressed.emit(index.model().sourceModel().sourceModel().metadataList[realSourceModelIndex.row()]["Source"],realSourceModelIndex, sourceModelIndex,)
+        source_row = (index.model().mapToSource(index)).row()
+        if source_row >= 0:
+            self.pressed.emit(source_row)
 
 
     def paint(self, painter, option, index):

@@ -1,4 +1,11 @@
 import os
+import json
+
+from typing import List
+
+from ezmodel.ezmetadatamodel import EzMetadataModel
+from ezmodel.ezmetadataentry import EzMetadataEntry
+
 
 
 def dict_to_ht_metadata(metadata_dict):
@@ -44,6 +51,42 @@ def dict_to_ht_metadata(metadata_dict):
 
     metadataJson = []
     for i in range(len(metadata_dict)):
+        if metadata_dict[i]['Default'] == 2:
             metadataJson.append({ 'keyName': metadata_dict[i]['Key'], 'value': {'type': 'string', 'link': metadata_dict[i]['Value']}, 'unit': metadata_dict[i]['Units'], 'annotation': metadata_dict[i]['Annotation']})
+        elif metadata_dict[i]['Default'] == 0:
+            metadataJson.append(
+                { 'keyName': metadata_dict[i]['Key'], 
+                   'value': 
+                   {
+                        'type': 'string', 
+                        'link': metadata_dict[i]['HT Value']
+                   }, 
+                   'unit': metadata_dict[i]['Units'], 
+                   'annotation': metadata_dict[i]['Annotation']
+                }
+                )
+    return metadataJson
+
+
+def ezmodel_to_ht_metadata(model: EzMetadataModel, missing_entries: List[EzMetadataEntry]):
+    """
+
+    """
+
+    metadataJson = []
+    entries = model.entries
+    for e in entries:
+        if e.enabled and (e not in missing_entries or e.override_source_value is True):
+            metadataJson.append(
+                {"keyName": e.ht_name,
+                    "value":
+                    {
+                        "type": "string",
+                        "link": e.ht_value
+                    },
+                    "unit": e.ht_units,
+                    "annotation": e.ht_annotation
+                }
+            )
     return metadataJson
 

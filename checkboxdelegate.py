@@ -15,14 +15,22 @@ class CheckBoxDelegate(QItemDelegate):
         option.rect = option.rect.adjusted((option.rect.width()/2) - 8,0,0,0)
         QItemDelegate.paint(self, painter, option, index)
 
+#    def drawCheck(self, painter, option, rect, index):
+#        rect = rect.adjusted((rect.width()/2)-8,0,0,0)
+#        option.rect = option.rect.adjusted((option.rect.width()/2) - 8,0,0,0)
+#        QItemDelegate.drawCheck(self, painter, option, rect, index)
+
     def editorEvent(self, event, model, option, index):
-        flags = index.flags()
-        if int(flags & Qt.ItemIsEnabled) == 0:
-            return False
+        flags = model.flags(index)
+#        if ! (flags & Qt.ItemIsUserCheckable) ||  ! (flags & Qt.ItemIsEnabled):
+#            return False
         value = index.data(Qt.CheckStateRole)
         if (event.type() == QEvent.MouseButtonRelease):
              checkRect = option.rect.adjusted((option.rect.width()/2)+ 20,(option.rect.height()/2),0,0)
-             if checkRect.contains(event.pos()):
+             if not checkRect.contains(event.pos()):
+                print("ouch")
+             else:
+                print("not ouch")
                 return False
         else:
             return False

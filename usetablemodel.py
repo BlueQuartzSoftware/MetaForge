@@ -21,8 +21,6 @@ class TableModelU(QAbstractTableModel):
     K_KEY_META_KEY = "Key"
     K_VALUE_META_KEY = "Value"
     K_SOURCE_META_KEY = "Source"
-    K_HTNAME_META_KEY = "HT Name"
-    K_HTVALUE_META_KEY = "HT Value"
     K_ANNOTATION_META_KEY = "Annotation"
     K_UNITS_META_KEY = "Units"
     K_EDITABLE_META_KEY = "Editable"
@@ -33,7 +31,7 @@ class TableModelU(QAbstractTableModel):
     K_SOURCE_COL_INDEX = 0
 
     K_USESOURCE_COL_NAME = "Use Source Value"
-    K_USESOURCE_COL_INDEX = 1
+    K_OVERRIDESOURCEVALUE_COL_INDEX = 1
 
     K_HTKEY_COL_NAME = "HT Name"
     K_HTKEY_COL_INDEX = 2
@@ -75,6 +73,8 @@ class TableModelU(QAbstractTableModel):
             self.templatelist.append(newList[i])
             if "Custom Input" not in newList[i]["Source"]:
                 self.templatesources.append("/".join(newList[i]['Source'].split("/")[1:]))
+            else:
+                self.addRow(newList[i])
 
     def rowCount(self, parent=QModelIndex()):
         return len(self.metadataList)
@@ -88,7 +88,7 @@ class TableModelU(QAbstractTableModel):
                 return self.metadataList[index.row()][self.K_KEY_META_KEY]
 
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                return str(self.metadataList[index.row()][self.K_VALUE_META_KEY])
+                return self.metadataList[index.row()][self.K_VALUE_META_KEY]
 
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
                 return self.metadataList[index.row()][self.K_ANNOTATION_META_KEY]
@@ -100,7 +100,7 @@ class TableModelU(QAbstractTableModel):
                 return self.metadataList[index.row()][self.K_SOURCE_META_KEY]
                 
         elif role == Qt.CheckStateRole:
-            if index.column() == self.K_USESOURCE_COL_INDEX:
+            if index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 return self.metadataList[index.row()][self.K_USESOURCE_META_KEY]
 
         return None
@@ -121,7 +121,7 @@ class TableModelU(QAbstractTableModel):
                 return self.K_SOURCE_COL_NAME
             elif section == self.K_REMOVE_COL_INDEX:
                 return self.K_REMOVE_COL_NAME
-            elif section == self.K_USESOURCE_COL_INDEX:
+            elif section == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 return self.K_USESOURCE_COL_NAME
 
             return None
@@ -131,12 +131,12 @@ class TableModelU(QAbstractTableModel):
             if not index.isValid():
                 return False
             elif index.column() == self.K_HTKEY_COL_INDEX:
-                if self.K_CUSTOM_INPUT in self.metadataList[index.row()][self.K_SOURCE_META_KEY]:
+                if self.metadataList[index.row()][self.K_SOURCE_META_KEY] == self.K_CUSTOM_INPUT:
                     self.metadataList[index.row(
                     )][self.K_KEY_META_KEY] = value
                     self.dataChanged.emit(index, index)
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                if self.K_CUSTOM_INPUT in self.metadataList[index.row()][self.K_SOURCE_META_KEY]:
+                if self.metadataList[index.row()][self.K_SOURCE_META_KEY] == self.K_CUSTOM_INPUT:
                     self.metadataList[index.row(
                     )][self.K_VALUE_META_KEY] = value
                     self.dataChanged.emit(index, index)
@@ -154,7 +154,7 @@ class TableModelU(QAbstractTableModel):
 
             return True
         elif role == Qt.CheckStateRole:
-            if index.column() == self.K_USESOURCE_COL_INDEX:
+            if index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
                 pass
             #self.dataChanged.emit(index, index)
             return True
@@ -165,14 +165,11 @@ class TableModelU(QAbstractTableModel):
         if not index.isValid():
             return Qt.ItemIsEnabled
         if index.column() == self.K_REMOVE_COL_INDEX:
-            if self.K_CUSTOM_INPUT == self.metadataList[index.row()][self.K_SOURCE_META_KEY]:
-                return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
-            else:
-                return Qt.ItemIsEnabled
-        elif index.column() == self.K_SOURCE_COL_INDEX or index.column() == self.K_USESOURCE_COL_INDEX:
+            return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
+        elif index.column() == self.K_SOURCE_COL_INDEX or index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
             return Qt.ItemFlags(QAbstractTableModel.flags(self, index) ^ Qt.ItemIsEnabled)
         else:
-            if index.data() == "" or self.metadataList[index.row()][self.K_EDITABLE_META_KEY] == 2:
+            if index.data() == "" or self.metadataList[index.row()]["Editable"] == 2:
                 return Qt.ItemFlags(QAbstractTableModel.flags(self, index) | Qt.ItemIsEditable)
             else:
                 return Qt.ItemIsEnabled
@@ -186,72 +183,25 @@ class TableModelU(QAbstractTableModel):
     def addRow(self, row):
         self.beginInsertRows(self.index(len(self.metadataList), 0), len(
             self.metadataList), len(self.metadataList))
-
-        units = ""
-        annotation = ""
-        default = 2
-        value = row[self.K_VALUE_META_KEY]
-        name = row[self.K_KEY_META_KEY]
-        for i in range(len(self.templatelist)):
-            if self.templatelist[i][self.K_KEY_META_KEY] == row[self.K_KEY_META_KEY]:
-                if self.templatelist[i][self.K_USESOURCE_META_KEY] == 0:
-                    default = 0
-                    value = self.templatelist[i][self.K_HTVALUE_META_KEY]
-                name = self.templatelist[i][self.K_HTNAME_META_KEY]
-                units = self.templatelist[i][self.K_UNITS_META_KEY]
-                annotation = self.templatelist[i][self.K_ANNOTATION_META_KEY]
-        if row[self.K_KEY_META_KEY] in self.editableKeys:
+        if row["Key"] in self.editableKeys:
             self.metadataList.append(
-                {self.K_KEY_META_KEY: name,
-                 self.K_VALUE_META_KEY: value,
+                {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
+                 self.K_VALUE_META_KEY: row[self.K_VALUE_META_KEY],
                  self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
-                 self.K_UNITS_META_KEY: units,
-                 self.K_ANNOTATION_META_KEY: annotation,
+                 self.K_UNITS_META_KEY: "",
+                 self.K_ANNOTATION_META_KEY: "",
                  self.K_EDITABLE_META_KEY: 2,
-                 self.K_USESOURCE_META_KEY: default})
+                 self.K_USESOURCE_META_KEY: 2})
         else:
 
             self.metadataList.append(
-                {self.K_KEY_META_KEY: name,
-                 self.K_VALUE_META_KEY: value,
+                {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
+                 self.K_VALUE_META_KEY: row[self.K_VALUE_META_KEY],
                  self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
-                 self.K_UNITS_META_KEY: units,
-                 self.K_ANNOTATION_META_KEY: annotation,
+                 self.K_UNITS_META_KEY: "",
+                 self.K_ANNOTATION_META_KEY: "",
                  self.K_EDITABLE_META_KEY: 0,
-                 self.K_USESOURCE_META_KEY: default})
-
-        self.endInsertRows()
-
-    def addExistingRow(self, row):
-        self.beginInsertRows(self.index(len(self.metadataList), 0), len(
-            self.metadataList), len(self.metadataList))
-        if self.K_CUSTOM_INPUT in row[self.K_SOURCE_META_KEY]:
-            self.metadataList.append(
-             {self.K_KEY_META_KEY: row[self.K_HTNAME_META_KEY],
-             self.K_VALUE_META_KEY: row[self.K_HTVALUE_META_KEY],
-             self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
-             self.K_UNITS_META_KEY: row[self.K_UNITS_META_KEY],
-             self.K_ANNOTATION_META_KEY: row[self.K_ANNOTATION_META_KEY],
-             self.K_EDITABLE_META_KEY: row[self.K_EDITABLE_META_KEY],
-             self.K_USESOURCE_META_KEY: row[self.K_USESOURCE_META_KEY]} )
-        elif row[self.K_USESOURCE_META_KEY] == 0:
-            self.metadataList.append(
-             {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
-             self.K_VALUE_META_KEY: row[self.K_HTVALUE_META_KEY],
-             self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
-             self.K_UNITS_META_KEY: row[self.K_UNITS_META_KEY],
-             self.K_ANNOTATION_META_KEY: row[self.K_ANNOTATION_META_KEY],
-             self.K_EDITABLE_META_KEY: row[self.K_EDITABLE_META_KEY],
-             self.K_USESOURCE_META_KEY: row[self.K_USESOURCE_META_KEY]} )
-        else:
-            self.metadataList.append(
-             {self.K_KEY_META_KEY: row[self.K_KEY_META_KEY],
-             self.K_VALUE_META_KEY: row[self.K_VALUE_META_KEY],
-             self.K_SOURCE_META_KEY: row[self.K_SOURCE_META_KEY],
-             self.K_UNITS_META_KEY: row[self.K_UNITS_META_KEY],
-             self.K_ANNOTATION_META_KEY: row[self.K_ANNOTATION_META_KEY],
-             self.K_EDITABLE_META_KEY: row[self.K_EDITABLE_META_KEY],
-             self.K_USESOURCE_META_KEY: row[self.K_USESOURCE_META_KEY]} )
+                 self.K_USESOURCE_META_KEY: 2})
 
         self.endInsertRows()
 

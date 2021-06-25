@@ -8,14 +8,13 @@ from PySide2.QtWidgets import QApplication, QStyle
 class ListModel(QAbstractListModel):
     rowAdded = Signal()
     rowRemoved = Signal()
-    def __init__(self,data,tablemodel,fileList ,parent=None):
+    def __init__(self, fileList, parent=None):
         QAbstractListModel.__init__(self, parent)
         self.metadataList = fileList
-        self.tablemodel = tablemodel
 
     def flags(self, index):
-        defaultFlags = QAbstractListModel.flags(self,index);
-        return Qt.ItemIsDropEnabled | defaultFlags;
+        defaultFlags = QAbstractListModel.flags(self,index)
+        return Qt.ItemIsDropEnabled | defaultFlags
 
     def canDropMimeData(self, data, action, row, column, parent):
         for file in data.urls():

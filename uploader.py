@@ -14,30 +14,34 @@ class Uploader(QObject):
         super(Uploader, self).__init__(parent)
         self.interrupt = False
 
-    def performUpload(self, metadataList, authControl, ht_id_path, metadata):
+    def performUpload(self, filelist, authControl, ht_space_id, ht_id_path, metadata):
         self.interrupt = False
 
         # Check that all files initially exist. This is a quick sanity check. The user could
         # *still* delete a file out from under the codes.
-        for i in tqdm(range(len(metadataList)), desc="Checking Files"):
-            if not QFileInfo.exists(metadataList[i]):
+        for i in tqdm(range(len(filelist)), desc="Checking Files"):
+            if not QFileInfo.exists(filelist[i]):
                 self.currentlyUploading.emit(
-                    "File Missing: " + metadataList[i].split("/")[-1])
+                    "File Missing: " + filelist[i].split("/")[-1])
                 self.interrupt = True
 
-        for i in tqdm(range(len(metadataList)), desc="Uploading Files"):
+        for i in tqdm(range(len(filelist)), desc="Uploading Files"):
             if self.interrupt:
                 break
 
-            if not QFileInfo.exists(metadataList[i]):
+            if not QFileInfo.exists(filelist[i]):
                 self.currentlyUploading.emit(
-                    "File Missing: " + metadataList[i].split("/")[-1])
+                    "File Missing: " + filelist[i].split("/")[-1])
                 break
             else:
                 self.currentlyUploading.emit(
-                    "Currently uploading: " + metadataList[i].split("/")[-1])
-                ht_requests.upload_file(
-                    authControl, metadataList[i], 'user', None, ht_id_path, metadata)
+                    "Currently uploading: " + filelist[i].split("/")[-1])
+                ht_requests.upload_file(auth_control=authControl, 
+                                local_path=filelist[i],
+                                ht_space='project',
+                                ht_space_id=ht_space_id,
+                                ht_id_path=ht_id_path, 
+                                metadata=metadata)
                 self.currentUploadDone.emit(i+1)
         self.allUploadsDone.emit()
 

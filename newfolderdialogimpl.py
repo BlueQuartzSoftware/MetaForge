@@ -1,6 +1,7 @@
 from PySide2.QtWidgets import QDialog, QMessageBox, QApplication, QStyle
 from PySide2.QtCore import Signal, QStringListModel
-from newfolderdialog import Ui_NewFolderDialog
+
+from ui_newfolderdialog import Ui_NewFolderDialog
 
 class NewFolderDialogImpl(QDialog):
     nameSubmitted = Signal(str)
