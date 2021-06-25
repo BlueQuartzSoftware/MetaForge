@@ -2,7 +2,7 @@
 
 from ezmodel.ezmetadataentry import EzMetadataEntry
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QHeaderView, QToolButton, QStyle, QProgressDialog
-from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QFileInfo, QUrl
+from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSettings
 from PySide2.QtGui import QCursor, QDesktopServices
 from ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
@@ -58,6 +58,9 @@ class MainWindow(QMainWindow):
         self.setAcceptDrops(True)
         self.numCustoms = 0
         self.editableKeys = []
+
+        # Read window settings
+        self.read_window_settings()
 
         # Setup the blank Create Template table
         self.setup_create_ez_table()
@@ -139,6 +142,11 @@ class MainWindow(QMainWindow):
         self.ui.useTemplateListView.clicked.connect(
             self.removeRowfromUsefileType)
 
+    def read_window_settings(self):
+        settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
+        self.restoreGeometry(settings.value("geometry"))
+        self.restoreState(settings.value("window_state"))
+
     def acceptKey(self, apikey):
         self.accessKey = apikey
 
@@ -169,8 +177,14 @@ class MainWindow(QMainWindow):
                 self.uselistmodel.removeRow(rowIndex)
 
     def closeEvent(self, event):
+        settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
+        settings.setValue("geometry", self.saveGeometry())
+        settings.setValue("window_state", self.saveState())
+
         self.mThread.quit()
         self.mThread.wait(250)
+
+        super().closeEvent(event)
 
     def eventFilter(self, object, event):
         if object == self.ui.hyperthoughtTemplateLineEdit:

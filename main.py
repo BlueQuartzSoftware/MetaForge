@@ -23,6 +23,7 @@ from resources_rc import *
 if __name__ == "__main__":
     app = QApplication(sys.argv)
     app.setApplicationDisplayName("MetaForge")
+    app.setOrganizationName("BlueQuartz Software")
     app.setWindowIcon(QIcon(':/resources/applicationIcon.png'))
     window = MainWindow()
     window.show()
