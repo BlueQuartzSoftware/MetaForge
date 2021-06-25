@@ -18,6 +18,10 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_OVERRIDDEN = 'Value overridden from source'
     K_MISSING = "Missing from data file"
 
+    # Row colors
+    K_MISSING_ENTRY_COLOR = QColor(255, 190, 194)
+    K_OVERRIDDEN_ENTRY_COLOR = QColor(253, 255, 190)
+
     # These are the user facing header and the index of each column in the table.
     K_SOURCE_COL_NAME = "Source"
     K_SOURCE_COL_INDEX = 0
@@ -34,8 +38,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_HTUNITS_COL_NAME = "HT Units"
     K_HTUNITS_COL_INDEX = 4
 
-    K_ICON_COL_NAME = "Parsing Messages"
-    K_ICON_COL_INDEX = 5
+    K_PARSINGMESSAGES_COL_NAME = "Parsing Messages"
+    K_PARSINGMESSAGES_COL_INDEX = 5
 
     def __init__(self, data, parent=None):
         QSortFilterProxyModel.__init__(self, parent)
@@ -81,45 +85,71 @@ class QUseEzTableModel(QSortFilterProxyModel):
 
         if role == Qt.DisplayRole or role == Qt.EditRole:
             if index.column() == self.K_HTNAME_COL_INDEX:
-                return metadata_entry.ht_name
+                return self._get_htname_data(metadata_entry)
             elif index.column() == self.K_SOURCE_COL_INDEX:
-                if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                    return src_model.K_CUSTOM_VALUE
-                else:
-                    return metadata_entry.source_path
+                return self._get_source_data(metadata_entry)
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                if metadata_entry.override_source_value is True:
-                    return metadata_entry.ht_value
-                elif metadata_entry.source_type is not EzMetadataEntry.SourceType.FILE:
-                    return metadata_entry.ht_value
-                elif self.metadata_file_chosen is True:
-                    return metadata_entry.ht_value
-                else:
-                    return self.K_SOURCE_NOT_LOADED
+                return self._get_htvalue_data(metadata_entry)
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
-                return metadata_entry.ht_annotation
+                return self._get_htannotation_data(metadata_entry)
             elif index.column() == self.K_HTUNITS_COL_INDEX:
-                return metadata_entry.ht_units
-            elif index.column() == self.K_ICON_COL_INDEX:
-                if metadata_entry in self.missing_entries:
-                    return self.K_MISSING
-                elif metadata_entry.override_source_value is True:
-                    return self.K_OVERRIDDEN
-                else:
-                    return None
+                return self._get_htunits_data(metadata_entry)
+            elif index.column() == self.K_PARSINGMESSAGES_COL_INDEX:
+                return self._get_parsingmessages_data(metadata_entry)
         elif role == Qt.BackgroundRole:
-            if metadata_entry in self.missing_entries:
-                return QColor(255, 190, 194)
-            elif metadata_entry.override_source_value is True:
-                return QColor(253, 255, 190)
+            return self._get_background_color_data(metadata_entry)
         elif role == Qt.FontRole:
-            flags = self.flags(index)
-            if not (flags & Qt.ItemIsEditable):
-                italic_font = QFont()
-                italic_font.setItalic(True)
-                return italic_font
-        return None
+            return self._get_font_data(index)
+        return self._get_default_data()
+    
+    def _get_source_data(self, metadata_entry: EzMetadataEntry) -> str:
+        if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+            return self.sourceModel().K_CUSTOM_VALUE
+        else:
+            return metadata_entry.source_path
+    
+    def _get_htname_data(self, metadata_entry: EzMetadataEntry) -> str:
+        return metadata_entry.ht_name
+    
+    def _get_htvalue_data(self, metadata_entry: EzMetadataEntry) -> str:
+        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+            if metadata_entry in self.missing_entries:
+                return None
+            elif self.metadata_file_chosen is False and metadata_entry.override_source_value is False:
+                return self.K_SOURCE_NOT_LOADED
+        return metadata_entry.ht_value
 
+    def _get_htannotation_data(self, metadata_entry: EzMetadataEntry) -> str:
+        return metadata_entry.ht_annotation
+    
+    def _get_htunits_data(self, metadata_entry: EzMetadataEntry) -> str:
+        return metadata_entry.ht_units
+    
+    def _get_parsingmessages_data(self, metadata_entry: EzMetadataEntry) -> str:
+        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+            if metadata_entry in self.missing_entries:
+                return self.K_MISSING
+            elif metadata_entry.override_source_value is True:
+                return self.K_OVERRIDDEN
+        return None
+    
+    def _get_background_color_data(self, metadata_entry: EzMetadataEntry) -> QColor:
+        if metadata_entry in self.missing_entries:
+            return self.K_MISSING_ENTRY_COLOR
+        elif metadata_entry.override_source_value is True:
+            return self.K_OVERRIDDEN_ENTRY_COLOR
+        return None
+    
+    def _get_font_data(self, index: QModelIndex) -> QFont:
+        flags = self.flags(index)
+        if not (flags & Qt.ItemIsEditable):
+            italic_font = QFont()
+            italic_font.setItalic(True)
+            return italic_font
+        return None
+    
+    def _get_default_data(self):
+        return None
     
     def setData(self, index, value, role):
         if not index.isValid():
@@ -139,10 +169,9 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 self.dataChanged.emit(index, index)
                 return True
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                if metadata_entry.override_source_value is True:
-                    metadata_entry.ht_value = value
-                    self.dataChanged.emit(index, index)
-                    return True
+                metadata_entry.ht_value = value
+                self.dataChanged.emit(index, index)
+                return True
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
                 metadata_entry.ht_annotation = value
                 self.dataChanged.emit(index, index)
@@ -170,8 +199,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 return self.K_HTANNOTATION_COL_NAME
             elif section == self.K_HTUNITS_COL_INDEX:
                 return self.K_HTUNITS_COL_NAME
-            elif section == self.K_ICON_COL_INDEX:
-                return self.K_ICON_COL_NAME
+            elif section == self.K_PARSINGMESSAGES_COL_INDEX:
+                return self.K_PARSINGMESSAGES_COL_NAME
 
         if orientation == Qt.Vertical:
             return "     "
@@ -179,7 +208,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
         return None
 
 
-    def flags(self, index):
+    def flags(self, index) -> Qt.ItemFlags:
         if not index.isValid():
             return Qt.NoItemFlags
 
@@ -187,36 +216,59 @@ class QUseEzTableModel(QSortFilterProxyModel):
         metadata_entry: EzMetadataEntry = self.sourceModel().metadata_model.entry(source_row)
         
         if index.column() == self.K_SOURCE_COL_INDEX:
-            return Qt.ItemIsEnabled
+            return self._get_source_flags(metadata_entry)
         elif index.column() == self.K_HTNAME_COL_INDEX:
-            if metadata_entry.editable is True:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-            else:
-                return Qt.ItemIsEnabled
+            return self._get_htname_flags(metadata_entry)
         elif index.column() == self.K_HTVALUE_COL_INDEX:
-            if metadata_entry.source_type is not EzMetadataEntry.SourceType.FILE:
+            return self._get_htvalue_flags(metadata_entry)
+        elif index.column() == self.K_HTANNOTATION_COL_INDEX:
+            return self._get_htannotation_flags(metadata_entry)
+        elif index.column() == self.K_HTUNITS_COL_INDEX:
+            return self._get_htunits_flags(metadata_entry)
+        elif index.column() == self.K_PARSINGMESSAGES_COL_INDEX:
+            return self._get_parsingmessages_flags(metadata_entry)
+        else:
+            return self._get_default_flags()
+
+    def _get_source_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+    
+    def _get_htname_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
+        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+            if metadata_entry not in self.missing_entries:
                 if metadata_entry.editable is True:
                     return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-            else:
-                if metadata_entry.override_source_value is True:
-                    if metadata_entry.editable is True:
-                        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-                elif self.metadata_file_chosen is True:
-                    if metadata_entry.editable is True:
-                        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-            return Qt.ItemIsEnabled
-        elif index.column() == self.K_HTANNOTATION_COL_INDEX:
-            if metadata_entry.editable is True:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-            else:
-                return Qt.ItemIsEnabled
-        elif index.column() == self.K_HTUNITS_COL_INDEX:
-            if metadata_entry.editable is True:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-            else:
-                return Qt.ItemIsEnabled
-        elif index.column() == self.K_ICON_COL_INDEX:
-            return Qt.ItemIsEnabled
+        elif metadata_entry.editable is True:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+    
+    def _get_htvalue_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
+        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+            if metadata_entry.override_source_value is True:
+                if metadata_entry.editable is True:
+                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            elif self.metadata_file_chosen is True:
+                if metadata_entry.editable is True:
+                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         else:
-            return Qt.NoItemFlags
+            if metadata_entry.editable is True:
+                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
+    def _get_htannotation_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
+        if metadata_entry.editable is True:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        else:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+    
+    def _get_htunits_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
+        if metadata_entry.editable is True:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        else:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+    
+    def _get_parsingmessages_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+    
+    def _get_default_flags(self):
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
