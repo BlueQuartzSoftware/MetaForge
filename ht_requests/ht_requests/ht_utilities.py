@@ -76,7 +76,7 @@ def ezmodel_to_ht_metadata(model: EzMetadataModel, missing_entries: List[EzMetad
     metadataJson = []
     entries = model.entries
     for e in entries:
-        if e.enabled and e not in missing_entries:
+        if e.enabled and (e not in missing_entries or e.override_source_value is True):
             metadataJson.append(
                 {"keyName": e.ht_name,
                     "value":
