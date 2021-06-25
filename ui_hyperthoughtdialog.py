@@ -12,7 +12,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
-from ht_widgets.deselectable_list_view import DeselectableListView
+from ht_widgets.deselectable_table_view import DeselectableTableView
 
 import resources_rc
 
@@ -36,6 +36,10 @@ class Ui_HyperthoughtDialog(object):
         self.horizontalLayout_3.setContentsMargins(4, 4, 4, 4)
         self.label = QLabel(HyperthoughtDialog)
         self.label.setObjectName(u"label")
+        font = QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.label.setFont(font)
         self.label.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.horizontalLayout_3.addWidget(self.label)
@@ -47,6 +51,7 @@ class Ui_HyperthoughtDialog(object):
 
         self.label_3 = QLabel(HyperthoughtDialog)
         self.label_3.setObjectName(u"label_3")
+        self.label_3.setFont(font)
         self.label_3.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.horizontalLayout_3.addWidget(self.label_3)
@@ -58,6 +63,7 @@ class Ui_HyperthoughtDialog(object):
 
         self.label_2 = QLabel(HyperthoughtDialog)
         self.label_2.setObjectName(u"label_2")
+        self.label_2.setFont(font)
         self.label_2.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
 
         self.horizontalLayout_3.addWidget(self.label_2)
@@ -78,16 +84,6 @@ class Ui_HyperthoughtDialog(object):
         self.gridLayout_2.setSpacing(6)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout_2.setContentsMargins(-1, 0, 0, 0)
-        self.folderListView = DeselectableListView(HyperthoughtDialog)
-        self.folderListView.setObjectName(u"folderListView")
-        self.folderListView.setAlternatingRowColors(True)
-        self.folderListView.setSelectionMode(QAbstractItemView.SingleSelection)
-        self.folderListView.setSelectionBehavior(QAbstractItemView.SelectItems)
-        self.folderListView.setUniformItemSizes(True)
-        self.folderListView.setSelectionRectVisible(True)
-
-        self.gridLayout_2.addWidget(self.folderListView, 1, 1, 1, 1)
-
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
         self.parentDirectoryButton = QToolButton(HyperthoughtDialog)
@@ -100,16 +96,16 @@ class Ui_HyperthoughtDialog(object):
 
         self.horizontalLayout_5.addWidget(self.parentDirectoryButton)
 
-        self.directoryLabel = QLabel(HyperthoughtDialog)
-        self.directoryLabel.setObjectName(u"directoryLabel")
+        self.breadcrumbLabel = QLabel(HyperthoughtDialog)
+        self.breadcrumbLabel.setObjectName(u"breadcrumbLabel")
         sizePolicy1 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Preferred)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.directoryLabel.sizePolicy().hasHeightForWidth())
-        self.directoryLabel.setSizePolicy(sizePolicy1)
-        self.directoryLabel.setMinimumSize(QSize(0, 0))
+        sizePolicy1.setHeightForWidth(self.breadcrumbLabel.sizePolicy().hasHeightForWidth())
+        self.breadcrumbLabel.setSizePolicy(sizePolicy1)
+        self.breadcrumbLabel.setMinimumSize(QSize(0, 0))
 
-        self.horizontalLayout_5.addWidget(self.directoryLabel)
+        self.horizontalLayout_5.addWidget(self.breadcrumbLabel)
 
         self.horizontalSpacer_2 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
 
@@ -142,10 +138,10 @@ class Ui_HyperthoughtDialog(object):
 
         self.horizontalLayout.addWidget(self.locationLabel)
 
-        self.selectedProjectFolder = QLineEdit(HyperthoughtDialog)
-        self.selectedProjectFolder.setObjectName(u"selectedProjectFolder")
+        self.selectedFolderLabel = QLineEdit(HyperthoughtDialog)
+        self.selectedFolderLabel.setObjectName(u"selectedFolderLabel")
 
-        self.horizontalLayout.addWidget(self.selectedProjectFolder)
+        self.horizontalLayout.addWidget(self.selectedFolderLabel)
 
 
         self.gridLayout_2.addLayout(self.horizontalLayout, 2, 1, 1, 1)
@@ -154,6 +150,21 @@ class Ui_HyperthoughtDialog(object):
         self.projectListView.setObjectName(u"projectListView")
 
         self.gridLayout_2.addWidget(self.projectListView, 1, 0, 2, 1)
+
+        self.folderListView = DeselectableTableView(HyperthoughtDialog)
+        self.folderListView.setObjectName(u"folderListView")
+        self.folderListView.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.folderListView.setAlternatingRowColors(False)
+        self.folderListView.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.folderListView.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.folderListView.setShowGrid(False)
+        self.folderListView.setCornerButtonEnabled(False)
+        self.folderListView.horizontalHeader().setCascadingSectionResizes(True)
+        self.folderListView.horizontalHeader().setMinimumSectionSize(100)
+        self.folderListView.horizontalHeader().setStretchLastSection(True)
+        self.folderListView.verticalHeader().setVisible(False)
+
+        self.gridLayout_2.addWidget(self.folderListView, 1, 1, 1, 1)
 
         self.gridLayout_2.setColumnStretch(0, 33)
         self.gridLayout_2.setColumnStretch(1, 100)
@@ -174,6 +185,8 @@ class Ui_HyperthoughtDialog(object):
 
         self.apiKeyButton = QPushButton(HyperthoughtDialog)
         self.apiKeyButton.setObjectName(u"apiKeyButton")
+        sizePolicy.setHeightForWidth(self.apiKeyButton.sizePolicy().hasHeightForWidth())
+        self.apiKeyButton.setSizePolicy(sizePolicy)
 
         self.gridLayout.addWidget(self.apiKeyButton, 0, 6, 1, 1)
 
@@ -196,18 +209,15 @@ class Ui_HyperthoughtDialog(object):
         self.apiKeyLabel = QLabel(HyperthoughtDialog)
         self.apiKeyLabel.setObjectName(u"apiKeyLabel")
 
-        self.gridLayout.addWidget(self.apiKeyLabel, 0, 0, 1, 2)
+        self.gridLayout.addWidget(self.apiKeyLabel, 0, 0, 1, 1)
 
         self.apiKeyLineEdit = QLineEdit(HyperthoughtDialog)
         self.apiKeyLineEdit.setObjectName(u"apiKeyLineEdit")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Fixed)
-        sizePolicy4.setHorizontalStretch(0)
-        sizePolicy4.setVerticalStretch(0)
-        sizePolicy4.setHeightForWidth(self.apiKeyLineEdit.sizePolicy().hasHeightForWidth())
-        self.apiKeyLineEdit.setSizePolicy(sizePolicy4)
+        sizePolicy1.setHeightForWidth(self.apiKeyLineEdit.sizePolicy().hasHeightForWidth())
+        self.apiKeyLineEdit.setSizePolicy(sizePolicy1)
         self.apiKeyLineEdit.setMinimumSize(QSize(0, 0))
 
-        self.gridLayout.addWidget(self.apiKeyLineEdit, 0, 2, 1, 3)
+        self.gridLayout.addWidget(self.apiKeyLineEdit, 0, 1, 1, 4)
 
 
         self.retranslateUi(HyperthoughtDialog)
@@ -232,7 +242,7 @@ class Ui_HyperthoughtDialog(object):
         self.parentDirectoryButton.setStatusTip("")
 #endif // QT_CONFIG(statustip)
         self.parentDirectoryButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"Up", None))
-        self.directoryLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"/Some/Path/to/Store/Data", None))
+        self.breadcrumbLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"/Some/Path/to/Store/Data", None))
 #if QT_CONFIG(tooltip)
         self.newFolderButton.setToolTip(QCoreApplication.translate("HyperthoughtDialog", u"Create Remote Folder", None))
 #endif // QT_CONFIG(tooltip)

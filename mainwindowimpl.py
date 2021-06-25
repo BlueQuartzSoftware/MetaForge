@@ -32,8 +32,7 @@ from ezmodel.ezmetadatamodel import EzMetadataModel
 class MainWindow(QMainWindow):
     K_CREATE_TREE_HEADER = "Available File Metadata"
 
-    createUpload = Signal(
-        list, htauthcontroller.HTAuthorizationController, str, list)
+    createUpload = Signal(list, htauthcontroller.HTAuthorizationController, str, str, list)
 
     def __init__(self):
         super(MainWindow, self).__init__()
@@ -537,8 +536,11 @@ class MainWindow(QMainWindow):
         progress.setWindowFlags(
             Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint)
         progress.setAttribute(Qt.WA_DeleteOnClose)
-        self.createUpload.emit(
-            self.uselistmodel.metadataList, auth_control, self.folderuuid, metadataJson)
+        self.createUpload.emit(self.uselistmodel.metadataList, 
+                    auth_control, 
+                    self.hyperthoughtui.current_project["content"]["pk"],
+                    self.folderuuid, 
+                    metadataJson)
         self.uploader.currentUploadDone.connect(progress.setValue)
         self.uploader.currentlyUploading.connect(progress.setLabelText)
         self.uploader.allUploadsDone.connect(progress.accept)

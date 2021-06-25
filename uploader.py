@@ -14,7 +14,7 @@ class Uploader(QObject):
         super(Uploader, self).__init__(parent)
         self.interrupt = False
 
-    def performUpload(self, filelist, authControl, ht_id_path, metadata):
+    def performUpload(self, filelist, authControl, ht_space_id, ht_id_path, metadata):
         self.interrupt = False
 
         # Check that all files initially exist. This is a quick sanity check. The user could
@@ -36,8 +36,12 @@ class Uploader(QObject):
             else:
                 self.currentlyUploading.emit(
                     "Currently uploading: " + filelist[i].split("/")[-1])
-                ht_requests.upload_file(
-                    authControl, filelist[i], 'user', None, ht_id_path, metadata)
+                ht_requests.upload_file(auth_control=authControl, 
+                                local_path=filelist[i],
+                                ht_space='project',
+                                ht_space_id=ht_space_id,
+                                ht_id_path=ht_id_path, 
+                                metadata=metadata)
                 self.currentUploadDone.emit(i+1)
         self.allUploadsDone.emit()
 
