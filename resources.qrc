@@ -1,30 +1,30 @@
 <!DOCTYPE RCC>
  <RCC version="1.0">
     <qresource>
-        <file>resources/images/applicationIcon.png</file>
+        <file>resources/Images/applicationIcon.png</file>
 
-        <file>resources/images/close-pushed@2x.png</file>
-        <file>resources/images/close-pushed.png</file>
+        <file>resources/Images/close-pushed@2x.png</file>
+        <file>resources/Images/close-pushed.png</file>
 
-        <file>resources/images/arrow-top@2x.png</file>
-        <file>resources/images/arrow-top.png</file>
+        <file>resources/Images/arrow-top@2x.png</file>
+        <file>resources/Images/arrow-top.png</file>
         
-        <file>resources/images/folder@2x.png</file>
-        <file>resources/images/folder.png</file>
+        <file>resources/Images/folder@2x.png</file>
+        <file>resources/Images/folder.png</file>
         
-        <file>resources/images/plus@2x.png</file>
-        <file>resources/images/plus.png</file>
+        <file>resources/Images/plus@2x.png</file>
+        <file>resources/Images/plus.png</file>
             
-        <file>resources/images/delete@2x.png</file>
-        <file>resources/images/delete.png</file>
+        <file>resources/Images/delete@2x.png</file>
+        <file>resources/Images/delete.png</file>
 
-        <file>resources/images/check_plain@2x.png</file>
-        <file>resources/images/check_plain.png</file>
+        <file>resources/Images/check_plain@2x.png</file>
+        <file>resources/Images/check_plain.png</file>
 
-        <file>resources/images/warning@2x.png</file>
-        <file>resources/images/warning.png</file>
+        <file>resources/Images/warning@2x.png</file>
+        <file>resources/Images/warning.png</file>
     
-        <file>resources/images/key@2x.png</file>
-        <file>resources/images/key.png</file>
+        <file>resources/Images/key@2x.png</file>
+        <file>resources/Images/key.png</file>
     </qresource>
 </RCC>

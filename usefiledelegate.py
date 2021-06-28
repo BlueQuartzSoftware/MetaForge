@@ -12,7 +12,7 @@ class UseFileDelegate(QItemDelegate):
         QItemDelegate.__init__(self, parent)
 
     def paint(self, painter, option, index):        
-            icon = QIcon(QPixmap(':/resources/close-pushed@2x.png'))
+            icon = QIcon(QPixmap(':/resources/Images/close-pushed@2x.png'))
             painter.save()            
             line_1x = icon.pixmap(12,12)
             painter.drawText( option.rect.adjusted(5,option.rect.height()/2 - 8 , 0, 0), Qt.AlignLeft, index.data())

@@ -138,7 +138,7 @@ class Ui_MainWindow(object):
         self.appendCreateTableRowButton = QToolButton(self.CreateTemplateTab)
         self.appendCreateTableRowButton.setObjectName(u"appendCreateTableRowButton")
         icon = QIcon()
-        icon.addFile(u":/resources/plus@2x.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon.addFile(u":/resources/Images/plus@2x.png", QSize(), QIcon.Normal, QIcon.Off)
         self.appendCreateTableRowButton.setIcon(icon)
         self.appendCreateTableRowButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
@@ -147,7 +147,7 @@ class Ui_MainWindow(object):
         self.removeCreateTableRowButton = QToolButton(self.CreateTemplateTab)
         self.removeCreateTableRowButton.setObjectName(u"removeCreateTableRowButton")
         icon1 = QIcon()
-        icon1.addFile(u":/resources/delete@2x.png", QSize(), QIcon.Normal, QIcon.Off)
+        icon1.addFile(u":/resources/Images/delete@2x.png", QSize(), QIcon.Normal, QIcon.Off)
         self.removeCreateTableRowButton.setIcon(icon1)
         self.removeCreateTableRowButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
@@ -400,9 +400,7 @@ class Ui_MainWindow(object):
 
         self.appendUseTableRowButton = QToolButton(self.UseTemplateTab)
         self.appendUseTableRowButton.setObjectName(u"appendUseTableRowButton")
-        icon2 = QIcon()
-        icon2.addFile(u":/resources/plus.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.appendUseTableRowButton.setIcon(icon2)
+        self.appendUseTableRowButton.setIcon(icon)
         self.appendUseTableRowButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
         self.horizontalLayout_12.addWidget(self.appendUseTableRowButton)
@@ -515,7 +513,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1328, 24))
+        self.menubar.setGeometry(QRect(0, 0, 1328, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuOpen_Recent = QMenu(self.menuFile)

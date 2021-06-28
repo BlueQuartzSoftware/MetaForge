@@ -165,7 +165,7 @@
          </property>
          <property name="icon">
           <iconset resource="resources.qrc">
-           <normaloff>:/resources/images/arrow-top@2x.png</normaloff>:/resources/images/arrow-top@2x.png</iconset>
+           <normaloff>:/resources/Images/arrow-top.png</normaloff>:/resources/Images/arrow-top.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -223,7 +223,7 @@
          </property>
          <property name="icon">
           <iconset resource="resources.qrc">
-           <normaloff>:/resources/images/folder@2x.png</normaloff>:/resources/images/folder@2x.png</iconset>
+           <normaloff>:/resources/Images/folder@2x.png</normaloff>:/resources/Images/folder@2x.png</iconset>
          </property>
          <property name="iconSize">
           <size>
@@ -361,7 +361,7 @@
      </property>
      <property name="icon">
       <iconset resource="resources.qrc">
-       <normaloff>:/resources/images/key@2x.png</normaloff>:/resources/images/key@2x.png</iconset>
+       <normaloff>:/resources/Images/key@2x.png</normaloff>:/resources/Images/key@2x.png</iconset>
      </property>
      <property name="iconSize">
       <size>
