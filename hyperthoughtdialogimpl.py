@@ -197,11 +197,7 @@ class HyperthoughtDialogImpl(QDialog):
 
     def parentDirectory(self):
         try:
-            print(f'parentDirectory[BEFORE]: {self.htPathFromBreadCrumbs()}')
             self.bread_crumb_path.pop()
-            print(f'parentDirectory[AFTER]: {self.htPathFromBreadCrumbs()}')
-
-
             self.updateBreadCrumbLabel()
 
             folderlist = ht_requests.get_item_dict_from_ht_path(self.authcontrol, 
