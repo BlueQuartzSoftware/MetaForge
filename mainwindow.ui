@@ -880,7 +880,7 @@
      <x>0</x>
      <y>0</y>
      <width>1328</width>
-     <height>22</height>
+     <height>24</height>
     </rect>
    </property>
    <widget class="QMenu" name="menuFile">
@@ -892,15 +892,13 @@
       <string>Open Recent</string>
      </property>
     </widget>
+    <addaction name="actionOpen_Template"/>
     <addaction name="actionOpenPackage"/>
     <addaction name="separator"/>
     <addaction name="menuOpen_Recent"/>
     <addaction name="separator"/>
-    <addaction name="actionOpen_Template"/>
-    <addaction name="separator"/>
-    <addaction name="actionSave_Package"/>
-    <addaction name="separator"/>
     <addaction name="actionSave_Template"/>
+    <addaction name="actionSave_Package"/>
     <addaction name="separator"/>
     <addaction name="actionClose"/>
    </widget>
@@ -980,7 +978,7 @@
   </action>
   <action name="actionOpen_Template">
    <property name="text">
-    <string>Edit Template</string>
+    <string>Open Template</string>
    </property>
   </action>
   <action name="actionPackages">
