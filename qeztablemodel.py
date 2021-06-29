@@ -74,9 +74,9 @@ class QEzTableModel(QAbstractTableModel):
                 return metadata_entry.ht_name
             elif index.column() == self.K_SOURCEVAL_COL_INDEX:
                 if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                    return self.K_CUSTOM_VALUE
+                    return str(self.K_CUSTOM_VALUE)
                 else:
-                    return metadata_entry.source_value
+                    return str(metadata_entry.source_value)
             elif index.column() == self.K_SOURCE_COL_INDEX:
                 if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
                     return self.K_CUSTOM_VALUE
@@ -84,12 +84,12 @@ class QEzTableModel(QAbstractTableModel):
                     return metadata_entry.source_path
             elif index.column() == self.K_HTVALUE_COL_INDEX:
                 if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                    return metadata_entry.ht_value
+                    return str(metadata_entry.ht_value)
                 else:
                     if metadata_entry.override_source_value is True:
-                        return metadata_entry.ht_value
+                        return str(metadata_entry.ht_value)
                     else:
-                        return self.K_FROM_SOURCE
+                        return str(self.K_FROM_SOURCE)
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
                 return metadata_entry.ht_annotation
             elif index.column() == self.K_HTUNITS_COL_INDEX:

@@ -11,6 +11,7 @@ from usetablemodel import TableModelU
 from uselistmodel import ListModel
 from treemodel import TreeModel
 from trashdelegate import TrashDelegate
+from checkboxdelegate import CheckBoxDelegate
 from qcreateeztablemodel import QCreateEzTableModel
 from quseeztablemodel import QUseEzTableModel
 from usefiledelegate import UseFileDelegate
@@ -113,12 +114,15 @@ class MainWindow(QMainWindow):
     
     def setup_create_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         self.createtrashDelegate = TrashDelegate()
+        self.checkboxDelegate = CheckBoxDelegate()
         self.create_ez_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
         self.create_ez_table_model_proxy = self.init_create_table_model_proxy(self.create_ez_table_model)
         self.ui.metadataTableView.setModel(self.create_ez_table_model_proxy)
         self.filter_create_table()
         self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_REMOVE_COL_INDEX, self.createtrashDelegate)
         self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
+        self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
+        self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_EDITABLE_COL_INDEX, self.checkboxDelegate)
     
     def setup_use_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         self.usetrashDelegate = TrashDelegate()
