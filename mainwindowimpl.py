@@ -123,7 +123,14 @@ class MainWindow(QMainWindow):
         self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
         self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
         self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_EDITABLE_COL_INDEX, self.checkboxDelegate)
+        self.polish_create_ez_table()
     
+    def polish_create_ez_table(self):
+        self.ui.metadataTableView.resizeColumnsToContents()
+        self.ui.metadataTableView.setColumnWidth(self.create_ez_table_model.K_HTANNOTATION_COL_INDEX, self.width() * .1)
+        self.ui.metadataTableView.setColumnWidth(self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width() * .125)
+        self.ui.metadataTableView.horizontalHeader().setStretchLastSection(True)
+
     def setup_use_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         self.usetrashDelegate = TrashDelegate()
         self.use_ez_table_model = QEzTableModel(metadata_model, parent=self)
@@ -132,6 +139,13 @@ class MainWindow(QMainWindow):
         self.filter_use_table()
         self.ui.useTemplateTableView.setItemDelegateForColumn(self.use_ez_table_model_proxy.K_REMOVE_COL_INDEX, self.usetrashDelegate)
         self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
+        self.polish_use_ez_table()
+
+    def polish_use_ez_table(self):
+        self.ui.useTemplateTableView.resizeColumnsToContents()
+        self.ui.useTemplateTableView.setColumnWidth(self.use_ez_table_model.K_HTANNOTATION_COL_INDEX, self.width() * .1)
+        self.ui.useTemplateTableView.setColumnWidth(self.use_ez_table_model.K_HTUNITS_COL_INDEX, self.width() * .1)
+        self.ui.useTemplateTableView.horizontalHeader().setStretchLastSection(True)
 
     def setup_create_ez_tree(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         headers = [self.K_CREATE_TREE_HEADER]
@@ -511,7 +525,7 @@ class MainWindow(QMainWindow):
             self.ui.metadataTableView.setWordWrap(True)
             # self.ui.metadataTableView.setColumnWidth(1, 200)
             self.ui.metadataTableView.setRowHeight(21, 35)
-            self.ui.metadataTableView.resizeColumnsToContents()
+            self.polish_create_ez_table()
 
         self.toggleButtons()
         return True
@@ -540,6 +554,7 @@ class MainWindow(QMainWindow):
         self.currentTemplate = templateFilePath.split("/")[-1]
         self.ui.displayedFileLabel.setText(templateFilePath.split("/")[-1])
         self.updateUseTableModel()
+        self.polish_use_ez_table()
 
     def loadOtherDataFile(self):
         datafile_input_path = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(

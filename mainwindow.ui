@@ -305,7 +305,7 @@
              <bool>false</bool>
             </property>
             <attribute name="horizontalHeaderStretchLastSection">
-             <bool>false</bool>
+             <bool>true</bool>
             </attribute>
             <attribute name="verticalHeaderVisible">
              <bool>true</bool>
@@ -719,7 +719,7 @@
                <enum>QAbstractItemView::SelectItems</enum>
               </property>
               <attribute name="horizontalHeaderStretchLastSection">
-               <bool>false</bool>
+               <bool>true</bool>
               </attribute>
               <attribute name="verticalHeaderMinimumSectionSize">
                <number>15</number>
