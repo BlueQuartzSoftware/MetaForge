@@ -12,7 +12,7 @@ class QEzTableModel(QAbstractTableModel):
     """
 
     # Total Number of Columns
-    K_COL_COUNT = 9
+    K_COL_COUNT = 10
 
     # These are some misc strings that are used.
     K_FROM_SOURCE = "--SOURCE--"
@@ -45,6 +45,9 @@ class QEzTableModel(QAbstractTableModel):
 
     K_EDITABLE_COL_NAME = "Editable"
     K_EDITABLE_COL_INDEX = 8
+
+    K_REMOVE_COL_NAME = "Remove Row"
+    K_REMOVE_COL_INDEX = 9
 
     def __init__(self, metadata_model: EzMetadataModel, parent=None):
         QAbstractTableModel.__init__(self, parent)

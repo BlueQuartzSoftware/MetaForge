@@ -16,12 +16,12 @@ class TrashDelegate(QItemDelegate):
 
     def createEditor(self, parent, option, index):
         source_row = (index.model().mapToSource(index)).row()
+
         if source_row >= 0:
             self.pressed.emit(source_row)
 
-
     def paint(self, painter, option, index):
-        icon = QIcon(QPixmap(':/resources/close-pushed@2x.png'))
+        icon = QIcon(QPixmap(':/resources/Images/close-pushed@2x.png'))
         painter.save()
         line_1x = icon.pixmap(16,16)
         painter.drawPixmap(option.rect.x()+option.rect.width()/2 - 8 ,
