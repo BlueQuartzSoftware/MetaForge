@@ -41,7 +41,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_PARSINGMESSAGES_COL_NAME = "Parsing Messages"
     K_PARSINGMESSAGES_COL_INDEX = 5
 
-    K_REMOVE_COL_NAME = "Remove Row"
+    K_REMOVE_COL_NAME = "Remove"
     K_REMOVE_COL_INDEX = 6
 
     def __init__(self, data, parent=None):
@@ -205,7 +205,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 return self.K_HTUNITS_COL_NAME
             elif section == self.K_PARSINGMESSAGES_COL_INDEX:
                 return self.K_PARSINGMESSAGES_COL_NAME
-
+            elif section == self.K_REMOVE_COL_INDEX:
+                return self.K_REMOVE_COL_NAME
         if orientation == Qt.Vertical:
             return "     "
 
