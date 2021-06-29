@@ -10,6 +10,7 @@ from qeztablemodel import QEzTableModel
 from usetablemodel import TableModelU
 from uselistmodel import ListModel
 from treemodel import TreeModel
+from trashdelegate import TrashDelegate
 from qcreateeztablemodel import QCreateEzTableModel
 from quseeztablemodel import QUseEzTableModel
 from usefiledelegate import UseFileDelegate
@@ -111,16 +112,22 @@ class MainWindow(QMainWindow):
         self.ui.dataFileLineEdit.installEventFilter(self)
     
     def setup_create_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
+        self.createtrashDelegate = TrashDelegate()
         self.create_ez_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
         self.create_ez_table_model_proxy = self.init_create_table_model_proxy(self.create_ez_table_model)
         self.ui.metadataTableView.setModel(self.create_ez_table_model_proxy)
         self.filter_create_table()
+        self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_REMOVE_COL_INDEX, self.createtrashDelegate)
+        self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
     
     def setup_use_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
+        self.usetrashDelegate = TrashDelegate()
         self.use_ez_table_model = QEzTableModel(metadata_model, parent=self)
         self.use_ez_table_model_proxy = self.init_use_table_model_proxy(self.use_ez_table_model)
         self.ui.useTemplateTableView.setModel(self.use_ez_table_model_proxy)
         self.filter_use_table()
+        self.ui.useTemplateTableView.setItemDelegateForColumn(self.use_ez_table_model_proxy.K_REMOVE_COL_INDEX, self.usetrashDelegate)
+        self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
 
     def setup_create_ez_tree(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         headers = [self.K_CREATE_TREE_HEADER]
@@ -251,19 +258,29 @@ class MainWindow(QMainWindow):
         self.ui.hyperThoughtUploadPath.setText(remoteDirPath)
         self.toggleButtons()
 
-    def handleRemoveCreate(self):
-        proxy_selected_rows = reversed(self.ui.metadataTableView.selectionModel().selectedRows())
-        source_row = -1
-        for index in proxy_selected_rows:
-            source_row = (index.model().mapToSource(index)).row()
+    def handleRemoveCreate(self, source_row = -1):
+        if source_row != -1:
             entry = self.create_ez_table_model.metadata_model.entry(source_row)
-            # Remove Custom Entries from the mode or just mark FILE sources as disabled.
             if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
                 self.create_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
                 self.create_ez_table_model.metadata_model.remove_by_index(source_row)
                 self.create_ez_table_model.endRemoveRows()
             elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
                 self.treeModel.changeLeafCheck(entry.source_path)
+        else:
+
+            proxy_selected_rows = reversed(self.ui.metadataTableView.selectionModel().selectedRows())
+            source_row = -1
+            for index in proxy_selected_rows:
+                source_row = (index.model().mapToSource(index)).row()
+                entry = self.create_ez_table_model.metadata_model.entry(source_row)
+                # Remove Custom Entries from the mode or just mark FILE sources as disabled.
+                if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                    self.create_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
+                    self.create_ez_table_model.metadata_model.remove_by_index(source_row)
+                    self.create_ez_table_model.endRemoveRows()
+                elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
+                    self.treeModel.changeLeafCheck(entry.source_path)
         
         self.create_ez_table_model_proxy.invalidate()
         index0 = self.create_ez_table_model.index(0, 0)
@@ -276,11 +293,9 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.update()
         # End stupid macOS Catalina workaround.
 
-    def handleRemoveUse(self, source):
-        proxy_selected_rows = reversed(self.ui.useTemplateTableView.selectionModel().selectedRows())
-        source_row = -1
-        for index in proxy_selected_rows:
-            source_row = (index.model().mapToSource(index)).row()
+    def handleRemoveUse(self, source_row = -1):
+        print("got to remove handleRemoveUse", source_row)
+        if source_row != -1:
             entry = self.use_ez_table_model.metadata_model.entry(source_row)
             if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
                 self.use_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
@@ -288,6 +303,18 @@ class MainWindow(QMainWindow):
                 self.use_ez_table_model.endRemoveRows()
             elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
                 entry.enabled = False
+        else:
+            proxy_selected_rows = reversed(self.ui.useTemplateTableView.selectionModel().selectedRows())
+            source_row = -1
+            for index in proxy_selected_rows:
+                source_row = (index.model().mapToSource(index)).row()
+                entry = self.use_ez_table_model.metadata_model.entry(source_row)
+                if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                    self.use_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
+                    self.use_ez_table_model.metadata_model.remove_by_index(source_row)
+                    self.use_ez_table_model.endRemoveRows()
+                elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
+                    entry.enabled = False
         
         self.use_ez_table_model_proxy.invalidate()
         index0 = self.use_ez_table_model_proxy.index(0, 0)

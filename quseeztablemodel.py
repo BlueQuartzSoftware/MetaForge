@@ -11,7 +11,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
     in this section. This will make it easier to move columns around and rename items.
     """
     # Total Number of Columns
-    K_COL_COUNT = 6
+    K_COL_COUNT = 7
 
     # These are some misc strings that are used.
     K_SOURCE_NOT_LOADED = "--SOURCE NOT LOADED--"
@@ -40,6 +40,9 @@ class QUseEzTableModel(QSortFilterProxyModel):
 
     K_PARSINGMESSAGES_COL_NAME = "Parsing Messages"
     K_PARSINGMESSAGES_COL_INDEX = 5
+
+    K_REMOVE_COL_NAME = "Remove Row"
+    K_REMOVE_COL_INDEX = 6
 
     def __init__(self, data, parent=None):
         QSortFilterProxyModel.__init__(self, parent)
@@ -228,6 +231,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
             return self._get_htunits_flags(metadata_entry)
         elif index.column() == self.K_PARSINGMESSAGES_COL_INDEX:
             return self._get_parsingmessages_flags(metadata_entry)
+        elif index.column() == self.K_REMOVE_COL_INDEX:
+            return self._get_removecolumn_flags(metadata_entry)
         else:
             return self._get_default_flags()
 
@@ -270,6 +275,9 @@ class QUseEzTableModel(QSortFilterProxyModel):
     
     def _get_parsingmessages_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+
+    def _get_removecolumn_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
+        return self._get_default_flags() | Qt.ItemIsEditable
     
     def _get_default_flags(self):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
