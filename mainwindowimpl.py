@@ -564,7 +564,6 @@ class MainWindow(QMainWindow):
 
     def toggleButtons(self):
         if (self.ui.hyperthoughtTemplateLineEdit.text() != "" and
-            self.ui.otherDataFileLineEdit.text() != "" and
             self.ui.useTemplateListView.model().rowCount() > 0 and
                 self.ui.hyperThoughtUploadPath.text() != ""):
 
