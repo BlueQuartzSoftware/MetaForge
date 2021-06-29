@@ -46,7 +46,7 @@ class QEzTableModel(QAbstractTableModel):
     K_EDITABLE_COL_NAME = "Editable"
     K_EDITABLE_COL_INDEX = 8
 
-    K_REMOVE_COL_NAME = "Remove Row"
+    K_REMOVE_COL_NAME = "Remove"
     K_REMOVE_COL_INDEX = 9
 
     def __init__(self, metadata_model: EzMetadataModel, parent=None):
@@ -186,6 +186,8 @@ class QEzTableModel(QAbstractTableModel):
                 return self.K_HTANNOTATION_COL_NAME
             elif section == self.K_HTUNITS_COL_INDEX:
                 return self.K_HTUNITS_COL_NAME
+            elif section == self.K_REMOVE_COL_INDEX:
+                return self.K_REMOVE_COL_NAME
             return None
         if orientation == Qt.Vertical:
             return "    "
