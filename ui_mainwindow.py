@@ -199,7 +199,7 @@ class Ui_MainWindow(object):
         self.metadataTableView.setSortingEnabled(True)
         self.metadataTableView.setCornerButtonEnabled(False)
         self.metadataTableView.horizontalHeader().setStretchLastSection(True)
-        self.metadataTableView.verticalHeader().setVisible(True)
+        self.metadataTableView.verticalHeader().setVisible(False)
         self.metadataTableView.verticalHeader().setMinimumSectionSize(15)
 
         self.gridLayout.addWidget(self.metadataTableView, 1, 1, 1, 1)
@@ -235,6 +235,11 @@ class Ui_MainWindow(object):
         self.horizontalLayout_10 = QHBoxLayout(self.widget_2)
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.horizontalLayout_10.setContentsMargins(4, 4, 4, 4)
+        self.clearCreateButton = QPushButton(self.widget_2)
+        self.clearCreateButton.setObjectName(u"clearCreateButton")
+
+        self.horizontalLayout_10.addWidget(self.clearCreateButton)
+
         self.horizontalSpacer_5 = QSpacerItem(1227, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_10.addItem(self.horizontalSpacer_5)
@@ -495,13 +500,18 @@ class Ui_MainWindow(object):
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.gridLayout_2.addItem(self.horizontalSpacer_3, 0, 0, 1, 1)
+        self.gridLayout_2.addItem(self.horizontalSpacer_3, 0, 1, 1, 1)
 
         self.hyperthoughtUploadButton = QPushButton(self.UseTemplateTab)
         self.hyperthoughtUploadButton.setObjectName(u"hyperthoughtUploadButton")
         self.hyperthoughtUploadButton.setEnabled(False)
 
-        self.gridLayout_2.addWidget(self.hyperthoughtUploadButton, 0, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.hyperthoughtUploadButton, 0, 2, 1, 1)
+
+        self.clearUseButton = QPushButton(self.UseTemplateTab)
+        self.clearUseButton.setObjectName(u"clearUseButton")
+
+        self.gridLayout_2.addWidget(self.clearUseButton, 0, 0, 1, 1)
 
 
         self.gridLayout_3.addLayout(self.gridLayout_2, 2, 0, 1, 1)
@@ -513,7 +523,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1328, 24))
+        self.menubar.setGeometry(QRect(0, 0, 1328, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuOpen_Recent = QMenu(self.menuFile)
@@ -540,7 +550,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(0)
+        self.TabWidget.setCurrentIndex(1)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -597,6 +607,7 @@ class Ui_MainWindow(object):
         self.removeCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Remove Value", None))
         self.createTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.createTemplateTreeSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
+        self.clearCreateButton.setText(QCoreApplication.translate("MainWindow", u"Clear", None))
         self.saveTemplateButton.setText(QCoreApplication.translate("MainWindow", u"Save Template as ...", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.CreateTemplateTab), QCoreApplication.translate("MainWindow", u"Create Template", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Files to be Uploaded:", None))
@@ -635,6 +646,7 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.hyperthoughtLocationButton.setText(QCoreApplication.translate("MainWindow", u"Select Remote Folder", None))
         self.hyperthoughtUploadButton.setText(QCoreApplication.translate("MainWindow", u"Upload Files", None))
+        self.clearUseButton.setText(QCoreApplication.translate("MainWindow", u"Clear", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.UseTemplateTab), QCoreApplication.translate("MainWindow", u"Use Template", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuOpen_Recent.setTitle(QCoreApplication.translate("MainWindow", u"Open Recent", None))
