@@ -65,6 +65,7 @@ if __name__ == "__main__":
     app.setApplicationDisplayName("MetaForge")
     app.setOrganizationName("BlueQuartz Software")
     app.setWindowIcon(QIcon(':/resources/Images/applicationIcon.png'))
+    app.setApplicationVersion("1.0.0")
 
     # helper = MetaForgeHelper(app)
     # helper.initFonts()
