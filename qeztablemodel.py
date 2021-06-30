@@ -201,9 +201,9 @@ class QEzTableModel(QAbstractTableModel):
         if index.column() == self.K_SORT_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         elif index.column() == self.K_SOURCE_COL_INDEX:
-            return Qt.ItemIsEnabled
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif index.column() == self.K_SOURCEVAL_COL_INDEX:
-            return Qt.ItemIsEnabled
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif index.column() == self.K_HTNAME_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         elif index.column() == self.K_HTVALUE_COL_INDEX:
@@ -213,24 +213,24 @@ class QEzTableModel(QAbstractTableModel):
                 if metadata_entry.override_source_value is True:
                     return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
                 else:
-                    return Qt.ItemIsEnabled
+                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif index.column() == self.K_HTANNOTATION_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         elif index.column() == self.K_HTUNITS_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
             if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
-                return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
+                return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable
             elif metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                return Qt.ItemIsEnabled
+                return Qt.ItemIsEnabled | Qt.ItemIsSelectable
             else:
-                return Qt.ItemIsEnabled
+                return Qt.ItemIsEnabled | Qt.ItemIsSelectable
         elif index.column() == self.K_EDITABLE_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
+            return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable
         elif index.column() == self.K_REMOVE_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         else:
-            return Qt.ItemIsEnabled
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def addRow(self, dataDict, source, value):
         pass

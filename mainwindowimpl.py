@@ -312,7 +312,6 @@ class MainWindow(QMainWindow):
         # End stupid macOS Catalina workaround.
 
     def handleRemoveUse(self, source_row = -1):
-        print("got to remove handleRemoveUse", source_row)
         if source_row != -1:
             entry = self.use_ez_table_model.metadata_model.entry(source_row)
             if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
