@@ -20,7 +20,7 @@ project(MetaForge VERSION 1.0.0 LANGUAGES NONE)
 find_program(RCC_EXE NAMES pyside2-rcc DOC "Pyside2 RCC Executable")
 find_program(UIC_EXE NAMES pyside2-uic DOC "Pyside2 UIC Executable")
 
-set(UI_FILES mainwindow hyperthoughtdialog newfolderdialog)
+set(UI_FILES mainwindow hyperthoughtdialog newfolderdialog aboutdialog)
   
 foreach(ui ${UI_FILES})
   add_custom_target(${ui}_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/${ui}.ui -o ${MetaForge_SOURCE_DIR}/ui_${ui}.py)
@@ -30,6 +30,7 @@ endforeach()
 # add_custom_target(MainWindow_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/mainwindow.ui -o ${MetaForge_SOURCE_DIR}/mainwindow_ui.py)
 # add_custom_target(HyperThoughtDialog_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/hyperthoughtdialog.ui -o ${MetaForge_SOURCE_DIR}/hyperthoughtdialog.py)
 # add_custom_target(NewFolderDialog_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/newfolderdialog.ui  -o ${MetaForge_SOURCE_DIR}/newfolderdialog.py)
+# add_custom_target(AboutDialog_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/aboutdialog.ui  -o ${MetaForge_SOURCE_DIR}/aboutdialog.py)
 
 
 add_custom_target(Resources_RCC ALL COMMAND "${RCC_EXE}" ${MetaForge_SOURCE_DIR}/resources.qrc  -o ${MetaForge_SOURCE_DIR}/resources_rc.py)

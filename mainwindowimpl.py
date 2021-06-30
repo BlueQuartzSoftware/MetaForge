@@ -6,6 +6,7 @@ from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyMode
 from PySide2.QtGui import QCursor, QDesktopServices
 from ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
+from aboutdialogimpl import AboutDialogImpl
 from qeztablemodel import QEzTableModel
 from usetablemodel import TableModelU
 from uselistmodel import ListModel
@@ -51,6 +52,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.ui.TabWidget.setCurrentWidget(self.ui.CreateTemplateTab)
         self.ui.actionHelp.triggered.connect(self.help)
+        self.ui.actionAbout.triggered.connect(self.displayAbout)
         self.ui.actionOpenPackage.triggered.connect(self.openPackage)
         self.ui.actionSave_Package.triggered.connect(self.savePackage)
         self.ui.actionClose.triggered.connect(self.close)
@@ -265,6 +267,10 @@ class MainWindow(QMainWindow):
             Qt.CaseInsensitive)
         self.createTreeSearchFilterModel.setFilterWildcard(
             "*"+self.ui.createTemplateTreeSearchBar.text()+"*")
+
+    def displayAbout(self):
+        aboutDialog = AboutDialogImpl(self)
+        aboutDialog.exec()
 
 
     def getLocation(self):

@@ -50,6 +50,8 @@ class Ui_MainWindow(object):
         self.actionPackages.setObjectName(u"actionPackages")
         self.actionPackages.setCheckable(True)
         self.actionPackages.setChecked(True)
+        self.actionAbout = QAction(MainWindow)
+        self.actionAbout.setObjectName(u"actionAbout")
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
         self.gridLayout_4 = QGridLayout(self.centralwidget)
@@ -513,7 +515,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1328, 24))
+        self.menubar.setGeometry(QRect(0, 0, 1328, 22))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuOpen_Recent = QMenu(self.menuFile)
@@ -537,6 +539,7 @@ class Ui_MainWindow(object):
         self.menuFile.addSeparator()
         self.menuFile.addAction(self.actionClose)
         self.menuHelp.addAction(self.actionHelp)
+        self.menuHelp.addAction(self.actionAbout)
 
         self.retranslateUi(MainWindow)
 
@@ -573,6 +576,7 @@ class Ui_MainWindow(object):
         self.actionOpen_Template.setShortcut(QCoreApplication.translate("MainWindow", u"Ctrl+O", None))
 #endif // QT_CONFIG(shortcut)
         self.actionPackages.setText(QCoreApplication.translate("MainWindow", u"Packages", None))
+        self.actionAbout.setText(QCoreApplication.translate("MainWindow", u"About", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Data File:", None))
         self.dataFileLineEdit.setText("")
 #if QT_CONFIG(tooltip)
