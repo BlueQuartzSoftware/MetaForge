@@ -52,23 +52,23 @@ def dict_to_ht_metadata(metadata_dict):
     metadataJson = []
     for i in range(len(metadata_dict)):
         if metadata_dict[i]['Default'] == 2:
-            metadataJson.append({ 'keyName': metadata_dict[i]['Key'], 'value': {'type': 'string', 'link': metadata_dict[i]['Value']}, 'unit': metadata_dict[i]['Units'], 'annotation': metadata_dict[i]['Annotation']})
+            ht_entry = _create_ht_entry(metadata_dict[i]['Key'],
+                                        metadata_dict[i]['Value'],
+                                        metadata_dict[i]['Units'],
+                                        metadata_dict[i]['Annotation'])
+            metadataJson.append(ht_entry)
         elif metadata_dict[i]['Default'] == 0:
-            metadataJson.append(
-                { 'keyName': metadata_dict[i]['Key'], 
-                   'value': 
-                   {
-                        'type': 'string', 
-                        'link': metadata_dict[i]['HT Value']
-                   }, 
-                   'unit': metadata_dict[i]['Units'], 
-                   'annotation': metadata_dict[i]['Annotation']
-                }
-                )
+            ht_entry = _create_ht_entry(metadata_dict[i]['Key'],
+                                        metadata_dict[i]['HT Value'],
+                                        metadata_dict[i]['Units'],
+                                        metadata_dict[i]['Annotation'])
+            metadataJson.append(ht_entry)
     return metadataJson
 
 
-def ezmodel_to_ht_metadata(model: EzMetadataModel, missing_entries: List[EzMetadataEntry]):
+def ezmodel_to_ht_metadata(model: EzMetadataModel,
+                           missing_entries: List[EzMetadataEntry],
+                           metadata_file_chosen: bool):
     """
 
     """
@@ -76,17 +76,31 @@ def ezmodel_to_ht_metadata(model: EzMetadataModel, missing_entries: List[EzMetad
     metadataJson = []
     entries = model.entries
     for e in entries:
-        if e.enabled and (e not in missing_entries or e.override_source_value is True):
-            metadataJson.append(
-                {"keyName": e.ht_name,
-                    "value":
-                    {
-                        "type": "string",
-                        "link": e.ht_value
-                    },
-                    "unit": e.ht_units,
-                    "annotation": e.ht_annotation
-                }
-            )
+        if e.enabled:
+            if e.source_type is EzMetadataEntry.SourceType.FILE:
+                if e.override_source_value is True:
+                    ht_entry = _create_ht_entry(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
+                    metadataJson.append(ht_entry)
+                elif e not in missing_entries:
+                    if metadata_file_chosen is True:
+                        ht_entry = _create_ht_entry(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
+                    else:
+                        ht_entry = _create_ht_entry(e.ht_name, e.source_value, e.ht_units, e.ht_annotation)
+                    metadataJson.append(ht_entry)
+            elif e.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                ht_entry = _create_ht_entry(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
+                metadataJson.append(ht_entry)
     return metadataJson
+
+def _create_ht_entry(ht_name: str, ht_value: str, ht_units: str, ht_annotation: str):
+    return {
+                "keyName": ht_name,
+                "value":
+                        {
+                            "type": "string",
+                            "link": ht_value
+                        },
+                "unit": ht_units,
+                "annotation": ht_annotation
+            }
 

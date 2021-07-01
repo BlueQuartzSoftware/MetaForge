@@ -14,13 +14,15 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_COL_COUNT = 7
 
     # These are some misc strings that are used.
-    K_SOURCE_NOT_LOADED = "--SOURCE NOT LOADED--"
-    K_OVERRIDDEN = 'Value overridden from source'
-    K_MISSING = "Missing from data file"
+    K_OVERRIDDEN_MSG = 'Data file value overridden'
+    K_MISSING_MSG = "Missing from data file"
+    K_FROMTEMPLATE_MSG = "Using value from template file"
+    K_FROMFILE_MSG = "Using data file value"
 
     # Row colors
     K_MISSING_ENTRY_COLOR = QColor(255, 190, 194)
     K_OVERRIDDEN_ENTRY_COLOR = QColor(253, 255, 190)
+    K_TEMPLATEFILE_ENTRY_COLOR = QColor(253, 255, 190)
 
     # These are the user facing header and the index of each column in the table.
     K_SOURCE_COL_NAME = "Source"
@@ -118,9 +120,9 @@ class QUseEzTableModel(QSortFilterProxyModel):
         if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
             if metadata_entry.override_source_value is False:
                 if metadata_entry in self.missing_entries:
-                    return None
+                    return ""
                 elif self.metadata_file_chosen is False:
-                    return self.K_SOURCE_NOT_LOADED
+                    return metadata_entry.source_value
         return metadata_entry.ht_value
 
     def _get_htannotation_data(self, metadata_entry: EzMetadataEntry) -> str:
@@ -132,16 +134,24 @@ class QUseEzTableModel(QSortFilterProxyModel):
     def _get_parsingmessages_data(self, metadata_entry: EzMetadataEntry) -> str:
         if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
             if metadata_entry.override_source_value is True:
-                return self.K_OVERRIDDEN
+                return self.K_OVERRIDDEN_MSG
             elif metadata_entry in self.missing_entries:
-                return self.K_MISSING
+                return self.K_MISSING_MSG
+            elif self.metadata_file_chosen is False:
+                return self.K_FROMTEMPLATE_MSG
+            else:
+                return self.K_FROMFILE_MSG
         return None
     
     def _get_background_color_data(self, metadata_entry: EzMetadataEntry) -> QColor:
-        if metadata_entry.override_source_value is True:
-            return self.K_OVERRIDDEN_ENTRY_COLOR
-        elif metadata_entry in self.missing_entries:
-            return self.K_MISSING_ENTRY_COLOR
+        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+            if metadata_entry.override_source_value is True:
+                return self.K_OVERRIDDEN_ENTRY_COLOR
+            elif metadata_entry in self.missing_entries:
+                return self.K_MISSING_ENTRY_COLOR
+            elif self.metadata_file_chosen is False:
+                return self.K_TEMPLATEFILE_ENTRY_COLOR
+
         return None
     
     def _get_font_data(self, index: QModelIndex) -> QFont:

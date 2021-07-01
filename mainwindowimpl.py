@@ -482,15 +482,19 @@ class MainWindow(QMainWindow):
             
             # Copy template file to package
             template_file_path = self.ui.hyperthoughtTemplateLineEdit.text()
-            template_file_name = template_file_path.split("/")[-1]
-            new_template_file_path = os.path.join(pkgpath, template_file_name)
-            QFile.copy(template_file_path, new_template_file_path)
+            new_template_file_path = ""
+            if template_file_path != "":
+                template_file_name = template_file_path.split("/")[-1]
+                new_template_file_path = os.path.join(pkgpath, template_file_name)
+                QFile.copy(template_file_path, new_template_file_path)
 
             # Copy "file to extract metadata from" to package
             extraction_file_path = self.ui.otherDataFileLineEdit.text()
-            extraction_file_name = extraction_file_path.split("/")[-1]
-            new_extraction_file_path = os.path.join(pkgpath, extraction_file_name)
-            QFile.copy(extraction_file_path, new_extraction_file_path)
+            new_extraction_file_path = ""
+            if extraction_file_path != "":
+                extraction_file_name = extraction_file_path.split("/")[-1]
+                new_extraction_file_path = os.path.join(pkgpath, extraction_file_name)
+                QFile.copy(extraction_file_path, new_extraction_file_path)
 
             # Save model, file list, template file, file_to_extract,
             # metadata_file_chosen, and missing_entries to json file
@@ -642,7 +646,9 @@ class MainWindow(QMainWindow):
     def uploadToHyperthought(self):
         auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)
 
-        metadataJson = ht_utilities.ezmodel_to_ht_metadata(self.use_ez_table_model.metadata_model, self.use_ez_table_model_proxy.missing_entries)
+        metadataJson = ht_utilities.ezmodel_to_ht_metadata(self.use_ez_table_model.metadata_model,
+                                                           self.use_ez_table_model_proxy.missing_entries,
+                                                           self.use_ez_table_model_proxy.metadata_file_chosen)
         progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(
             self.uselistmodel.metadataList), self)
 
