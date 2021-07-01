@@ -86,13 +86,12 @@ class Ui_HyperthoughtDialog(object):
         self.gridLayout_2.setContentsMargins(-1, 0, 0, 0)
         self.horizontalLayout_5 = QHBoxLayout()
         self.horizontalLayout_5.setObjectName(u"horizontalLayout_5")
-        self.parentDirectoryButton = QToolButton(HyperthoughtDialog)
+        self.parentDirectoryButton = QPushButton(HyperthoughtDialog)
         self.parentDirectoryButton.setObjectName(u"parentDirectoryButton")
         icon = QIcon()
         icon.addFile(u":/resources/Images/arrow-top.png", QSize(), QIcon.Normal, QIcon.Off)
         self.parentDirectoryButton.setIcon(icon)
         self.parentDirectoryButton.setIconSize(QSize(16, 16))
-        self.parentDirectoryButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
         self.horizontalLayout_5.addWidget(self.parentDirectoryButton)
 
@@ -111,13 +110,12 @@ class Ui_HyperthoughtDialog(object):
 
         self.horizontalLayout_5.addItem(self.horizontalSpacer_2)
 
-        self.newFolderButton = QToolButton(HyperthoughtDialog)
+        self.newFolderButton = QPushButton(HyperthoughtDialog)
         self.newFolderButton.setObjectName(u"newFolderButton")
         icon1 = QIcon()
         icon1.addFile(u":/resources/Images/folder@2x.png", QSize(), QIcon.Normal, QIcon.Off)
         self.newFolderButton.setIcon(icon1)
         self.newFolderButton.setIconSize(QSize(16, 16))
-        self.newFolderButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
 
         self.horizontalLayout_5.addWidget(self.newFolderButton)
 
