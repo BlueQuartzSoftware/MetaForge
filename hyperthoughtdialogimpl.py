@@ -71,9 +71,9 @@ class HyperthoughtDialogImpl(QDialog):
         mimeData = clipboard.mimeData()
         if mimeData.hasText():
             self.ui.apiKeyLineEdit.setText(mimeData.text())
-            self.ui.apiKeyLineEdit.setVisible(False)
-            self.ui.apiKeyLineEdit.setVisible(True)
-            self.ui.apiKeyLineEdit.update()    
+            # self.ui.apiKeyLineEdit.setVisible(False)
+            # self.ui.apiKeyLineEdit.setVisible(True)
+            # self.ui.apiKeyLineEdit.update()    
 
     def updateBreadCrumbLabel(self):
         path = "/"
@@ -81,9 +81,9 @@ class HyperthoughtDialogImpl(QDialog):
             path = path + p + "/"
 
         self.ui.breadcrumbLabel.setText(path)
-        self.ui.breadcrumbLabel.setVisible(False)
-        self.ui.breadcrumbLabel.setVisible(True)
-        self.ui.breadcrumbLabel.update()        
+        # self.ui.breadcrumbLabel.setVisible(False)
+        # self.ui.breadcrumbLabel.setVisible(True)
+        # self.ui.breadcrumbLabel.update()        
     
     def htPathFromBreadCrumbs(self) -> str:
         path = "/"

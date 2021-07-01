@@ -67,9 +67,13 @@ if __name__ == "__main__":
     app.setWindowIcon(QIcon(':/resources/Images/applicationIcon.png'))
     app.setApplicationVersion("1.0.0 RC-6")
 
-    # helper = MetaForgeHelper(app)
-    # helper.initFonts()
-    # helper.initStyleSheet()
+if platform.system() == 'Darwin':
+    v, _, _ = platform.mac_ver()
+    v = float('.'.join(v.split('.')[:2]))
+    if v >= 10.0 and v < 11.0:
+        helper = MetaForgeHelper(app)
+        helper.initFonts()
+        helper.initStyleSheet()
 
     window = MainWindow()
     window.show()

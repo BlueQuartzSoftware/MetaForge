@@ -327,13 +327,8 @@ class MainWindow(QMainWindow):
         self.create_ez_table_model_proxy.invalidate()
         index0 = self.create_ez_table_model.index(0, 0)
         index1 = self.create_ez_table_model.index(self.create_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
-        self.create_ez_table_model.dataChanged.emit(index0, index1)
-        # This toggle is for macOS Catalina to actual visually show the updated checkboxes.
-        self.ui.metadataTreeView.setVisible(False)
-        self.ui.metadataTreeView.setVisible(True)
-        self.ui.metadataTreeView.update()
-        self.ui.metadataTableView.update()
-        # End stupid macOS Catalina workaround.
+        self.create_ez_table_model_proxy.dataChanged.emit(index0, index1)
+
 
     def handleRemoveUse(self, source_row = -1):
         if source_row != -1:
@@ -395,7 +390,6 @@ class MainWindow(QMainWindow):
                 # Load template file
                 template_file_path = model_dict[self.K_TEMPLATEFILE_KEY_NAME]
                 self.ui.hyperthoughtTemplateLineEdit.setText(template_file_path)
-                self.ui.displayedFileLabel.setText(os.path.basename(template_file_path))
 
                 # Load file to extract metadata from
                 extraction_file_path = model_dict[self.K_FILETOEXTRACT_KEY_NAME]
@@ -579,7 +573,6 @@ class MainWindow(QMainWindow):
         metadata_model = EzMetadataModel.from_json_file(templateFilePath)
         self.setup_use_ez_table(metadata_model)
         self.currentTemplate = templateFilePath.split("/")[-1]
-        self.ui.displayedFileLabel.setText(templateFilePath.split("/")[-1])
         self.updateUseTableModel()
         self.polish_use_ez_table()
 
@@ -631,9 +624,9 @@ class MainWindow(QMainWindow):
         self.use_ez_table_model_proxy.missing_entries = self.use_ez_table_model.metadata_model.update_model_values_from_dict(headerDict)
         self.use_ez_table_model_proxy.metadata_file_chosen = True
 
-        index0 = self.use_ez_table_model.index(0, 0)
-        index1 = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
-        self.use_ez_table_model.dataChanged.emit(index0, index1)
+        index0 = self.use_ez_table_model_proxy.index(0, 0)
+        index1 = self.use_ez_table_model_proxy.index(self.use_ez_table_model_proxy.rowCount() - 1, QUseEzTableModel.K_COL_COUNT)
+        self.use_ez_table_model_proxy.dataChanged.emit(index0, index1)
 
     def toggleButtons(self):
         if (self.ui.hyperthoughtTemplateLineEdit.text() != "" and
