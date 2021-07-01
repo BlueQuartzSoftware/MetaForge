@@ -86,7 +86,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
         src_index = self.mapToSource(index)
         metadata_entry: EzMetadataEntry = src_model.metadata_model.entry(src_index.row())
 
-        if role == Qt.DisplayRole or role == Qt.EditRole:
+        if role == Qt.DisplayRole or role == Qt.EditRole or role == Qt.ToolTipRole:
             if index.column() == self.K_HTNAME_COL_INDEX:
                 return self._get_htname_data(metadata_entry)
             elif index.column() == self.K_SOURCE_COL_INDEX:

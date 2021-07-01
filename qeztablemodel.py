@@ -67,7 +67,7 @@ class QEzTableModel(QAbstractTableModel):
 
         metadata_entry: EzMetadataEntry = self.metadata_model.entry(index.row())
 
-        if role == Qt.DisplayRole or role == Qt.EditRole:
+        if role == Qt.DisplayRole or role == Qt.EditRole or role == Qt.ToolTipRole:
             if index.column() == self.K_SORT_COL_INDEX:
                 return index.row() + 1
             elif index.column() == self.K_HTNAME_COL_INDEX:
@@ -112,6 +112,8 @@ class QEzTableModel(QAbstractTableModel):
                 italic_font = QFont()
                 italic_font.setItalic(True)
                 return italic_font
+
+
         return None
     
     def setData(self, index, value, role):
