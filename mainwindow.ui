@@ -39,7 +39,7 @@
     <item row="0" column="1">
      <widget class="QTabWidget" name="TabWidget">
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="CreateTemplateTab">
        <attribute name="title">
@@ -308,7 +308,7 @@
              <bool>true</bool>
             </attribute>
             <attribute name="verticalHeaderVisible">
-             <bool>true</bool>
+             <bool>false</bool>
             </attribute>
             <attribute name="verticalHeaderMinimumSectionSize">
              <number>15</number>
@@ -383,6 +383,16 @@
                <number>4</number>
               </property>
               <item>
+               <widget class="QPushButton" name="clearCreateButton">
+                <property name="toolTip">
+                 <string>Reset all 'Create Template' input fields. All fields will be reset to an empty state.</string>
+                </property>
+                <property name="text">
+                 <string>Reset All Fields</string>
+                </property>
+               </widget>
+              </item>
+              <item>
                <spacer name="horizontalSpacer_5">
                 <property name="orientation">
                  <enum>Qt::Horizontal</enum>
@@ -397,8 +407,17 @@
               </item>
               <item>
                <widget class="QPushButton" name="saveTemplateButton">
+                <property name="toolTip">
+                 <string>Save Values to a .ez template file. You can also use standard 'Save' Shortcut key</string>
+                </property>
                 <property name="text">
                  <string>Save Template as ...</string>
+                </property>
+                <property name="default">
+                 <bool>false</bool>
+                </property>
+                <property name="flat">
+                 <bool>false</bool>
                 </property>
                </widget>
               </item>
@@ -836,6 +855,19 @@
             </property>
            </widget>
           </item>
+          <item>
+           <widget class="QPushButton" name="hyperthoughtUploadButton">
+            <property name="enabled">
+             <bool>false</bool>
+            </property>
+            <property name="toolTip">
+             <string>Upload all files to the HyperThought server</string>
+            </property>
+            <property name="text">
+             <string>Upload Files</string>
+            </property>
+           </widget>
+          </item>
          </layout>
         </item>
         <item row="2" column="0">
@@ -843,7 +875,7 @@
           <property name="spacing">
            <number>6</number>
           </property>
-          <item row="0" column="0">
+          <item row="0" column="1">
            <spacer name="horizontalSpacer_3">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -856,13 +888,13 @@
             </property>
            </spacer>
           </item>
-          <item row="0" column="1">
-           <widget class="QPushButton" name="hyperthoughtUploadButton">
-            <property name="enabled">
-             <bool>false</bool>
+          <item row="0" column="0">
+           <widget class="QPushButton" name="clearUseButton">
+            <property name="toolTip">
+             <string>Reset all 'Create Template' input fields. All fields will be reset to an empty state.</string>
             </property>
             <property name="text">
-             <string>Upload Files</string>
+             <string>Reset All Fields</string>
             </property>
            </widget>
           </item>

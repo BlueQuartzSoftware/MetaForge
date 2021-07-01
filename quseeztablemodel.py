@@ -92,7 +92,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
             elif index.column() == self.K_SOURCE_COL_INDEX:
                 return self._get_source_data(metadata_entry)
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                return self._get_htvalue_data(metadata_entry)
+                return str(self._get_htvalue_data(metadata_entry))
             elif index.column() == self.K_HTANNOTATION_COL_INDEX:
                 return self._get_htannotation_data(metadata_entry)
             elif index.column() == self.K_HTUNITS_COL_INDEX:

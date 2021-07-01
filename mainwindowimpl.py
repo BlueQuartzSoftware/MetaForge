@@ -64,6 +64,8 @@ class MainWindow(QMainWindow):
         self.ui.otherDataFileSelect.clicked.connect(self.loadOtherDataFile)
         self.ui.hyperthoughtUploadButton.clicked.connect(
             self.uploadToHyperthought)
+        self.ui.clearCreateButton.clicked.connect(self.clearCreate)
+        self.ui.clearUseButton.clicked.connect(self.clearUse)
         self.setAcceptDrops(True)
         self.numCustoms = 0
         self.editableKeys = []
@@ -173,6 +175,23 @@ class MainWindow(QMainWindow):
 
         self.ui.useTemplateListView.clicked.connect(
             self.removeRowfromUsefileType)
+
+    def clearCreate(self):
+        self.ui.dataFileLineEdit.setText("")
+        self.ui.dataTypeText.setText("None Selected")
+        self.ui.createTemplateListSearchBar.setText("")
+        self.ui.createTemplateTreeSearchBar.setText("")
+        self.setup_create_ez_table()
+        self.setup_create_ez_tree()
+
+    def clearUse(self):
+        self.ui.hyperthoughtTemplateLineEdit.setText("")
+        self.ui.otherDataFileLineEdit.setText("")
+        self.ui.useTemplateListSearchBar.setText("")
+        self.ui.displayedFileLabel.setText("No File Selected")
+        self.ui.addMetadataFileCheckBox.setChecked(True)
+        self.setup_use_ez_table()
+        self.clearUploadFiles()
 
     def read_window_settings(self):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())

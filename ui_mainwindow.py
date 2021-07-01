@@ -201,7 +201,7 @@ class Ui_MainWindow(object):
         self.metadataTableView.setSortingEnabled(True)
         self.metadataTableView.setCornerButtonEnabled(False)
         self.metadataTableView.horizontalHeader().setStretchLastSection(True)
-        self.metadataTableView.verticalHeader().setVisible(True)
+        self.metadataTableView.verticalHeader().setVisible(False)
         self.metadataTableView.verticalHeader().setMinimumSectionSize(15)
 
         self.gridLayout.addWidget(self.metadataTableView, 1, 1, 1, 1)
@@ -237,12 +237,18 @@ class Ui_MainWindow(object):
         self.horizontalLayout_10 = QHBoxLayout(self.widget_2)
         self.horizontalLayout_10.setObjectName(u"horizontalLayout_10")
         self.horizontalLayout_10.setContentsMargins(4, 4, 4, 4)
+        self.clearCreateButton = QPushButton(self.widget_2)
+        self.clearCreateButton.setObjectName(u"clearCreateButton")
+
+        self.horizontalLayout_10.addWidget(self.clearCreateButton)
+
         self.horizontalSpacer_5 = QSpacerItem(1227, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_10.addItem(self.horizontalSpacer_5)
 
         self.saveTemplateButton = QPushButton(self.widget_2)
         self.saveTemplateButton.setObjectName(u"saveTemplateButton")
+        self.saveTemplateButton.setFlat(False)
 
         self.horizontalLayout_10.addWidget(self.saveTemplateButton)
 
@@ -489,6 +495,12 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_7.addWidget(self.hyperthoughtLocationButton)
 
+        self.hyperthoughtUploadButton = QPushButton(self.UseTemplateTab)
+        self.hyperthoughtUploadButton.setObjectName(u"hyperthoughtUploadButton")
+        self.hyperthoughtUploadButton.setEnabled(False)
+
+        self.horizontalLayout_7.addWidget(self.hyperthoughtUploadButton)
+
 
         self.gridLayout_3.addLayout(self.horizontalLayout_7, 1, 0, 1, 1)
 
@@ -497,13 +509,12 @@ class Ui_MainWindow(object):
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
-        self.gridLayout_2.addItem(self.horizontalSpacer_3, 0, 0, 1, 1)
+        self.gridLayout_2.addItem(self.horizontalSpacer_3, 0, 1, 1, 1)
 
-        self.hyperthoughtUploadButton = QPushButton(self.UseTemplateTab)
-        self.hyperthoughtUploadButton.setObjectName(u"hyperthoughtUploadButton")
-        self.hyperthoughtUploadButton.setEnabled(False)
+        self.clearUseButton = QPushButton(self.UseTemplateTab)
+        self.clearUseButton.setObjectName(u"clearUseButton")
 
-        self.gridLayout_2.addWidget(self.hyperthoughtUploadButton, 0, 1, 1, 1)
+        self.gridLayout_2.addWidget(self.clearUseButton, 0, 0, 1, 1)
 
 
         self.gridLayout_3.addLayout(self.gridLayout_2, 2, 0, 1, 1)
@@ -543,7 +554,8 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(0)
+        self.TabWidget.setCurrentIndex(1)
+        self.saveTemplateButton.setDefault(False)
 
 
         QMetaObject.connectSlotsByName(MainWindow)
@@ -601,6 +613,13 @@ class Ui_MainWindow(object):
         self.removeCreateTableRowButton.setText(QCoreApplication.translate("MainWindow", u"Remove Value", None))
         self.createTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
         self.createTemplateTreeSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Type to search for key", None))
+#if QT_CONFIG(tooltip)
+        self.clearCreateButton.setToolTip(QCoreApplication.translate("MainWindow", u"Reset all 'Create Template' input fields. All fields will be reset to an empty state.", None))
+#endif // QT_CONFIG(tooltip)
+        self.clearCreateButton.setText(QCoreApplication.translate("MainWindow", u"Reset All Fields", None))
+#if QT_CONFIG(tooltip)
+        self.saveTemplateButton.setToolTip(QCoreApplication.translate("MainWindow", u"Save Values to a .ez template file. You can also use standard 'Save' Shortcut key", None))
+#endif // QT_CONFIG(tooltip)
         self.saveTemplateButton.setText(QCoreApplication.translate("MainWindow", u"Save Template as ...", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.CreateTemplateTab), QCoreApplication.translate("MainWindow", u"Create Template", None))
         self.label.setText(QCoreApplication.translate("MainWindow", u"Files to be Uploaded:", None))
@@ -638,7 +657,14 @@ class Ui_MainWindow(object):
         self.hyperthoughtLocationButton.setToolTip(QCoreApplication.translate("MainWindow", u"Allows user to set their API key from HyperThought and set a remote location on the HyperThought server to upload the data files", None))
 #endif // QT_CONFIG(tooltip)
         self.hyperthoughtLocationButton.setText(QCoreApplication.translate("MainWindow", u"Select Remote Folder", None))
+#if QT_CONFIG(tooltip)
+        self.hyperthoughtUploadButton.setToolTip(QCoreApplication.translate("MainWindow", u"Upload all files to the HyperThought server", None))
+#endif // QT_CONFIG(tooltip)
         self.hyperthoughtUploadButton.setText(QCoreApplication.translate("MainWindow", u"Upload Files", None))
+#if QT_CONFIG(tooltip)
+        self.clearUseButton.setToolTip(QCoreApplication.translate("MainWindow", u"Reset all 'Create Template' input fields. All fields will be reset to an empty state.", None))
+#endif // QT_CONFIG(tooltip)
+        self.clearUseButton.setText(QCoreApplication.translate("MainWindow", u"Reset All Fields", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.UseTemplateTab), QCoreApplication.translate("MainWindow", u"Use Template", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuOpen_Recent.setTitle(QCoreApplication.translate("MainWindow", u"Open Recent", None))
