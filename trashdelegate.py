@@ -21,6 +21,7 @@ class TrashDelegate(QItemDelegate):
             self.pressed.emit(source_row)
 
     def paint(self, painter, option, index):
+        super().paint(painter, option, index)
         icon = QIcon(QPixmap(':/resources/Images/close-pushed@2x.png'))
         painter.save()
         line_1x = icon.pixmap(16,16)
