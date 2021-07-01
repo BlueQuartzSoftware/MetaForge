@@ -225,6 +225,7 @@ class Ui_MainWindow(object):
         sizePolicy3.setHeightForWidth(self.metadataTableView.sizePolicy().hasHeightForWidth())
         self.metadataTableView.setSizePolicy(sizePolicy3)
         self.metadataTableView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
+        self.metadataTableView.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.metadataTableView.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
         self.metadataTableView.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked)
         self.metadataTableView.setProperty("showDropIndicator", False)
