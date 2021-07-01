@@ -495,12 +495,6 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_7.addWidget(self.hyperthoughtLocationButton)
 
-        self.hyperthoughtUploadButton = QPushButton(self.UseTemplateTab)
-        self.hyperthoughtUploadButton.setObjectName(u"hyperthoughtUploadButton")
-        self.hyperthoughtUploadButton.setEnabled(False)
-
-        self.horizontalLayout_7.addWidget(self.hyperthoughtUploadButton)
-
 
         self.gridLayout_3.addLayout(self.horizontalLayout_7, 1, 0, 1, 1)
 
@@ -516,6 +510,12 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addWidget(self.clearUseButton, 0, 0, 1, 1)
 
+        self.hyperthoughtUploadButton = QPushButton(self.UseTemplateTab)
+        self.hyperthoughtUploadButton.setObjectName(u"hyperthoughtUploadButton")
+        self.hyperthoughtUploadButton.setEnabled(False)
+
+        self.gridLayout_2.addWidget(self.hyperthoughtUploadButton, 0, 2, 1, 1)
+
 
         self.gridLayout_3.addLayout(self.gridLayout_2, 2, 0, 1, 1)
 
@@ -526,7 +526,7 @@ class Ui_MainWindow(object):
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1328, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1328, 24))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuOpen_Recent = QMenu(self.menuFile)
@@ -658,13 +658,13 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.hyperthoughtLocationButton.setText(QCoreApplication.translate("MainWindow", u"Select Remote Folder", None))
 #if QT_CONFIG(tooltip)
-        self.hyperthoughtUploadButton.setToolTip(QCoreApplication.translate("MainWindow", u"Upload all files to the HyperThought server", None))
-#endif // QT_CONFIG(tooltip)
-        self.hyperthoughtUploadButton.setText(QCoreApplication.translate("MainWindow", u"Upload Files", None))
-#if QT_CONFIG(tooltip)
         self.clearUseButton.setToolTip(QCoreApplication.translate("MainWindow", u"Reset all 'Create Template' input fields. All fields will be reset to an empty state.", None))
 #endif // QT_CONFIG(tooltip)
         self.clearUseButton.setText(QCoreApplication.translate("MainWindow", u"Reset All Fields", None))
+#if QT_CONFIG(tooltip)
+        self.hyperthoughtUploadButton.setToolTip(QCoreApplication.translate("MainWindow", u"Upload all files to the HyperThought server", None))
+#endif // QT_CONFIG(tooltip)
+        self.hyperthoughtUploadButton.setText(QCoreApplication.translate("MainWindow", u"Upload Files", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.UseTemplateTab), QCoreApplication.translate("MainWindow", u"Use Template", None))
         self.menuFile.setTitle(QCoreApplication.translate("MainWindow", u"File", None))
         self.menuOpen_Recent.setTitle(QCoreApplication.translate("MainWindow", u"Open Recent", None))
