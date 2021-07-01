@@ -830,6 +830,31 @@
            </widget>
           </item>
           <item>
+           <widget class="QLabel" name="label_7">
+            <property name="font">
+             <font>
+              <weight>75</weight>
+              <bold>true</bold>
+             </font>
+            </property>
+            <property name="text">
+             <string>Expires:</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="QLabel" name="hyperThoughtExpiresIn">
+            <property name="font">
+             <font>
+              <italic>true</italic>
+             </font>
+            </property>
+            <property name="text">
+             <string>Not Authenticated</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <spacer name="horizontalSpacer_6">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>

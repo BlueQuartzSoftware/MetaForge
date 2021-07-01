@@ -1,14 +1,13 @@
 # This Python file uses the following encoding: utf-8
 
 from ezmodel.ezmetadataentry import EzMetadataEntry
-from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QHeaderView, QToolButton, QStyle, QProgressDialog, QMessageBox
+from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QProgressDialog, QDialog
 from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSettings
 from PySide2.QtGui import QCursor, QDesktopServices
 from ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
 from aboutdialogimpl import AboutDialogImpl
 from qeztablemodel import QEzTableModel
-from usetablemodel import TableModelU
 from uselistmodel import ListModel
 from treemodel import TreeModel
 from trashdelegate import TrashDelegate
@@ -66,6 +65,7 @@ class MainWindow(QMainWindow):
             self.uploadToHyperthought)
         self.ui.clearCreateButton.clicked.connect(self.clearCreate)
         self.ui.clearUseButton.clicked.connect(self.clearUse)
+        self.hyperthoughtui.currentTokenExpired.connect(lambda:  self.ui.hyperThoughtExpiresIn.setText(self.hyperthoughtui.K_EXPIRED_STR))
         self.setAcceptDrops(True)
         self.numCustoms = 0
         self.editableKeys = []
@@ -111,7 +111,6 @@ class MainWindow(QMainWindow):
 
         self.createUpload.connect(self.uploader.performUpload)
         self.hyperthoughtui.apiSubmitted.connect(self.acceptKey)
-        self.hyperthoughtui.finished.connect(self.getLocation)
         self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
         self.ui.otherDataFileLineEdit.installEventFilter(self)
         self.ui.dataFileLineEdit.installEventFilter(self)
@@ -668,13 +667,15 @@ class MainWindow(QMainWindow):
         progress.exec()
 
     def authenticateToHyperThought(self):
-        self.hyperthoughtui.exec()
-
-        htUrl = self.hyperthoughtui.ui.ht_server_url.text()
-        if htUrl == "":
-            self.ui.hyperThoughtServer.setText("https://hyperthought.url")
-        else:
-            self.ui.hyperThoughtServer.setText(htUrl)
-            self.ui.hyperThoughtProject.setText(self.hyperthoughtui.current_project["content"]["title"])
-            self.ui.hyperThoughtUploadPath.setText(self.hyperthoughtui.getUploadDirectory())
+        ret = self.hyperthoughtui.exec()
+        if ret == int(QDialog.Accepted):
+            self.getLocation()
+            htUrl = self.hyperthoughtui.ui.ht_server_url.text()
+            if htUrl == "":
+                self.ui.hyperThoughtServer.setText("https://hyperthought.url")
+            else:
+                self.ui.hyperThoughtServer.setText(htUrl)
+                self.ui.hyperThoughtProject.setText(self.hyperthoughtui.current_project["content"]["title"])
+                self.ui.hyperThoughtUploadPath.setText(self.hyperthoughtui.getUploadDirectory())
+                self.ui.hyperThoughtExpiresIn.setText(self.hyperthoughtui.authcontrol.expires_at)
 
