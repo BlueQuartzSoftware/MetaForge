@@ -203,7 +203,7 @@ class Ui_MainWindow(object):
         sizePolicy2.setHeightForWidth(self.metadataTreeView.sizePolicy().hasHeightForWidth())
         self.metadataTreeView.setSizePolicy(sizePolicy2)
         self.metadataTreeView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
-        self.metadataTreeView.setAlternatingRowColors(False)
+        self.metadataTreeView.setAlternatingRowColors(True)
 
         self.gridLayout_9.addWidget(self.metadataTreeView, 1, 0, 1, 1)
 
@@ -229,8 +229,9 @@ class Ui_MainWindow(object):
         self.metadataTableView.setEditTriggers(QAbstractItemView.AnyKeyPressed|QAbstractItemView.DoubleClicked)
         self.metadataTableView.setProperty("showDropIndicator", False)
         self.metadataTableView.setDragDropOverwriteMode(False)
-        self.metadataTableView.setAlternatingRowColors(False)
+        self.metadataTableView.setAlternatingRowColors(True)
         self.metadataTableView.setSelectionBehavior(QAbstractItemView.SelectItems)
+        self.metadataTableView.setShowGrid(False)
         self.metadataTableView.setSortingEnabled(True)
         self.metadataTableView.setCornerButtonEnabled(False)
         self.metadataTableView.horizontalHeader().setStretchLastSection(True)
@@ -336,7 +337,7 @@ class Ui_MainWindow(object):
         self.useTemplateListView.setAcceptDrops(True)
         self.useTemplateListView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.useTemplateListView.setEditTriggers(QAbstractItemView.NoEditTriggers)
-        self.useTemplateListView.setAlternatingRowColors(False)
+        self.useTemplateListView.setAlternatingRowColors(True)
 
         self.gridLayout_10.addWidget(self.useTemplateListView, 1, 0, 1, 3)
 
@@ -425,9 +426,9 @@ class Ui_MainWindow(object):
         self.useTemplateTableView = QTableView(self.use_frame_2)
         self.useTemplateTableView.setObjectName(u"useTemplateTableView")
         self.useTemplateTableView.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
-        self.useTemplateTableView.setAlternatingRowColors(False)
+        self.useTemplateTableView.setAlternatingRowColors(True)
         self.useTemplateTableView.setSelectionBehavior(QAbstractItemView.SelectItems)
-        self.useTemplateTableView.setShowGrid(True)
+        self.useTemplateTableView.setShowGrid(False)
         self.useTemplateTableView.setGridStyle(Qt.SolidLine)
         self.useTemplateTableView.setSortingEnabled(True)
         self.useTemplateTableView.setCornerButtonEnabled(False)
@@ -435,17 +436,6 @@ class Ui_MainWindow(object):
         self.useTemplateTableView.verticalHeader().setMinimumSectionSize(15)
 
         self.gridLayout_6.addWidget(self.useTemplateTableView, 1, 0, 1, 4)
-
-        self.useTemplateListSearchBar = QLineEdit(self.use_frame_2)
-        self.useTemplateListSearchBar.setObjectName(u"useTemplateListSearchBar")
-        sizePolicy8 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        sizePolicy8.setHorizontalStretch(0)
-        sizePolicy8.setVerticalStretch(0)
-        sizePolicy8.setHeightForWidth(self.useTemplateListSearchBar.sizePolicy().hasHeightForWidth())
-        self.useTemplateListSearchBar.setSizePolicy(sizePolicy8)
-        self.useTemplateListSearchBar.setReadOnly(False)
-
-        self.gridLayout_6.addWidget(self.useTemplateListSearchBar, 0, 1, 1, 3)
 
         self.use_label_3 = QLabel(self.use_frame_2)
         self.use_label_3.setObjectName(u"use_label_3")
@@ -473,6 +463,17 @@ class Ui_MainWindow(object):
         self.appendUseTableRowButton.setMaximumSize(QSize(40, 16777215))
 
         self.gridLayout_6.addWidget(self.appendUseTableRowButton, 2, 2, 1, 1)
+
+        self.useTemplateListSearchBar = QLineEdit(self.use_frame_2)
+        self.useTemplateListSearchBar.setObjectName(u"useTemplateListSearchBar")
+        sizePolicy8 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy8.setHorizontalStretch(2)
+        sizePolicy8.setVerticalStretch(0)
+        sizePolicy8.setHeightForWidth(self.useTemplateListSearchBar.sizePolicy().hasHeightForWidth())
+        self.useTemplateListSearchBar.setSizePolicy(sizePolicy8)
+        self.useTemplateListSearchBar.setReadOnly(False)
+
+        self.gridLayout_6.addWidget(self.useTemplateListSearchBar, 0, 1, 1, 3)
 
 
         self.verticalLayout.addWidget(self.use_frame_2)
@@ -557,12 +558,12 @@ class Ui_MainWindow(object):
 
         self.TabWidget.addTab(self.UseTemplateTab, "")
 
-        self.gridLayout_4.addWidget(self.TabWidget, 1, 1, 1, 1)
+        self.gridLayout_4.addWidget(self.TabWidget, 0, 1, 1, 1)
 
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 1606, 22))
+        self.menubar.setGeometry(QRect(0, 0, 1606, 24))
         self.menuFile = QMenu(self.menubar)
         self.menuFile.setObjectName(u"menuFile")
         self.menuOpen_Recent = QMenu(self.menuFile)
@@ -675,7 +676,6 @@ class Ui_MainWindow(object):
 #endif // QT_CONFIG(tooltip)
         self.hyperthoughtTemplateSelect.setText(QCoreApplication.translate("MainWindow", u"Select", None))
         self.addMetadataFileCheckBox.setText(QCoreApplication.translate("MainWindow", u"Add Extracted Metadata File To File List", None))
-        self.useTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search table using wildcard (*.*)", None))
         self.use_label_3.setText(QCoreApplication.translate("MainWindow", u"Search Table", None))
 #if QT_CONFIG(tooltip)
         self.removeUseTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Removes the selected rows from the table", None))
@@ -685,6 +685,7 @@ class Ui_MainWindow(object):
         self.appendUseTableRowButton.setToolTip(QCoreApplication.translate("MainWindow", u"Add a Custom Value that is only going to be used for this upload", None))
 #endif // QT_CONFIG(tooltip)
         self.appendUseTableRowButton.setText("")
+        self.useTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search table using wildcard (*.*)", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"Project Directory Path:", None))
         self.label_4.setText(QCoreApplication.translate("MainWindow", u"Project:", None))
         self.hyperThoughtProject.setText(QCoreApplication.translate("MainWindow", u"Project Not Selected", None))
