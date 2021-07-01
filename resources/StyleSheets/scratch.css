@@ -1,0 +1,433 @@
+
+QWidget:item:hover
+{
+    background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ffa02f, stop: 1 #ca0619);
+}
+
+QWidget:item:selected
+{
+    /* background-color: QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, 
+                        stop: 0 #ffa02f, stop: 1 #1e1e1e); */
+}
+
+
+/* ----------------------------------------------------------------------------
+* QRadioButton Parameter Widgets
+* ----------------------------------------------------------------------------*/
+QRadioButton
+{
+    font-family: "Lato";
+    color: #F6F6F6;
+}
+QRadioButton:hover
+{
+    color: #F6F6F6;
+}
+
+QRadioButton:checked
+{
+    color: #21b1f8;
+}
+
+QRadioButton::indicator:checked, 
+QRadioButton::indicator:unchecked
+{
+    color: #b1b1b1;
+    background-color: #1e1e1e;
+    border: 1px solid #b1b1b1;
+    border-radius: 5px;
+}
+
+QRadioButton::indicator:checked
+{
+    background-color: qradialgradient(
+        cx: 0.5, cy: 0.5,
+        fx: 0.5, fy: 0.5,
+        radius: 1.0,
+        stop: 0.25 #21b1f8,
+        stop: 0.3 #333333
+    );
+}
+
+QRadioButton::indicator
+{
+    border-radius: 3px;
+}
+
+QRadioButton::indicator:hover
+{
+    border: 1px solid #21b1f8;
+}
+QRadioButton::indicator:disabled
+{
+    border: 1px solid #444;
+}
+
+
+/* ----------------------------------------------------------------------------
+* QtSSplitter Section
+* ----------------------------------------------------------------------------*/
+QtSSplitter 
+{
+    /* border: 1px solid #333333; */
+    padding: 0px;
+}
+
+/* ----------------------------------------------------------------------------
+* QGroupBox Section
+* ----------------------------------------------------------------------------*/
+QGroupBox::title
+{
+    font-family: "Lato";
+    /* height: 185px; */
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 0px;
+}
+
+QGroupBox
+{
+    font-family: "Lato";
+    font-size: 16pt;
+    color: #21b1f8;
+}
+
+QGroupBox:focus
+{
+    border: 2px solid QLinearGradient( x1: 0, y1: 0, x2: 0, y2: 1, stop: 0 #ffa02f, stop: 1 #1e1e1e);
+}
+
+/* ----------------------------------------------------------------------------
+* QDockWidget Section
+* ----------------------------------------------------------------------------*/
+/* For the QDockWidget border style, see QMainWindow::separator */
+QDockWidget 
+{
+    border: 1px solid  #333333;
+    font-family: "Lato";
+    font-size: 13pt;
+    font-weight: bold;
+    color: #21b1f8;
+    titlebar-close-icon: url(resources/images/widgets/close-normal.png);
+    titlebar-normal-icon: url(resources/images/widgets/minimize-normal.png);
+}
+
+QDockWidget::title
+{
+    background: #333333;
+    color: rgb(255, 255, 255);
+    padding: 5px;
+}
+QDockWidget::close-button
+{
+    subcontrol-position: top right;
+    subcontrol-origin: margin;
+    position: absolute;
+    top: 2px; right: 8px; bottom: 0px;
+    width: 20px;
+    height: 20px;
+}
+QDockWidget::float-button 
+{
+    subcontrol-position: top right;
+    subcontrol-origin: margin;
+    position: absolute;
+    top: 2px; right: 30px; bottom: 0px;
+    width: 20px;
+    height: 20px;
+}
+QDockWidget::close-button:pressed, 
+QDockWidget::float-button:pressed
+{
+    padding: 1px -1px -1px 1px;
+}
+
+/* ----------------------------------------------------------------------------
+* QMainWindow Section
+* ----------------------------------------------------------------------------*/
+/* This is a bizzare one. The separator is the border that
+   is drawn around the QDockWidgets */
+QMainWindow::separator 
+{
+    background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 #161616, stop: 0.5 #151515, stop: 0.6 #212121, stop:1 #343434);
+    color: white;
+    padding-left: 4px;
+    border: 1px solid #4c4c4c;
+    spacing: 3px; /* spacing between items in the tool bar */
+}
+
+QMainWindow::separator:hover
+{
+    background-color: QLinearGradient(x1:0, y1:0, x2:0, y2:1, stop:0 #1e1e1e, stop:0.5 #b56c17 stop:1 #ffa02f);
+    color: white;
+    padding-left: 4px;
+    border: 1px solid #6c6c6c;
+    spacing: 3px; /* spacing between items in the tool bar */
+}
+
+
+
+SVListView,
+QListWidget,
+SVListWidget
+{
+    font-family: "Lato";
+    font-size: 13pt;
+    background: #1e1e1e;
+    outline: none;  /* removes the "focus rect" */
+    border: 1px solid #b1b1b1;
+}
+
+
+/* ----------------------------------------------------------------------------
+* QProgressBar Section
+* ----------------------------------------------------------------------------*/
+QProgressBar
+{
+    border: 1px solid grey;
+    border-radius: 0px;
+    text-align: center;
+    color: black;
+}
+
+QProgressBar::chunk
+{
+    background-color: #21b1f8;
+    color: white;
+}
+
+/* ----------------------------------------------------------------------------
+* QMessageBox Section
+* ----------------------------------------------------------------------------*/
+QMessageBox
+{
+    font-family: "Lato";
+    background-color: #2e2e2e;
+    color: white;
+}
+
+/* This is needed for the QMessageBox which takes QAbstractButton instances */
+QMessageBox > QPushButton
+{
+    border-width: 1px;
+    border-color: #b1b1b1;
+    border-style: solid;
+    border-radius: 5px;
+    /* font-family: "Lato";
+    font-size: 10pt; */
+    min-height: 24px;
+    /* min-width: 240px; */
+    padding: 0 7 0 7;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #fbfeff, stop:1 #eaf8ff);
+}
+
+
+/* ----------------------------------------------------------------------------
+* QToolButton Section
+* ----------------------------------------------------------------------------*/
+.QToolButton { 
+    color: #F6F6F6;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #808080, stop:1 #505050);
+    border: 1px solid #ACACAC;
+    border-radius: 5;
+    font-family: "Lato";
+    font-size: 12pt;
+    padding: 3 8 3 8;
+}
+
+
+
+/* ----------------------------------------------------------------------------
+* QStatusBar Section
+* ----------------------------------------------------------------------------*/
+QStatusBar {
+    background-color: #333333;
+    border: 1px solid #333333;
+    min-height: 26px;
+    color: #b1b1b1;
+}
+
+
+/* ----------------------------------------------------------------------------
+* QTableWidget Section
+* ----------------------------------------------------------------------------*/
+
+/* See QHeaderView on how to style the QTableWidget header */
+QTableWidget
+{
+    font-family: "Lato";
+    color: #b1b1b1;
+    font-size: 12pt;
+    background: #333333;
+    outline: none;  /* removes the "focus rect" */
+    border: 1px solid #444444;
+}
+
+QTableWidget::item:selected 
+{
+    background:  #444444;
+    color: #21b1f8;
+}
+
+QTableWidget::item 
+{
+   /* padding-bottom: 2px;
+   padding-top: 2px;
+   border-top-color: transparent;
+   border-bottom-color: transparent;
+   border: 1px solid transparent;
+   color: #C0C0C0; */
+}
+QTableWidget::item:hover 
+{
+    background:  #444444;
+    border: 0px;
+    color: #21b1f8;
+}
+
+QTableWidget::item:selected:hover 
+{
+    background:  #444444;
+    color: #21b1f8;
+}
+
+
+
+/* ----------------------------------------------------------------------------
+* QTextEdit Section
+* ----------------------------------------------------------------------------*/
+QTextEdit
+{
+    background-color: #2e2e2e;
+    color: #079cdf;
+}
+
+QTextEdit:focus
+{
+    /* border: 1px solid #1e1e1e;
+    background-color: #3F3F3F; */
+}
+
+QTextEdit:disabled
+{
+    color: #079cdf;
+    background-color: rgb(64,64,64);
+}
+
+QPlainTextEdit
+{
+
+}
+
+
+/* ----------------------------------------------------------------------------
+* QSpinBox Section
+* ----------------------------------------------------------------------------*/
+QAbstractSpinBox
+{
+    font-family: "Lato";
+    color: #c9c8c7;
+    border: 1px solid #444444;
+    background-color: #1e1e1e;
+    selection-color: white;
+    selection-background-color: #21b1f8; 
+}
+
+QAbstractSpinBox:focus
+{
+    border: 1px solid #444444;
+    background-color: #252526;
+    color: #21b1f8;
+}
+
+QAbstractSpinBox:disabled
+{
+    color: disabled_text_color;
+    background-color: rgb(64,64,64);
+    border-color: #7f7d79;
+}
+
+QAbstractSpinBox:up-button 
+{
+    background-color: #21b1f8;
+    /* subcontrol-origin: border; */
+    subcontrol-position: top right;
+    border-top-right-radius: 0px;
+    height: 13px;
+    width: 20px;
+    image: url(resources/images/widgets/up_arrow_light.png);
+    top: -2px;
+}
+
+QAbstractSpinBox:up-button:pressed,
+QAbstractSpinBox:down-button:pressed
+{
+    background-color: #1b78a7;
+}
+
+QAbstractSpinBox:down-button 
+{
+    background-color: #21b1f8;
+    /* subcontrol-origin: border;
+    subcontrol-position: bottom right; */
+    border-bottom-right-radius: 0px;
+    height: 13px;
+    width: 20px;
+    image: url(resources/images/widgets/down_arrow_light.png);
+    bottom: -2px; /* fix symetry between up and down images */
+}
+
+QAbstractSpinBox:up-button:disabled,
+QAbstractSpinBox:down-button:disabled 
+{
+    background-color: transparent;
+}
+
+QAbstractSpinBox::up-button:hover 
+{
+    image: url(resources/images/widgets/up_arrow_dark.png);
+}
+
+QAbstractSpinBox::up-button:off 
+{
+    image: url(resources/images/widgets/up_arrow_disabled_dark.png);
+}
+/* 
+QAbstractSpinBox::up-button:disabled {
+    image: none;
+} */
+
+QAbstractSpinBox::down-button:hover 
+{
+    image: url(resources/images/widgets/down_arrow_dark.png);
+}
+
+QAbstractSpinBox::down-button:off 
+{
+    image: url(resources/images/widgets/down_arrow_disabled_dark.png);
+}
+/* 
+QAbstractSpinBox::down-button:disabled 
+{
+    image: none;
+} */
+
+/* ----------------------------------------------------------------------------
+* QToolBar Section
+* ----------------------------------------------------------------------------*/
+QToolBar 
+{
+    font-family: "Lato";
+    spacing: 3px; /* spacing between items in the tool bar */
+    min-height: 40px;
+    /* background-color: #f0f8fd;
+    border-bottom: 1px solid #407795; */
+}
+
+/* does not look good
+QToolButton:hover {
+  color: #FFFFFF;
+  background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #68b6e1, stop:1 #3b7ea4);
+} */
+
+

@@ -11,9 +11,7 @@
         
         <file>resources/Images/folder@2x.png</file>
         <file>resources/Images/folder.png</file>
-        
-        <file>resources/Images/plus@2x.png</file>
-        <file>resources/Images/plus.png</file>
+
             
         <file>resources/Images/delete@2x.png</file>
         <file>resources/Images/delete.png</file>
@@ -26,5 +24,19 @@
     
         <file>resources/Images/key@2x.png</file>
         <file>resources/Images/key.png</file>
+
+        
+        <file>resources/Images/plus@2x.png</file>
+        <file>resources/Images/plus.png</file>
+
+
+        <file>resources/Images/delete-dark.png</file>        
+        <file>resources/Images/plus-dark.png</file> 
+        <file>resources/Images/decrease-normal-dark.png</file>    
+
+        <file>resources/Images/expanded-normal-dark.png</file> 
+        <file>resources/Images/collapsed-normal-dark.png</file>  
+
+
     </qresource>
 </RCC>

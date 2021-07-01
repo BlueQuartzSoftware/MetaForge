@@ -153,7 +153,7 @@
      <item row="0" column="1">
       <layout class="QHBoxLayout" name="horizontalLayout_5">
        <item>
-        <widget class="QToolButton" name="parentDirectoryButton">
+        <widget class="QPushButton" name="parentDirectoryButton">
          <property name="toolTip">
           <string>Move Up a Directory</string>
          </property>
@@ -172,9 +172,6 @@
            <width>16</width>
            <height>16</height>
           </size>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonTextBesideIcon</enum>
          </property>
         </widget>
        </item>
@@ -214,7 +211,7 @@
         </spacer>
        </item>
        <item>
-        <widget class="QToolButton" name="newFolderButton">
+        <widget class="QPushButton" name="newFolderButton">
          <property name="toolTip">
           <string>Create Remote Folder</string>
          </property>
@@ -230,9 +227,6 @@
            <width>16</width>
            <height>16</height>
           </size>
-         </property>
-         <property name="toolButtonStyle">
-          <enum>Qt::ToolButtonTextBesideIcon</enum>
          </property>
         </widget>
        </item>
