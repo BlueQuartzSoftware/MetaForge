@@ -1,6 +1,6 @@
 import os
 
-from PySide2.QtWidgets import QDialog, QMessageBox, QApplication, QStyle, QListView
+from PySide2.QtWidgets import QDialog, QMessageBox, QApplication, QStyle, QListView, QDialogButtonBox
 from PySide2.QtCore import Signal, QStringListModel, Qt, Slot
 from PySide2.QtGui import QClipboard, QGuiApplication
 
@@ -10,6 +10,7 @@ from ht_requests.ht_requests import ht_requests
 from ui_hyperthoughtdialog import Ui_HyperthoughtDialog
 from newfolderdialogimpl import NewFolderDialogImpl
 from htremotefilelistmodel import HTRemoteFileListModel
+from HyperThoughtTokenVerifier import HyperThoughtTokenVerifier
 
 from typing import List
 
@@ -17,6 +18,9 @@ from typing import List
 class HyperthoughtDialogImpl(QDialog):
 
     apiSubmitted = Signal(str)
+    currentTokenExpired = Signal()
+
+    K_EXPIRED_STR = 'Access Token Expired!'
     
     def __init__(self, parent=None):
         super(HyperthoughtDialogImpl, self).__init__(parent)
@@ -32,6 +36,7 @@ class HyperthoughtDialogImpl(QDialog):
         self.remote_file_list_model = HTRemoteFileListModel(self)
         self.newfolderDialog = NewFolderDialogImpl()
         self.init_col_width = False
+        self.tokenverifier = HyperThoughtTokenVerifier()
 
         #Setup Signals/Slots connections
         self.ui.apiKeyButton.clicked.connect(self.acceptApiKey)
@@ -44,6 +49,17 @@ class HyperthoughtDialogImpl(QDialog):
         self.ui.pasteFromClipboardBtn.clicked.connect(self.pasteAPIKey)
         self.ui.projectListView.currentRowChanged.connect(self.projectRowChanged)
         self.setWindowTitle("Authenticate To HyperThought")
+        self.tokenverifier.currentTokenExpired.connect(self.handle_token_expired)
+
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setDisabled(True)
+
+    @Slot()    
+    def handle_token_expired(self):
+        self.ui.token_expiration.setText(self.K_EXPIRED_STR)
+        self.ui.projectListView.setDisabled(True)
+        self.ui.folderListView.setDisabled(True)
+        self.ui.buttonBox.button(QDialogButtonBox.Ok).setDisabled(True)
+        self.currentTokenExpired.emit()
 
     @Slot()    
     def clearLocationLineEdit(self):
@@ -89,6 +105,10 @@ class HyperthoughtDialogImpl(QDialog):
             self.ui.token_expiration.setText(self.authcontrol.expires_at)
             self.project_dict = ht_requests.list_projects(self.authcontrol)
             self.ui.projectListView.clear()
+            self.tokenverifier.setExpireTime(self.authcontrol.expires_in)
+            self.ui.projectListView.setEnabled(True)
+            self.ui.folderListView.setEnabled(True)
+            self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
             for project in self.project_dict:
                 self.ui.projectListView.addItem(project["content"]["title"])
             self.setWindowTitle("Authenticated to: " + self.authcontrol.base_url + " with User: " + self.authcontrol.get_username())

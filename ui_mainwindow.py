@@ -485,6 +485,18 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout_7.addWidget(self.hyperThoughtUploadPath)
 
+        self.label_7 = QLabel(self.UseTemplateTab)
+        self.label_7.setObjectName(u"label_7")
+        self.label_7.setFont(font)
+
+        self.horizontalLayout_7.addWidget(self.label_7)
+
+        self.hyperThoughtExpiresIn = QLabel(self.UseTemplateTab)
+        self.hyperThoughtExpiresIn.setObjectName(u"hyperThoughtExpiresIn")
+        self.hyperThoughtExpiresIn.setFont(font1)
+
+        self.horizontalLayout_7.addWidget(self.hyperThoughtExpiresIn)
+
         self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.horizontalLayout_7.addItem(self.horizontalSpacer_6)
@@ -653,6 +665,8 @@ class Ui_MainWindow(object):
         self.hyperThoughtProject.setText(QCoreApplication.translate("MainWindow", u"Project Not Selected", None))
         self.label_5.setText(QCoreApplication.translate("MainWindow", u"Project Directory Path:", None))
         self.hyperThoughtUploadPath.setText(QCoreApplication.translate("MainWindow", u"Folder Not Selected", None))
+        self.label_7.setText(QCoreApplication.translate("MainWindow", u"Expires:", None))
+        self.hyperThoughtExpiresIn.setText(QCoreApplication.translate("MainWindow", u"Not Authenticated", None))
 #if QT_CONFIG(tooltip)
         self.hyperthoughtLocationButton.setToolTip(QCoreApplication.translate("MainWindow", u"Allows user to set their API key from HyperThought and set a remote location on the HyperThought server to upload the data files", None))
 #endif // QT_CONFIG(tooltip)

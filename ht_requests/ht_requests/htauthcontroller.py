@@ -34,6 +34,7 @@ class HTAuthorizationController:
         self.refresh_token = access_obj['refreshToken']
         self.client_id = access_obj['clientId']
         self.expires_at = access_obj['expiresAt']
+        self.expires_in = access_obj['expiresIn']
 
     def get_auth_header(self):
         """Get the authorization header to use with HyperThought API calls.
