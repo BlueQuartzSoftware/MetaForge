@@ -4,7 +4,7 @@ from ezmodel.ezmetadataentry import EzMetadataEntry
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QProgressDialog, QDialog
 from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSettings
 from PySide2.QtGui import QCursor, QDesktopServices
-from ui_mainwindow import Ui_MainWindow
+from generated.ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
 from aboutdialogimpl import AboutDialogImpl
 from qeztablemodel import QEzTableModel

@@ -14,7 +14,7 @@
    <string/>
   </property>
   <property name="windowIcon">
-   <iconset resource="resources.qrc">
+   <iconset>
     <normaloff>:/resources/Images/applicationIcon.png</normaloff>:/resources/Images/applicationIcon.png</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
@@ -36,13 +36,13 @@
       </size>
      </property>
      <property name="frameShape">
-      <enum>QFrame::Panel</enum>
+      <enum>QFrame::NoFrame</enum>
      </property>
      <property name="text">
       <string/>
      </property>
      <property name="pixmap">
-      <pixmap resource="resources.qrc">:/resources/Images/applicationIcon.png</pixmap>
+      <pixmap resource="resources.qrc">:/resources/Images/MetaForge.icns</pixmap>
      </property>
      <property name="scaledContents">
       <bool>true</bool>

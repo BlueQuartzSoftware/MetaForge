@@ -14,7 +14,7 @@ from PySide2.QtWidgets import *
 
 from ht_widgets.deselectable_table_view import DeselectableTableView
 
-import resources_rc
+from  . import resources_rc
 
 class Ui_HyperthoughtDialog(object):
     def setupUi(self, HyperthoughtDialog):

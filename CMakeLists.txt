@@ -23,7 +23,7 @@ find_program(UIC_EXE NAMES pyside2-uic DOC "Pyside2 UIC Executable")
 set(UI_FILES mainwindow hyperthoughtdialog newfolderdialog aboutdialog)
   
 foreach(ui ${UI_FILES})
-  add_custom_target(${ui}_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/${ui}.ui -o ${MetaForge_SOURCE_DIR}/ui_${ui}.py)
+  add_custom_target(${ui}_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/${ui}.ui --from-imports  -o ${MetaForge_SOURCE_DIR}/generated/ui_${ui}.py)
 endforeach()
 
 
@@ -33,4 +33,4 @@ endforeach()
 # add_custom_target(AboutDialog_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/aboutdialog.ui  -o ${MetaForge_SOURCE_DIR}/aboutdialog.py)
 
 
-add_custom_target(Resources_RCC ALL COMMAND "${RCC_EXE}" ${MetaForge_SOURCE_DIR}/resources.qrc  -o ${MetaForge_SOURCE_DIR}/resources_rc.py)
+add_custom_target(Resources_RCC ALL COMMAND "${RCC_EXE}" ${MetaForge_SOURCE_DIR}/resources.qrc  -o ${MetaForge_SOURCE_DIR}/generated/resources_rc.py)

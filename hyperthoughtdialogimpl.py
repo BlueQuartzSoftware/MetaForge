@@ -7,7 +7,7 @@ from PySide2.QtGui import QClipboard, QGuiApplication
 from ht_requests.ht_requests import ht_utilities
 from ht_requests.ht_requests import htauthcontroller
 from ht_requests.ht_requests import ht_requests
-from ui_hyperthoughtdialog import Ui_HyperthoughtDialog
+from generated.ui_hyperthoughtdialog import Ui_HyperthoughtDialog
 from newfolderdialogimpl import NewFolderDialogImpl
 from htremotefilelistmodel import HTRemoteFileListModel
 from HyperThoughtTokenVerifier import HyperThoughtTokenVerifier

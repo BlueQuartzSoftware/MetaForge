@@ -1,7 +1,9 @@
 <!DOCTYPE RCC>
  <RCC version="1.0">
     <qresource>
-        <file>resources/Images/applicationIcon.png</file>
+        <file>resources/Images/MetaForge.png</file>
+        <file>resources/Images/MetaForge.icns</file>
+        <file>resources/Images/MetaForge.ico</file>
 
         <file>resources/Images/close-pushed@2x.png</file>
         <file>resources/Images/close-pushed.png</file>
@@ -37,7 +39,7 @@
         <file>resources/Images/expanded-normal-dark.png</file> 
         <file>resources/Images/collapsed-normal-dark.png</file>  
 
-    <file>resources/Images/widgets/decrease-normal.png</file>
-    <file>resources/Images/widgets/decrease-mouse-over.png</file>
+        <file>resources/Images/widgets/decrease-normal.png</file>
+        <file>resources/Images/widgets/decrease-mouse-over.png</file>
     </qresource>
 </RCC>

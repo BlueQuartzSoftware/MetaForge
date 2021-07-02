@@ -1,5 +1,5 @@
 from PySide2.QtWidgets import QDialog, QApplication
-from ui_aboutdialog import Ui_AboutDialog
+from generated.ui_aboutdialog import Ui_AboutDialog
 
 
 class AboutDialogImpl(QDialog):
@@ -12,7 +12,7 @@ class AboutDialogImpl(QDialog):
         self.ui.ApplicationNameLabel.setText(QApplication.applicationDisplayName() + " " + QApplication.applicationVersion())
 
         detailsText = "\n" + QApplication.organizationName() + "\n"
-        detailsText += "©2022, All Rights Reserved." + "\n"
+        detailsText += "©2021, All Rights Reserved." + "\n"
 
         self.ui.aboutDetailsLabel.setText( detailsText )
 

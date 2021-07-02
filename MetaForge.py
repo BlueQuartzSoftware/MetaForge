@@ -14,9 +14,9 @@ if platform.system() == 'Darwin':
 from PySide2.QtWidgets import QApplication, QWidget, QMainWindow
 from PySide2.QtCore import QFile, QIODevice, QObject, QFileSystemWatcher, Qt, Signal, Slot
 from PySide2.QtGui import QIcon, QFontDatabase
-from ui_mainwindow import Ui_MainWindow
+from generated.ui_mainwindow import Ui_MainWindow
 from mainwindowimpl import MainWindow
-from resources_rc import *
+from generated.resources_rc import *
 
 
 class MetaForgeHelper(QObject):
@@ -65,10 +65,12 @@ if __name__ == "__main__":
     app.setApplicationName("MetaForge")
     app.setApplicationDisplayName("MetaForge")
     app.setOrganizationName("BlueQuartz Software")
-    app.setWindowIcon(QIcon(':/resources/Images/applicationIcon.png'))
-    app.setApplicationVersion("1.0.0 RC-7")
+    app.setApplicationVersion("1.0.0 RC-8")
 
     if platform.system() == 'Darwin':
+        # Set the Application Icon
+        app.setWindowIcon(QIcon(':/resources/Images/MetaForge.icns'))
+
         style_sheet = ""
         # there are 3 choices for StyleSheets. Pick one
         style_sheet = "resources/StyleSheets/light.css"
@@ -78,6 +80,10 @@ if __name__ == "__main__":
         helper.initFonts()
         # IF YOU DO NOT WANT A STYLE SHEET THEN COMMENT OUT THE NEXT LINE
         helper.initStyleSheet()
+    else:
+        # Set the Application Icon
+        app.setWindowIcon(QIcon(':/resources/Images/MetaForge.png'))        
+
 
     window = MainWindow()
     window.show()

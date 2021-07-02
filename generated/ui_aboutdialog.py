@@ -12,7 +12,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
-import resources_rc
+from  . import resources_rc
 
 class Ui_AboutDialog(object):
     def setupUi(self, AboutDialog):
@@ -33,8 +33,8 @@ class Ui_AboutDialog(object):
         sizePolicy.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
         self.label.setSizePolicy(sizePolicy)
         self.label.setMaximumSize(QSize(128, 128))
-        self.label.setFrameShape(QFrame.Panel)
-        self.label.setPixmap(QPixmap(u":/resources/Images/applicationIcon.png"))
+        self.label.setFrameShape(QFrame.NoFrame)
+        self.label.setPixmap(QPixmap(u":/resources/Images/MetaForge.icns"))
         self.label.setScaledContents(True)
         self.label.setAlignment(Qt.AlignHCenter|Qt.AlignTop)
 
