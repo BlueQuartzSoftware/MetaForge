@@ -673,7 +673,10 @@ class MainWindow(QMainWindow):
                 self.ui.hyperThoughtUploadPath.setText(self.hyperthoughtui.getUploadDirectory())
         
         if self.hyperthoughtui.authcontrol is not None:
-            datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%X%z')
+            try:
+                datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%X.%f%z')
+            except ValueError:
+                datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%X%z')
             expires_at = datetime_obj.strftime("%m/%d/%Y %I:%M:%S %p")
             self.ui.hyperThoughtExpiresIn.setText(expires_at)
 
