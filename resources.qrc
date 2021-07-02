@@ -37,6 +37,7 @@
         <file>resources/Images/expanded-normal-dark.png</file> 
         <file>resources/Images/collapsed-normal-dark.png</file>  
 
-
+    <file>resources/Images/widgets/decrease-normal.png</file>
+    <file>resources/Images/widgets/decrease-mouse-over.png</file>
     </qresource>
 </RCC>

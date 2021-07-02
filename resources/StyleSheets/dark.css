@@ -768,14 +768,6 @@ QTabBar::tab:selected
 {
     background-color: #3678E3;
     border-radius: 8px;
-
-    /* border-top: 4px solid rgba(255, 255, 250, 0.9);
-    border-left: 1px solid rgba(255, 255, 250, 0.5);
-    border-right: 1px solid rgba(255, 255, 250, 0.5); */
-    /* border-left: 2px solid #21b1f8;
-    border-right: 2px solid #21b1f8; 
-    border-top-left-radius: 0px;
-    border-top-right-radius: 0px; */
 }
 
 QTabBar::tab:!selected 

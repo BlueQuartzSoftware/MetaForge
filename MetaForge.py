@@ -21,10 +21,11 @@ from resources_rc import *
 
 class MetaForgeHelper(QObject):
 
-    def __init__(self, application: QApplication):
+    def __init__(self, application: QApplication, stylesheet_path: str):
         self.app = application
         self.watcher = QFileSystemWatcher()
-        self.css_file_path = "resources/StyleSheets/dark.css"
+
+        self.css_file_path = stylesheet_path
         self.watcher.addPath(self.css_file_path)
         self.watcher.fileChanged.connect(self.fileChanged)
 
@@ -68,8 +69,14 @@ if __name__ == "__main__":
     app.setApplicationVersion("1.0.0 RC-6")
 
     if platform.system() == 'Darwin':
-        helper = MetaForgeHelper(app)
+        style_sheet = ""
+        # there are 3 choices for StyleSheets. Pick one
+        style_sheet = "resources/StyleSheets/light.css"
+        # style_sheet = "resources/StyleSheets/dark.css"
+        # style_sheet = "resources/StyleSheets/dark_ics.css"
+        helper = MetaForgeHelper(app, style_sheet)
         helper.initFonts()
+        # IF YOU DO NOT WANT A STYLE SHEET THEN COMMENT OUT THE NEXT LINE
         helper.initStyleSheet()
 
     window = MainWindow()

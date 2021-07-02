@@ -1,0 +1,217 @@
+/* ----------------------------------------------------------------------------
+* QSpinBox Section
+* ----------------------------------------------------------------------------*/
+QAbstractSpinBox 
+{
+    font-family: "Lato";
+    color: rgb(0,0,0);
+    border: 1px solid rgb(77,129,191);
+    background-color: rgb(245,245,255);
+    /* selection-color: white;
+    selection-background-color: #f8bf36; */
+}
+
+QAbstractSpinBox:disabled {
+    color: rgb(119,119,118);
+    background-color: rgb(226,226,226);
+    border-color: #7f7d79;
+}
+
+QAbstractSpinBox:up-button {
+    /* background-color: qlineargradient(spread:pad, x1:1, y1:0.8, x2:1, y2:0, stop:0 #f9ca58, stop:1 #fad57a); */
+    background-color:rgb(70,124,214);
+    subcontrol-origin: border;
+    subcontrol-position: top right;
+    border-top-right-radius: 3px;
+    height: 13px;
+    width: 20px;
+}
+
+QAbstractSpinBox:down-button {
+    /* background-color: qlineargradient(spread:pad, x1:1, y1:0.8, x2:1, y2:0, stop:0 #f8bf36, stop:1 #f9ca58); */
+    background-color:rgb(70,124,214);
+    subcontrol-origin: border;
+    subcontrol-position: bottom right;
+    border-bottom-right-radius: 3px;
+    height: 13px;
+    width: 20px;
+}
+
+QAbstractSpinBox:up-button:disabled,
+QAbstractSpinBox:down-button:disabled {
+    background-color: transparent;
+}
+
+QAbstractSpinBox::up-button {
+    image: url(:/DREAM3D/Images/widgets/up_arrow_light.png);
+    top: 0px; /* fix simetry between up and down images */
+}
+
+QAbstractSpinBox::up-button:hover {
+    image: url(:/DREAM3D/Images/widgets/up_arrow_lighter.png);
+}
+
+QAbstractSpinBox::up-button:off {
+    image: url(:/DREAM3D/Images/widgets/up_arrow_disabled_dark.png);
+}
+
+/* QAbstractSpinBox::up-button:disabled {
+    image: none;
+} */
+
+QAbstractSpinBox::down-button {
+    image: url(:/DREAM3D/Images/widgets/down_arrow_light.png);
+    bottom: -2px; /* fix simetry between up and down images */
+}
+QAbstractSpinBox::down-button:hover {
+    image: url(:/DREAM3D/Images/widgets/down_arrow_lighter.png);
+}
+
+QAbstractSpinBox::down-button:off {
+    image: url(:/DREAM3D/Images/widgets/down_arrow_disabled_dark.png);
+}
+
+
+/* ----------------------------------------------------------------------------
+* QTextEdit Section
+* ----------------------------------------------------------------------------*/
+QTextEdit {
+   color: rgb(0,0,0);
+   background: rgb(255,255,255);
+   font-size: 12pt;
+}
+
+
+/* ----------------------------------------------------------------------------
+* QDockWidget Section
+* ----------------------------------------------------------------------------*/
+/* For the QDockWidget border style, see QMainWindow::separator */
+QDockWidget 
+{
+    border: 1px solid  rgb(19,60,109);
+    font-family: "Lato";
+    font-size: 13pt;
+    font-weight: bold;
+    color: rgb(255,255,255);
+    titlebar-close-icon: url(:/DREAM3D/Images/widgets/close-normal.png);
+    titlebar-normal-icon: url(:/DREAM3D/Images/widgets/minimize-normal.png);
+}
+QDockWidget::title 
+{
+    background: rgb(19,60,109);
+    color: rgb(255,255,255);
+    padding: 5px;
+}
+QDockWidget::close-button 
+{
+    subcontrol-position: top right;
+    subcontrol-origin: margin;
+    position: absolute;
+    top: 2px; right: 8px; bottom: 0px;
+    width: 20px;
+    height: 20px;
+}
+QDockWidget::float-button {
+    
+    subcontrol-position: top right;
+    subcontrol-origin: margin;
+    position: absolute;
+    top: 2px; right: 30px; bottom: 0px;
+    width: 20px;
+    height: 20px;
+}
+QDockWidget::close-button:pressed, 
+QDockWidget::float-button:pressed
+{
+    padding: 1px -1px -1px 1px;
+}
+/* These icon settings are ignored....
+QDockWidget::close-button:hover {
+    titlebar-close-icon: url(:/DREAM3D/Images/widgets/close-mouseover.png);
+}
+QDockWidget::close-button:pressed {
+     titlebar-close-icon: url(:/DREAM3D/Images/widgets/close-pushed.png);
+}
+QDockWidget::float-button:hover {
+    titlebar-normal-icon: url(:/DREAM3D/Images/widgets/minimize-mouseover.png);
+}
+QDockWidget::float-button:pressed  {
+     titlebar-normal-icon: url(:/DREAM3D/Images/widgets/minimize-pushed.png);
+} */
+
+
+/* ----------------------------------------------------------------------------
+* QGroupBox Section
+* ----------------------------------------------------------------------------*/
+QGroupBox::title
+{
+    /* height: 185px; */
+    subcontrol-origin: margin;
+    subcontrol-position: top left;
+    padding: 0 0px;
+    background-color: rgb(255,255,255);
+}
+
+QGroupBox
+{
+    font-family: "Lato-Bold";
+    font-weight: bold;
+    font-size: 14pt;
+    background-color: rgb(255,255,255);
+}
+
+
+QTabBar::tab:top:!selected {
+    margin-top: 3px;
+}
+
+QTabBar::tab:bottom:!selected {
+    margin-bottom: 3px;
+}
+
+QTabBar::tab:top, QTabBar::tab:bottom {
+    min-width: 100px;
+    margin-right: -1px;
+    padding: 5px 10px 5px 10px;
+}
+
+QTabBar::tab:top:selected {
+    /* border-bottom-color: none; */
+}
+
+QTabBar::tab:bottom:selected {
+    /* border-top-color: none; */
+}
+
+QTabBar::tab:top:last, QTabBar::tab:bottom:last,
+QTabBar::tab:top:only-one, QTabBar::tab:bottom:only-one {
+    margin-right: 0;
+}
+
+QTabBar::tab:left:!selected {
+    margin-right: 3px;
+}
+
+QTabBar::tab:right:!selected {
+    margin-left: 3px;
+}
+
+QTabBar::tab:left, QTabBar::tab:right {
+    min-height: 15ex;
+    margin-bottom: 0px;
+    padding: 10px 5px 10px 5px;
+}
+
+QTabBar::tab:left:selected {
+    /* border-left-color: none; */
+}
+
+QTabBar::tab:right:selected {
+    /* border-right-color: none; */
+}
+
+QTabBar::tab:left:last, QTabBar::tab:right:last,
+QTabBar::tab:left:only-one, QTabBar::tab:right:only-one {
+    margin-bottom: 0;
+}
+
