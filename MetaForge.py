@@ -65,7 +65,7 @@ if __name__ == "__main__":
     app.setApplicationName("MetaForge")
     app.setApplicationDisplayName("MetaForge")
     app.setOrganizationName("BlueQuartz Software")
-    app.setApplicationVersion("1.0.0 RC-8")
+    app.setApplicationVersion("1.0.0 RC-9")
 
     if platform.system() == 'Darwin':
         # Set the Application Icon

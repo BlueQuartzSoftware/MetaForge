@@ -13,6 +13,7 @@ from htremotefilelistmodel import HTRemoteFileListModel
 from HyperThoughtTokenVerifier import HyperThoughtTokenVerifier
 
 from typing import List
+from datetime import datetime
 
 
 class HyperthoughtDialogImpl(QDialog):
@@ -102,7 +103,9 @@ class HyperthoughtDialogImpl(QDialog):
             self.authcontrol = htauthcontroller.HTAuthorizationController(self.accessKey)
             self.ui.ht_server_url.setText(self.authcontrol.base_url)
             self.ui.ht_username.setText(self.authcontrol.get_username())
-            self.ui.token_expiration.setText(self.authcontrol.expires_at)
+            datetime_obj = datetime.strptime(self.authcontrol.expires_at, '%Y-%m-%dT%X%z')
+            expires_at = datetime_obj.strftime("%m/%d/%Y %I:%M:%S %p")
+            self.ui.token_expiration.setText(expires_at)
             self.project_dict = ht_requests.list_projects(self.authcontrol)
             self.ui.projectListView.clear()
             self.tokenverifier.setExpireTime(self.authcontrol.expires_in)

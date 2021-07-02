@@ -28,6 +28,7 @@ import parsers.ctf as ctf
 import parsers.ang as ang
 import json
 from typing import List
+from datetime import datetime
 
 from ezmodel.ezmetadatamodel import EzMetadataModel
 
@@ -670,5 +671,9 @@ class MainWindow(QMainWindow):
                 self.ui.hyperThoughtServer.setText(htUrl)
                 self.ui.hyperThoughtProject.setText(self.hyperthoughtui.current_project["content"]["title"])
                 self.ui.hyperThoughtUploadPath.setText(self.hyperthoughtui.getUploadDirectory())
-                self.ui.hyperThoughtExpiresIn.setText(self.hyperthoughtui.authcontrol.expires_at)
+        
+        if self.hyperthoughtui.authcontrol is not None:
+            datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%X%z')
+            expires_at = datetime_obj.strftime("%m/%d/%Y %I:%M:%S %p")
+            self.ui.hyperThoughtExpiresIn.setText(expires_at)
 
