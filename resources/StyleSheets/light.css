@@ -27,7 +27,7 @@ QListView {
     color: rgb(0,0,0);
     font-size: 12pt;
     background: rgb(255,255,255);
-    outline: none;  /* removes the "focus rect" */
+    outline: none;  
     border: 0px solid transparent;
 }
 QListView::item {
@@ -275,7 +275,7 @@ QTableView, QTableWidget
     color: white;
     font-size: 12pt;
     background: white;
-    outline: none;  /* removes the "focus rect" */
+    outline: none;  
     border: 1px solid rgb( 68,  89, 100);
 }
 
@@ -482,20 +482,29 @@ QLineEdit:disabled
     background-color: rgb(226,226,226);
 }
 
-
-
 /* ----------------------------------------------------------------------------
 * QTreeView Section
 * ----------------------------------------------------------------------------*/
-QTreeView {
+QTreeView 
+{
+    /* font-family: Lato;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 12px;
+    line-height: 14.4px;
+    text-align: center; */
+
     show-decoration-selected: 1;
-    font-size: 13pt;
+
     background-color: rgb(255,255,255);
     border-style: none;
-    outline: none; /* removes the "focus rect" */
+
+    outline: none; 
     alternate-background-color: rgb(255,255,255);
 }
-QTreeView::item {
+/*
+QTreeView::item 
+{
     padding-bottom: 0px;
     padding-top: 0px;
     border-top-color: transparent;
@@ -503,46 +512,78 @@ QTreeView::item {
     background: rgb(255,255,255);
     border-style: none;
 }
-QTreeView::item:hover {
+QTreeView::indicator
+{
+    background-color: #3468D5;
+    color: rgba(0, 0, 0, 0.9);
+    width: 14px;
+    height: 14px;
+    border-radius: 3px;
+}
+
+QTreeView::indicator:unchecked 
+{
+    image: url(:/icons/eye_grey.png);
+}
+QTreeView::indicator:checked 
+{
+    image: url(resources/Images/checkbox_light.png);
+}
+QTreeView::indicator:indeterminate 
+{
+    image: url(resources/Images/checkbox_indeterminate_light.png);
+}
+QTreeView::item:hover 
+{
     background: rgb(233,247,254);
     border: 0px;
 }
-QTreeView::item:selected:active{
+QTreeView::item:selected:active
+{
     color: rgb(255,255,255);
-   background:  rgb(112,160,216);
+    background:  rgb(112,160,216);
 }
-QTreeView::item:selected:!active {
+QTreeView::item:selected:!active 
+{
     color: rgb(0,0,0);
-   background:  rgb(112,160,216);
+    background: rgb(112,160,216);
 }
-QTreeView::branch{
+
+QTreeView::branch 
+{
     background: rgb(255,255,255);
 }
 QTreeView::branch:has-children:!has-siblings:closed,
-QTreeView::branch:closed:has-children:has-siblings {
+QTreeView::branch:closed:has-children:has-siblings
+{
     border-image: none;
-    image: url(:/DREAM3D/Images/widgets/collapsed-normal.png);
+    image: url(/resources/Images/tree-closed-black.png);
 }
 QTreeView::branch:open:has-children:!has-siblings,
-QTreeView::branch:open:has-children:has-siblings  {
+QTreeView::branch:open:has-children:has-siblings
+  {
     border-image: none;
-    image: url(:/DREAM3D/Images/widgets/expanded-normal.png);
+    image: url(/resources/Images/tree-open-black.png);
 }
-QTreeView::branch:hover {
+
+QTreeView::branch:hover 
+{
    background: rgb(233,247,254);
     border: 0px;
 }
-QTreeView::branch:selected:active{
+QTreeView::branch:selected:active
+{
     background:  rgb(112,160,216);
     border: 0px;
     border-style: none;
 }
-QTreeView::branch:selected:!active {
+QTreeView::branch:selected:!active 
+{
     background:  rgb(112,160,216);
     border: 0px;
     border-style: none;
 }
-
+*/
 /* ----------------------------------------------------------------------------
 * QTabView Section for the StatsGenerator Tabs
 * ----------------------------------------------------------------------------*/
