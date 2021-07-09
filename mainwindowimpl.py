@@ -1,9 +1,19 @@
 # This Python file uses the following encoding: utf-8
+import os
+from parsers.metaforgeparser import MetaForgeParser
 
-from ezmodel.ezmetadataentry import EzMetadataEntry
+from tqdm import tqdm
+from uploader import Uploader
+import json
+from typing import List
+from datetime import datetime
+
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QProgressDialog, QDialog
 from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSettings
 from PySide2.QtGui import QCursor, QDesktopServices
+
+from ezmodel.ezmetadataentry import EzMetadataEntry
+from ezmodel.ezmetadatamodel import EzMetadataModel
 from generated.ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
 from aboutdialogimpl import AboutDialogImpl
@@ -20,17 +30,10 @@ from ht_requests.ht_requests import ht_utilities
 from ht_requests.ht_requests import htauthcontroller
 from ht_requests.ht_requests import ht_requests
 
-from tqdm import tqdm
-from uploader import Uploader
-import os
-
-import parsers.ctf as ctf
-import parsers.ang as ang
-import json
-from typing import List
-from datetime import datetime
-
-from ezmodel.ezmetadatamodel import EzMetadataModel
+from parsers.ctf_parser import CtfParser
+from parsers.ang_parser import AngParser
+from parsers.fei_tiff_parser import FeiTiffParser
+from parsers.ini_parser import IniParser
 
 
 class MainWindow(QMainWindow):
@@ -42,6 +45,9 @@ class MainWindow(QMainWindow):
     K_FILETOEXTRACT_KEY_NAME = 'file_to_extract'
     K_MISSINGENTRIES_KEY_NAME = 'missing_entries'
     K_METADATAFILECHOSEN_KEY_NAME = 'metadata_file_chosen'
+    K_PARSER_COMBO_INDEX_NAME = 'fileParserCombo_Index'
+    
+    available_parsers: List[MetaForgeParser] = (AngParser(), CtfParser(), IniParser(), FeiTiffParser())
 
     createUpload = Signal(list, htauthcontroller.HTAuthorizationController, str, str, list)
 
@@ -58,21 +64,17 @@ class MainWindow(QMainWindow):
         self.ui.actionClose.triggered.connect(self.close)
         self.ui.actionSave_Template.triggered.connect(self.saveTemplate)
         self.ui.actionOpen_Template.triggered.connect(self.restoreTemplate)
-        self.ui.dataFileSelect.clicked.connect(self.selectFile)
+        self.ui.dataFileSelect.clicked.connect(self.select_input_data_file)
         self.ui.hyperthoughtTemplateSelect.clicked.connect(self.selectTemplate)
         self.ui.saveTemplateButton.clicked.connect(self.saveTemplate)
         self.ui.otherDataFileSelect.clicked.connect(self.loadOtherDataFile)
-        self.ui.hyperthoughtUploadButton.clicked.connect(
-            self.uploadToHyperthought)
+        self.ui.hyperthoughtUploadButton.clicked.connect(self.uploadToHyperthought)
         self.ui.clearCreateButton.clicked.connect(self.clearCreate)
         self.ui.clearUseButton.clicked.connect(self.clearUse)
         self.hyperthoughtui.currentTokenExpired.connect(lambda:  self.ui.hyperThoughtExpiresIn.setText(self.hyperthoughtui.K_EXPIRED_STR))
         self.setAcceptDrops(True)
         self.numCustoms = 0
         self.editableKeys = []
-
-        # Read window settings
-        self.read_window_settings()
 
         # Setup the blank Create Template table
         self.setup_create_ez_table()
@@ -88,19 +90,23 @@ class MainWindow(QMainWindow):
 
         self.ui.addUploadFilesBtn.clicked.connect(self.addUploadFiles)
         self.ui.clearUploadFilesBtn.clicked.connect(self.clearUploadFiles)
-        self.ui.appendCreateTableRowButton.clicked.connect(
-            self.addCustomRowToCreateTable)
+        self.ui.appendCreateTableRowButton.clicked.connect(self.addCustomRowToCreateTable)
         self.ui.removeCreateTableRowButton.clicked.connect(self.handleRemoveCreate)
         self.ui.removeUseTableRowButton.clicked.connect(self.handleRemoveUse)
         self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
         self.ui.hyperthoughtLocationButton.clicked.connect(self.authenticateToHyperThought)
     
         self.ui.useTemplateListSearchBar.textChanged.connect(self.filter_use_table)
-        self.ui.createTemplateListSearchBar.textChanged.connect(
-            self.filter_create_table)
-        self.ui.createTemplateTreeSearchBar.textChanged.connect(
-            self.filterCreateTree)
+        self.ui.createTemplateListSearchBar.textChanged.connect(self.filter_create_table)
+        self.ui.createTemplateTreeSearchBar.textChanged.connect(self.filterCreateTree)
         self.ui.addMetadataFileCheckBox.stateChanged.connect(self.checkFileList)
+
+        # Setup the Combo Box with all of the parsers that we know about
+
+
+        for index, parser in enumerate(self.available_parsers):
+            self.ui.fileParserCombo.addItem(parser.human_label(), index)
+        self.ui.fileParserCombo.currentIndexChanged.connect(self.handleParserComboBoxChange)
 
         self.fileType = ""
         self.accessKey = ""
@@ -115,6 +121,9 @@ class MainWindow(QMainWindow):
         self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
         self.ui.otherDataFileLineEdit.installEventFilter(self)
         self.ui.dataFileLineEdit.installEventFilter(self)
+
+        # Read window settings
+        self.read_window_settings()
     
     def setup_create_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         self.createtrashDelegate = TrashDelegate()
@@ -197,6 +206,10 @@ class MainWindow(QMainWindow):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
         self.restoreGeometry(settings.value("geometry"))
         self.restoreState(settings.value("window_state"))
+        index = settings.value(self.K_PARSER_COMBO_INDEX_NAME)
+        if index == None:
+            index = 0
+        self.ui.fileParserCombo.setCurrentIndex(index)
 
     def acceptKey(self, apikey):
         self.accessKey = apikey
@@ -207,7 +220,7 @@ class MainWindow(QMainWindow):
 
     def addUploadFiles(self):
         linetexts = QFileDialog.getOpenFileNames(self, self.tr("Select File"), QStandardPaths.displayName(
-            QStandardPaths.HomeLocation), self.tr("Files (*.ctf *.xml *.ang)"))[0]
+            QStandardPaths.HomeLocation), self.tr("Files (*.ctf *.xml *.ang *.tif *.tiff)"))[0]
         for line in linetexts:
             self.uselistmodel.addRow(line)
         self.toggleButtons()
@@ -231,6 +244,7 @@ class MainWindow(QMainWindow):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
         settings.setValue("geometry", self.saveGeometry())
         settings.setValue("window_state", self.saveState())
+        settings.setValue(self.K_PARSER_COMBO_INDEX_NAME, self.ui.fileParserCombo.currentIndex())
 
         self.mThread.quit()
         self.mThread.wait(250)
@@ -255,13 +269,14 @@ class MainWindow(QMainWindow):
                 self.ui.otherDataFileLineEdit.setText(event.mimeData().urls()[0].toLocalFile())
                 self.importMetadataFromDataFile()
         if object == self.ui.dataFileLineEdit:
+            accepted_ext = ['.ang', '.ctf', '.tiff' , '.tif']
             if event.type() == QEvent.DragEnter:
-                if str(event.mimeData().urls()[0])[-6:-2] == ".ctf" or str(event.mimeData().urls()[0])[-6:-2] == ".ang":
-                    event.acceptProposedAction()
+                file_ext = str(event.mimeData().urls()[0])[-6:-2]
+                event.acceptProposedAction()
             if (event.type() == QEvent.Drop):
-                if str(event.mimeData().urls()[0])[-6:-2] == ".ctf" or str(event.mimeData().urls()[0])[-6:-2] == ".ang":
-                    event.acceptProposedAction()
-                    self.selectFile(event.mimeData().urls()[0].toLocalFile())
+                file_ext = str(event.mimeData().urls()[0])[-6:-2]
+                event.acceptProposedAction()
+                self.select_input_data_file(event.mimeData().urls()[0].toLocalFile())              
 
         return QMainWindow.eventFilter(self, object,  event)
 
@@ -507,7 +522,37 @@ class MainWindow(QMainWindow):
             with open(paths_output_path, 'w') as outfile:
                 json.dump(model_dict, outfile, indent=4)
 
-    def selectFile(self, fileLink=None):
+    def parseDataFile(self, filePath:str="", parser:MetaForgeParser=None):
+        if parser == None:
+            return
+        if filePath == "":
+            return
+        # parse the metadata from the input data file
+        headerDict = parser.parse_header_as_dict(filePath)
+
+
+        metadata_model = EzMetadataModel.create_model(headerDict,
+                                                filePath,
+                                                source_type=EzMetadataEntry.SourceType.FILE)
+
+        # Setup the Create Template table
+        self.setup_create_ez_table(metadata_model=metadata_model)
+
+        # Setup the Create Template tree
+        self.setup_create_ez_tree(metadata_model=metadata_model)
+
+        self.ui.metadataTableView.setWordWrap(True)
+        self.ui.metadataTableView.setRowHeight(21, 35)
+        self.polish_create_ez_table()
+        self.ui.dataTypeText.setText(parser.human_label())
+
+    def handleParserComboBoxChange(self, index: int=-1):
+        if index != -1:
+            filePath = self.ui.dataFileLineEdit.text()
+            parser = self.available_parsers[index]
+            self.parseDataFile(filePath, parser)
+            
+    def select_input_data_file(self, fileLink=None):
         if fileLink == False:
             filePath = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(
                 QStandardPaths.HomeLocation), self.tr("Files (*.*)"))[0]
@@ -518,38 +563,23 @@ class MainWindow(QMainWindow):
             self.ui.dataFileLineEdit.setText(filePath)
 
             split = os.path.splitext(filePath)
-            ext = split[1].replace('.', '')
+            ext = split[1] #.replace('.', '')
 
-            self.ui.dataTypeText.setText(ext.upper())
-            if self.ui.fileParserCombo.findText(f'{ext.upper()} Parser') != -1:
-                self.ui.fileParserCombo.setCurrentIndex(
-                    self.ui.fileParserCombo.findText(f'{ext.upper()} Parser'))
             headerDict = {}
-            if ext.upper() == "CTF":
-                headerDict = ctf.parse_header_as_dict(filePath)
-            elif ext.upper() == "ANG":
-                headerDict = ang.parse_header_as_dict(filePath)
-            # elif ext.upper() == "XML":
-            #     print("XML Parser used")
-            else:
+            parser = None
+
+            found_a_parser = False
+            for index, p in enumerate(self.available_parsers):
+                if p.accepts_extension(ext):
+                    parser = p
+                    found_a_parser = True
+                    self.ui.fileParserCombo.setCurrentIndex(index)
+                    break
+            if found_a_parser == False:
                 raise RuntimeError('No parser available for selected file.')
-
-            metadata_model = EzMetadataModel.create_model(headerDict,
-                                                          filePath,
-                                                          source_type=EzMetadataEntry.SourceType.FILE)
             
-            # Setup the Create Template table
-            self.setup_create_ez_table(metadata_model=metadata_model)
+            self.parseDataFile(filePath, parser)
 
-            # Setup the Create Template tree
-            self.setup_create_ez_tree(metadata_model=metadata_model)
-
-            self.ui.metadataTableView.setWordWrap(True)
-            # self.ui.metadataTableView.setColumnWidth(1, 200)
-            self.ui.metadataTableView.setRowHeight(21, 35)
-            self.polish_create_ez_table()
-
-        self.toggleButtons()
         return True
 
     def selectTemplate(self):

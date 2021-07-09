@@ -129,9 +129,6 @@ class Ui_MainWindow(object):
         self.horizontalLayout_3.addWidget(self.fileParserLabel)
 
         self.fileParserCombo = QComboBox(self.create_frame_3)
-        self.fileParserCombo.addItem("")
-        self.fileParserCombo.addItem("")
-        self.fileParserCombo.addItem("")
         self.fileParserCombo.setObjectName(u"fileParserCombo")
 
         self.horizontalLayout_3.addWidget(self.fileParserCombo)
@@ -630,7 +627,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(1)
+        self.TabWidget.setCurrentIndex(0)
         self.saveTemplateButton.setDefault(False)
 
 
@@ -674,11 +671,7 @@ class Ui_MainWindow(object):
         self.dataTypeLabel.setText(QCoreApplication.translate("MainWindow", u"Data Type Detected:", None))
         self.dataTypeText.setText(QCoreApplication.translate("MainWindow", u"None", None))
         self.fileParserLabel.setText(QCoreApplication.translate("MainWindow", u"File Parser:", None))
-        self.fileParserCombo.setItemText(0, QCoreApplication.translate("MainWindow", u"CTF Parser", None))
-        self.fileParserCombo.setItemText(1, QCoreApplication.translate("MainWindow", u"ANG Parser", None))
-        self.fileParserCombo.setItemText(2, QCoreApplication.translate("MainWindow", u"Custom Parser", None))
-
-        self.fileParserCombo.setCurrentText(QCoreApplication.translate("MainWindow", u"CTF Parser", None))
+        self.fileParserCombo.setCurrentText("")
 #if QT_CONFIG(tooltip)
         self.clearCreateButton.setToolTip(QCoreApplication.translate("MainWindow", u"Reset all 'Create Template' input fields. All fields will be reset to an empty state.", None))
 #endif // QT_CONFIG(tooltip)
