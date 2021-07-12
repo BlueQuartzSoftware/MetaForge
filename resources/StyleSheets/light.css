@@ -131,14 +131,14 @@ QPushButton#appendCreateTableRowButton,
 QPushButton#addUploadFilesBtn,
 QPushButton#appendUseTableRowButton
 {
-    image: url(:/resources/Images/plus-dark.png);
+    image: url(:/resources/Images/dark/plus-dark.png);
 }
 
 QPushButton#removeUseTableRowButton,
 QPushButton#clearUploadFilesBtn,
 QPushButton#removeCreateTableRowButton
 {
-    image: url(:/resources/Images/delete-dark.png);
+    image: url(:/resources/Images/dark/delete-dark.png);
 }
 
 QPushButton#hyperthoughtUploadButton,
@@ -258,11 +258,11 @@ QComboBox QAbstractItemView {
 }
 
 QComboBox::down-arrow {
-    image: url(:resources/Images/widgets/decrease-normal.png);
+    image: url(:resources/Images/decrease-normal.png);
 }
 
 QComboBox::down-arrow:hover {
-    image: url(:resources/Images/widgets/decrease-mouse-over.png);
+    image: url(:resources/Images/decrease-mouse-over.png);
 }
 
 

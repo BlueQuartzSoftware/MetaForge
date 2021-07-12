@@ -76,14 +76,14 @@ QPushButton#appendCreateTableRowButton,
 QPushButton#addUploadFilesBtn,
 QPushButton#appendUseTableRowButton
 {
-    image: url(:/resources/Images/plus-dark.png);
+    image: url(:/resources/Images/dark/plus-dark.png);
 }
 
 QPushButton#removeUseTableRowButton,
 QPushButton#clearUploadFilesBtn,
 QPushButton#removeCreateTableRowButton
 {
-    image: url(:/resources/Images/delete-dark.png);
+    image: url(:/resources/Images/dark/delete-dark.png);
 }
 
 QPushButton#hyperthoughtUploadButton,
@@ -392,7 +392,7 @@ QComboBox::drop-down
 
 QComboBox::down-arrow
 {
-    image: url(:resources/Images/decrease-normal-dark.png);
+    image: url(:resources/Images/dark/decrease-normal-dark.png);
 }
 /*
 QComboBox:hover
@@ -583,13 +583,13 @@ QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings 
 {
     border-image: none;
-    image: url(resources/Images/collapsed-normal-dark.png);
+    image: url(resources/Images/dark/collapsed-normal-dark.png);
 }
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings  
 {
     border-image: none;
-    image: url(resources/Images/expanded-normal-dark.png);
+    image: url(resources/Images/dark/expanded-normal-dark.png);
 }
 QTreeView::branch:hover 
 {

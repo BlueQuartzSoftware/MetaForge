@@ -25,6 +25,7 @@ from checkboxdelegate import CheckBoxDelegate
 from qcreateeztablemodel import QCreateEzTableModel
 from quseeztablemodel import QUseEzTableModel
 from usefiledelegate import UseFileDelegate
+from metaforgestyledatahelper import MetaForgeStyleDataHelper
 
 from ht_requests.ht_requests import ht_utilities
 from ht_requests.ht_requests import htauthcontroller
@@ -51,8 +52,10 @@ class MainWindow(QMainWindow):
 
     createUpload = Signal(list, htauthcontroller.HTAuthorizationController, str, str, list)
 
-    def __init__(self):
+    def __init__(self, app: QApplication):
         super(MainWindow, self).__init__()
+        
+        self.style_sheet_helper: MetaForgeStyleDataHelper = MetaForgeStyleDataHelper(app)
         self.hyperthoughtui = HyperthoughtDialogImpl()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
@@ -124,9 +127,9 @@ class MainWindow(QMainWindow):
 
         # Read window settings
         self.read_window_settings()
-    
+
     def setup_create_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
-        self.createtrashDelegate = TrashDelegate()
+        self.createtrashDelegate = TrashDelegate(stylehelper=self.style_sheet_helper)
         self.checkboxDelegate = CheckBoxDelegate()
         self.create_ez_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
         self.create_ez_table_model_proxy = self.init_create_table_model_proxy(self.create_ez_table_model)
@@ -145,7 +148,7 @@ class MainWindow(QMainWindow):
         self.ui.metadataTableView.horizontalHeader().setStretchLastSection(True)
 
     def setup_use_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
-        self.usetrashDelegate = TrashDelegate()
+        self.usetrashDelegate = TrashDelegate(stylehelper=self.style_sheet_helper)
         self.use_ez_table_model = QEzTableModel(metadata_model, parent=self)
         self.use_ez_table_model_proxy = self.init_use_table_model_proxy(self.use_ez_table_model)
         self.ui.useTemplateTableView.setModel(self.use_ez_table_model_proxy)
@@ -179,7 +182,7 @@ class MainWindow(QMainWindow):
         self.uselistmodel.rowRemoved.connect(self.toggleButtons)
         self.uselistmodel.rowAdded.connect(self.toggleButtons)
 
-        self.useFileDelegate = UseFileDelegate(self)
+        self.useFileDelegate = UseFileDelegate(self, stylehelper=self.style_sheet_helper)
         self.ui.useTemplateListView.setItemDelegate(self.useFileDelegate)
 
         self.ui.useTemplateListView.clicked.connect(
