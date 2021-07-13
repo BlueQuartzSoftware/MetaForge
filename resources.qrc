@@ -40,5 +40,9 @@
         <file>resources/Images/dark/expanded-normal-dark.png</file> 
         <file>resources/Images/dark/collapsed-normal-dark.png</file>  
 
+        <file>resources/Images/dark/checkbox-on.png</file>  
+        <file>resources/Images/dark/checkbox-off.png</file>  
+        <file>resources/Images/dark/checkbox-on-disabled.png</file>  
+        <file>resources/Images/dark/checkbox-off-disabled.png</file>  
     </qresource>
 </RCC>

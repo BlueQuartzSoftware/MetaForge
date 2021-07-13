@@ -536,11 +536,11 @@ QCheckBox
 
 QCheckBox::indicator
 {
-    background-color: #2B2B2B;  
+    background-color: #383838;  
     color: rgba(255, 255, 250, 0.9);
-    width: 16px;
-    height: 16px;
-    border: 1px solid rgba(255, 255, 250, 0.5);
+    /* width: 16px;
+    height: 16px; */
+    border: 0px solid rgba(255, 255, 250, 0.5);
 }
 /* QCheckBox::indicator:hover
 {
@@ -549,12 +549,22 @@ QCheckBox::indicator
 
 QCheckBox::indicator:checked
 {
-    image: url(resources/Images/dark/checkbox_light.png);
+    image: url(resources/Images/dark/checkbox-on.png)
+}
+
+QCheckBox::indicator:unchecked
+{
+    image: url(resources/Images/dark/checkbox-off.png)
 }
 
 QCheckBox::indicator:disabled
 {
-    border: 1px solid #444;
+    image: url(resources/Images/dark/checkbox-on-disabled.png)
+}
+
+QCheckBox::indicator:unchecked:disabled
+{
+    image: url(resources/Images/dark/checkbox-off-disabled.png)
 }
 
 

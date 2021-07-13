@@ -493,6 +493,56 @@ QLineEdit:disabled
 }
 
 /* ----------------------------------------------------------------------------
+* QCheckBox Parameter Widgets
+* ----------------------------------------------------------------------------*/
+QCheckBox
+{
+    color: #000000;
+    font-family: Lato;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 14px;
+    spacing: 12px;
+    color: #000000;
+}
+
+QCheckBox::indicator
+{
+    background-color: #E8EBED;  
+    color: #000000;
+    /* width: 16px;
+    height: 16px; */
+    border: 0px solid rgba(255, 255, 250, 0.5);
+}
+/* QCheckBox::indicator:hover
+{
+    border: 1px solid #21b1f8;
+} */
+
+QCheckBox::indicator:checked
+{
+    image: url(resources/Images/dark/checkbox-on.png)
+}
+
+QCheckBox::indicator:unchecked
+{
+    image: url(resources/Images/dark/checkbox-off.png)
+}
+
+QCheckBox::indicator:disabled
+{
+    image: url(resources/Images/dark/checkbox-on-disabled.png)
+}
+
+QCheckBox::indicator:unchecked:disabled
+{
+    image: url(resources/Images/dark/checkbox-off-disabled.png)
+}
+
+
+
+/* ----------------------------------------------------------------------------
 * QTreeView Section
 * ----------------------------------------------------------------------------*/
 QTreeView 
