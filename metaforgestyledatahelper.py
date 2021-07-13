@@ -49,11 +49,12 @@ class MetaForgeStyleDataHelper(QObject):
       return
 
     with open(self.css_file_path) as css_file:
+      print(f'  Reloading style sheet from {self.css_file_path}')
       cssContent = css_file.read()
       css_file.close()
       self.app.setStyleSheet(cssContent)
 
   @Slot(None)
   def fileChanged(self):
-      print('css file changed.....')
+     # print('css file changed.....')
       self.initStyleSheet()

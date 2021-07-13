@@ -336,6 +336,7 @@ class Ui_MainWindow(object):
         self.useTemplateListView.setVerticalScrollBarPolicy(Qt.ScrollBarAlwaysOn)
         self.useTemplateListView.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.useTemplateListView.setAlternatingRowColors(True)
+        self.useTemplateListView.setUniformItemSizes(True)
 
         self.gridLayout_10.addWidget(self.useTemplateListView, 1, 0, 1, 3)
 
@@ -627,7 +628,7 @@ class Ui_MainWindow(object):
 
         self.retranslateUi(MainWindow)
 
-        self.TabWidget.setCurrentIndex(0)
+        self.TabWidget.setCurrentIndex(1)
         self.saveTemplateButton.setDefault(False)
 
 
@@ -693,7 +694,13 @@ class Ui_MainWindow(object):
         self.create_label_1.setText(QCoreApplication.translate("MainWindow", u"Search Table", None))
         self.createTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("MainWindow", u"Search table using wildcard (*.*)", None))
         self.TabWidget.setTabText(self.TabWidget.indexOf(self.CreateTemplateTab), QCoreApplication.translate("MainWindow", u"Create Template", None))
+#if QT_CONFIG(tooltip)
+        self.addUploadFilesBtn.setToolTip(QCoreApplication.translate("MainWindow", u"Add files to the upload list", None))
+#endif // QT_CONFIG(tooltip)
         self.addUploadFilesBtn.setText("")
+#if QT_CONFIG(tooltip)
+        self.clearUploadFilesBtn.setToolTip(QCoreApplication.translate("MainWindow", u"Clear *all* the files from the list", None))
+#endif // QT_CONFIG(tooltip)
         self.clearUploadFilesBtn.setText("")
         self.label.setText(QCoreApplication.translate("MainWindow", u"Files to be Uploaded:", None))
 #if QT_CONFIG(tooltip)

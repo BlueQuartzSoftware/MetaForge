@@ -515,6 +515,9 @@
                  <height>16777215</height>
                 </size>
                </property>
+               <property name="toolTip">
+                <string>Add files to the upload list</string>
+               </property>
                <property name="text">
                 <string/>
                </property>
@@ -539,6 +542,9 @@
                  <width>40</width>
                  <height>16777215</height>
                 </size>
+               </property>
+               <property name="toolTip">
+                <string>Clear *all* the files from the list</string>
                </property>
                <property name="text">
                 <string/>
@@ -585,6 +591,9 @@
                 <set>QAbstractItemView::NoEditTriggers</set>
                </property>
                <property name="alternatingRowColors">
+                <bool>true</bool>
+               </property>
+               <property name="uniformItemSizes">
                 <bool>true</bool>
                </property>
               </widget>

@@ -23,29 +23,39 @@ QScrollArea
 /* ----------------------------------------------------------------------------
 * QListView Section
 * ----------------------------------------------------------------------------*/
-QListView {
-    color: rgb(0,0,0);
-    font-size: 12pt;
+QListView 
+{
+    font-family: Lato;
+    /* font-style: normal; */
+    /* font-weight: normal; */
+    font-size: 14px;
+        
+    text-align: center;
+
     background: rgb(255,255,255);
     outline: none;  
-    border: 0px solid transparent;
+    border-radius: 4px;
 }
-QListView::item {
+/* QListView::item 
+{
    padding-bottom: 2px;
    padding-top: 2px;
    border-top-color: transparent;
    border-bottom-color: transparent;
-   border: 0px solid transparent;
+   border: 1px solid transparent;
+   line-height: 16px;
 }
-QListView::item:hover {
+QListView::item:hover 
+{
     background:  rgb(233,247,254);
     border: 0px;
-    color: rgb(0,0,0);
+    color: #FF00FF;
 }
-QListView::item:selected {
-    background: 1 rgb(164,222,255);
+QListView::item:selected 
+{
+    background: #FF00FF;
     color: rgb(0,0,0);
-}
+}  */
 
 
 /* ----------------------------------------------------------------------------
@@ -447,7 +457,7 @@ QTabBar::tab:!selected:hover
 * ----------------------------------------------------------------------------*/
 QLabel
 {
-    color: rgb(0,0,0);
+    color: #000000;
     font-family: Lato;
     font-style: normal;
     font-weight: normal;

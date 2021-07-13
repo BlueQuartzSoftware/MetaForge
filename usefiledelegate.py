@@ -29,7 +29,7 @@ class UseFileDelegate(QItemDelegate):
 
         painter.save()            
         line_1x = icon.pixmap(12,12)
-        painter.drawText( option.rect.adjusted(5,option.rect.height()/2 - 8 , 0, 0), Qt.AlignLeft, index.data())
+       # painter.drawText( option.rect.adjusted(5,option.rect.height()/2 - 8 , 0, 0), Qt.AlignLeft, index.data())
         painter.drawPixmap(option.rect.x()+option.rect.width() - 25,
         option.rect.y()+option.rect.height()/2 - 4,
         12,
@@ -38,6 +38,6 @@ class UseFileDelegate(QItemDelegate):
         painter.restore()
 
 
-    def sizeHint(self, option, index):
-        return QSize( option.rect.width(), 24)
+    # def sizeHint(self, option, index):
+    #     return QSize( option.rect.width(), 24)
 
