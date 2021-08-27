@@ -1,0 +1,30 @@
+package:
+  name: metaforge
+  version: "1.0.0"
+
+source:
+  git_rev: rc-10
+  git_url: https://github.com/BlueQuartzSoftware/MetaForge.git
+  #[source information here]
+  # folder: my-destination/folder
+
+
+requirements:
+  build:
+    - python
+  run:
+  - python 
+  # # To build a recipe against different versions of NumPy
+  # # And ensure that each version is part of the package dependencies
+  # # It is required to use the --numpy option with conda-build. For example --numpy 1.7
+  # - numpy x.x
+  dependencies:
+    - pip:
+      - tqdm
+      - requests
+      - pyside2
+      - dataclasses-json
+
+
+about:
+  home: https://github.com/BlueQuartzSoftware/MetaForge/
