@@ -1,19 +1,25 @@
 import os
 
+from typing import List
+from datetime import datetime
+
 from PySide2.QtWidgets import QDialog, QMessageBox, QApplication, QStyle, QListView, QDialogButtonBox
 from PySide2.QtCore import Signal, QStringListModel, Qt, Slot
 from PySide2.QtGui import QClipboard, QGuiApplication
+import PySide2.QtCore
 
 from ht_requests.ht_requests import ht_utilities
 from ht_requests.ht_requests import htauthcontroller
 from ht_requests.ht_requests import ht_requests
-from generated.ui_hyperthoughtdialog import Ui_HyperthoughtDialog
 from newfolderdialogimpl import NewFolderDialogImpl
 from htremotefilelistmodel import HTRemoteFileListModel
 from HyperThoughtTokenVerifier import HyperThoughtTokenVerifier
 
-from typing import List
-from datetime import datetime
+qt_version = PySide2.QtCore.__version_info__
+if qt_version[1] == 12:
+    from generated_5_12.ui_hyperthoughtdialog import Ui_HyperthoughtDialog
+elif qt_version[1] == 15:
+    from generated_5_15.ui_hyperthoughtdialog import Ui_HyperthoughtDialog
 
 
 class HyperthoughtDialogImpl(QDialog):

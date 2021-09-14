@@ -11,10 +11,10 @@ from datetime import datetime
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QProgressDialog, QDialog
 from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSettings
 from PySide2.QtGui import QCursor, QDesktopServices
+import PySide2.QtCore
 
 from ezmodel.ezmetadataentry import EzMetadataEntry
 from ezmodel.ezmetadatamodel import EzMetadataModel
-from generated.ui_mainwindow import Ui_MainWindow
 from hyperthoughtdialogimpl import HyperthoughtDialogImpl
 from aboutdialogimpl import AboutDialogImpl
 from qeztablemodel import QEzTableModel
@@ -35,6 +35,13 @@ from parsers.ctf_parser import CtfParser
 from parsers.ang_parser import AngParser
 from parsers.fei_tiff_parser import FeiTiffParser
 from parsers.ini_parser import IniParser
+
+
+qt_version = PySide2.QtCore.__version_info__
+if qt_version[1] == 12:
+    from generated_5_12.ui_mainwindow import Ui_MainWindow
+elif qt_version[1] == 15:
+    from generated_5_15.ui_mainwindow import Ui_MainWindow
 
 
 class MainWindow(QMainWindow):

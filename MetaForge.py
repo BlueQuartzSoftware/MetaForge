@@ -14,10 +14,19 @@ if platform.system() == 'Darwin':
 from PySide2.QtWidgets import QApplication, QWidget, QMainWindow
 from PySide2.QtCore import QFile, QIODevice, QObject, Qt
 from PySide2.QtGui import QIcon
+import PySide2.QtCore
 
-from generated.ui_mainwindow import Ui_MainWindow
+
+qt_version = PySide2.QtCore.__version_info__
+
+if qt_version[1] == 12:
+    from generated_5_12.ui_mainwindow import Ui_MainWindow
+    from generated_5_12.resources_rc import *
+elif qt_version[1] == 15:
+    from generated_5_15.ui_mainwindow import Ui_MainWindow
+    from generated_5_15.resources_rc import *
+
 from mainwindowimpl import MainWindow
-from generated.resources_rc import *
 from metaforgestyledatahelper import MetaForgeStyleDataHelper
 
 if __name__ == "__main__":

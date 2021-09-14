@@ -1,5 +1,13 @@
 from PySide2.QtWidgets import QDialog, QApplication
-from generated.ui_aboutdialog import Ui_AboutDialog
+import PySide2.QtCore
+
+qt_version = PySide2.QtCore.__version_info__
+if qt_version[1] == 12:
+    from generated_5_12.ui_aboutdialog import Ui_AboutDialog
+elif qt_version[1] == 15:
+    from generated_5_15.ui_aboutdialog import Ui_AboutDialog
+
+
 
 
 class AboutDialogImpl(QDialog):

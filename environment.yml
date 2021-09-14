@@ -1,0 +1,14 @@
+name: MetaForge
+channels:
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python=3.8
+  - tqdm=4.60.0
+  - pyside2
+  - requests
+  - dataclasses-json
+  - Pillow>=8.2.0
+
+  
+

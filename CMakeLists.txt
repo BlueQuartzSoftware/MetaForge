@@ -21,9 +21,17 @@ find_program(RCC_EXE NAMES pyside2-rcc DOC "Pyside2 RCC Executable")
 find_program(UIC_EXE NAMES pyside2-uic DOC "Pyside2 UIC Executable")
 
 set(UI_FILES mainwindow hyperthoughtdialog newfolderdialog aboutdialog)
-  
+
+#--------------------------------------------------------------------------------------------------
+# Depending if you use Pip or Conda to install pyside2 you will get either Qt 5.12 (Conda) or 5.12 (Pip)
+# The python codes that load the generated files know to check the version of Qt that is being used
+# and load from a different directory. Right now you will need to manually change this variable to
+# match which Qt version is installed. THIS ONLY SUPPORTS QT 5.12 AND QT 5.15
+set(QT_VERSION "5_12")
+#set(QT_VERSION "5_15")
+
 foreach(ui ${UI_FILES})
-  add_custom_target(${ui}_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/${ui}.ui --from-imports  -o ${MetaForge_SOURCE_DIR}/generated/ui_${ui}.py)
+  add_custom_target(${ui}_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/${ui}.ui --from-imports  -o ${MetaForge_SOURCE_DIR}/${QT_VERSION}/ui_${ui}.py)
 endforeach()
 
 
@@ -33,4 +41,4 @@ endforeach()
 # add_custom_target(AboutDialog_UIC ALL COMMAND "${UIC_EXE}" ${MetaForge_SOURCE_DIR}/aboutdialog.ui  -o ${MetaForge_SOURCE_DIR}/aboutdialog.py)
 
 
-add_custom_target(Resources_RCC ALL COMMAND "${RCC_EXE}" ${MetaForge_SOURCE_DIR}/resources.qrc  -o ${MetaForge_SOURCE_DIR}/generated/resources_rc.py)
+add_custom_target(Resources_RCC ALL COMMAND "${RCC_EXE}" ${MetaForge_SOURCE_DIR}/resources.qrc  -o ${MetaForge_SOURCE_DIR}/${QT_VERSION}/resources_rc.py)
