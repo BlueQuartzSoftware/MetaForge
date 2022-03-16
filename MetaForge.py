@@ -12,53 +12,22 @@ if platform.system() == 'Darwin':
         os.environ["QT_MAC_WANTS_LAYER"] = "1"
 
 from PySide2.QtWidgets import QApplication, QWidget, QMainWindow
-from PySide2.QtCore import QFile, QIODevice, QObject, QFileSystemWatcher, Qt, Signal, Slot
-from PySide2.QtGui import QIcon, QFontDatabase
-from generated.ui_mainwindow import Ui_MainWindow
+from PySide2.QtCore import QFile, QIODevice, QObject, Qt
+from PySide2.QtGui import QIcon
+import PySide2.QtCore
+
+
+qt_version = PySide2.QtCore.__version_info__
+
+if qt_version[1] == 12:
+    from generated_5_12.ui_mainwindow import Ui_MainWindow
+    from generated_5_12.resources_rc import *
+elif qt_version[1] == 15:
+    from generated_5_15.ui_mainwindow import Ui_MainWindow
+    from generated_5_15.resources_rc import *
+
 from mainwindowimpl import MainWindow
-from generated.resources_rc import *
-
-
-class MetaForgeHelper(QObject):
-
-    def __init__(self, application: QApplication, stylesheet_path: str):
-        self.app = application
-        self.watcher = QFileSystemWatcher()
-
-        self.css_file_path = stylesheet_path
-        self.watcher.addPath(self.css_file_path)
-        self.watcher.fileChanged.connect(self.fileChanged)
-
-    def initFonts(self):
-        fontList = ["resources/fonts/FiraSans-Regular.ttf", 
-                    "resources/fonts/Lato-Regular.ttf",
-                    "resources/fonts/Lato-Black.ttf", 
-                    "resources/fonts/Lato-BlackItalic.ttf",
-                    "resources/fonts/Lato-Bold.ttf", 
-                    "resources/fonts/Lato-BoldItalic.ttf", 
-                    "resources/fonts/Lato-Hairline.ttf", 
-                    "resources/fonts/Lato-HairlineItalic.ttf",
-                    "resources/fonts/Lato-Italic.ttf", 
-                    "resources/fonts/Lato-Light.ttf", 
-                    "resources/fonts/Lato-LightItalic.ttf"]
-        for f in fontList:
-            fontID = QFontDatabase.addApplicationFont(f)
-
-    def initStyleSheet(self):
-        css_file = open(self.css_file_path)
-        cssContent = css_file.read()
-        css_file.close()
-        app.setStyleSheet(cssContent)
-
-    @Slot(None)
-    def fileChanged(self):
-        print('css file changed.....')
-        css_file = open(self.css_file_path)
-        cssContent = css_file.read()
-        css_file.close()
-        self.app.setStyleSheet(cssContent)
-
-
+from metaforgestyledatahelper import MetaForgeStyleDataHelper
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
@@ -70,22 +39,12 @@ if __name__ == "__main__":
     if platform.system() == 'Darwin':
         # Set the Application Icon
         app.setWindowIcon(QIcon(':/resources/Images/MetaForge.icns'))
-
-        style_sheet = ""
-        # there are 3 choices for StyleSheets. Pick one
-        style_sheet = "resources/StyleSheets/light.css"
-        # style_sheet = "resources/StyleSheets/dark.css"
-        # style_sheet = "resources/StyleSheets/dark_ics.css"
-        helper = MetaForgeHelper(app, style_sheet)
-        helper.initFonts()
-        # IF YOU DO NOT WANT A STYLE SHEET THEN COMMENT OUT THE NEXT LINE
-        helper.initStyleSheet()
     else:
         # Set the Application Icon
         app.setWindowIcon(QIcon(':/resources/Images/MetaForge.png'))        
 
 
-    window = MainWindow()
+    window = MainWindow(app)
     window.show()
 
     sys.exit(app.exec_())

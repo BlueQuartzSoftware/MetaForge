@@ -23,29 +23,39 @@ QScrollArea
 /* ----------------------------------------------------------------------------
 * QListView Section
 * ----------------------------------------------------------------------------*/
-QListView {
-    color: rgb(0,0,0);
-    font-size: 12pt;
+QListView 
+{
+    font-family: Lato;
+    /* font-style: normal; */
+    /* font-weight: normal; */
+    font-size: 14px;
+        
+    text-align: center;
+
     background: rgb(255,255,255);
     outline: none;  
-    border: 0px solid transparent;
+    border-radius: 4px;
 }
-QListView::item {
+/* QListView::item 
+{
    padding-bottom: 2px;
    padding-top: 2px;
    border-top-color: transparent;
    border-bottom-color: transparent;
-   border: 0px solid transparent;
+   border: 1px solid transparent;
+   line-height: 16px;
 }
-QListView::item:hover {
+QListView::item:hover 
+{
     background:  rgb(233,247,254);
     border: 0px;
-    color: rgb(0,0,0);
+    color: #FF00FF;
 }
-QListView::item:selected {
-    background: 1 rgb(164,222,255);
+QListView::item:selected 
+{
+    background: #FF00FF;
     color: rgb(0,0,0);
-}
+}  */
 
 
 /* ----------------------------------------------------------------------------
@@ -131,14 +141,14 @@ QPushButton#appendCreateTableRowButton,
 QPushButton#addUploadFilesBtn,
 QPushButton#appendUseTableRowButton
 {
-    image: url(:/resources/Images/plus-dark.png);
+    image: url(:/resources/Images/dark/plus-dark.png);
 }
 
 QPushButton#removeUseTableRowButton,
 QPushButton#clearUploadFilesBtn,
 QPushButton#removeCreateTableRowButton
 {
-    image: url(:/resources/Images/delete-dark.png);
+    image: url(:/resources/Images/dark/delete-dark.png);
 }
 
 QPushButton#hyperthoughtUploadButton,
@@ -258,11 +268,11 @@ QComboBox QAbstractItemView {
 }
 
 QComboBox::down-arrow {
-    image: url(:resources/Images/widgets/decrease-normal.png);
+    image: url(:resources/Images/decrease-normal.png);
 }
 
 QComboBox::down-arrow:hover {
-    image: url(:resources/Images/widgets/decrease-mouse-over.png);
+    image: url(:resources/Images/decrease-mouse-over.png);
 }
 
 
@@ -447,7 +457,7 @@ QTabBar::tab:!selected:hover
 * ----------------------------------------------------------------------------*/
 QLabel
 {
-    color: rgb(0,0,0);
+    color: #000000;
     font-family: Lato;
     font-style: normal;
     font-weight: normal;
@@ -481,6 +491,56 @@ QLineEdit:disabled
     color: rgb(119,119,118);
     background-color: rgb(226,226,226);
 }
+
+/* ----------------------------------------------------------------------------
+* QCheckBox Parameter Widgets
+* ----------------------------------------------------------------------------*/
+QCheckBox
+{
+    color: #000000;
+    font-family: Lato;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 13px;
+    line-height: 14px;
+    spacing: 12px;
+    color: #000000;
+}
+
+QCheckBox::indicator
+{
+    background-color: #E8EBED;  
+    color: #000000;
+    /* width: 16px;
+    height: 16px; */
+    border: 0px solid rgba(255, 255, 250, 0.5);
+}
+/* QCheckBox::indicator:hover
+{
+    border: 1px solid #21b1f8;
+} */
+
+QCheckBox::indicator:checked
+{
+    image: url(resources/Images/dark/checkbox-on.png)
+}
+
+QCheckBox::indicator:unchecked
+{
+    image: url(resources/Images/dark/checkbox-off.png)
+}
+
+QCheckBox::indicator:disabled
+{
+    image: url(resources/Images/dark/checkbox-on-disabled.png)
+}
+
+QCheckBox::indicator:unchecked:disabled
+{
+    image: url(resources/Images/dark/checkbox-off-disabled.png)
+}
+
+
 
 /* ----------------------------------------------------------------------------
 * QTreeView Section

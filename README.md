@@ -4,21 +4,25 @@ HyperThought Data/MetaData Uploading program
 
 ## How to install ##
 
+### Conda with Pip installed dependencies ###
+
 Best practice would be to create a virtual environment for python.
   ```lang-console
-  conda create -n easybake python=3.8 tqdm requests
-  pip install pyside2
-  pip install dataclasses-json
+  conda create -n easybake python=3.8
+  conda env create -f environment.yml
   ```
-  or
+That will create a conda virtual environment called **MetaForge** using conda installed dependencies
 
+### Conda with Conda installed dependencies ###
+
+Best practice would be to create a virtual environment for python.
   ```lang-console
-  python3 -m venv easybake tqdm requests
-  source easybake/bin/activate
-  pip install pyside2
-  pip install dataclasses-json
+  conda create -n easybake python=3.8
+  conda activate easybake
+  conda install -r Requirements.txt
   ```
 
+## Full Install Notes ##
 
 1. git clone into the directory.
 
@@ -37,7 +41,7 @@ pip install PySide2 tqdm requests
 From a command prompt within the EasyBake directory (shown using an Anaconda prompt on a Unix Terminal)
 
 ```lang-console
-(easybake) [user@host.com:EasyBake]% python main.py
+(easybake) [user@host.com:EasyBake]% python MetaForge.py
 ```
 
 

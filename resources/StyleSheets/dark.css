@@ -102,14 +102,14 @@ QPushButton#appendCreateTableRowButton,
 QPushButton#addUploadFilesBtn,
 QPushButton#appendUseTableRowButton
 {
-    image: url(:/resources/Images/plus-dark.png);
+    image: url(:/resources/Images/dark/plus-dark.png);
 }
 
 QPushButton#removeUseTableRowButton,
 QPushButton#clearUploadFilesBtn,
 QPushButton#removeCreateTableRowButton
 {
-    image: url(:/resources/Images/delete-dark.png);
+    image: url(:/resources/Images/dark/delete-dark.png);
 }
 
 QPushButton#hyperthoughtUploadButton,
@@ -435,7 +435,7 @@ QComboBox::down-arrow
 {
     background-color: #3062C6;
     border-radius: 4px;
-    image: url(resources/Images/decrease-normal-dark.png);
+    image: url(resources/Images/dark/decrease-normal-dark.png);
 }
 
 /* QComboBox:hover
@@ -536,11 +536,11 @@ QCheckBox
 
 QCheckBox::indicator
 {
-    background-color: #2B2B2B;  
+    background-color: #383838;  
     color: rgba(255, 255, 250, 0.9);
-    width: 16px;
-    height: 16px;
-    border: 1px solid rgba(255, 255, 250, 0.5);
+    /* width: 16px;
+    height: 16px; */
+    border: 0px solid rgba(255, 255, 250, 0.5);
 }
 /* QCheckBox::indicator:hover
 {
@@ -549,12 +549,22 @@ QCheckBox::indicator
 
 QCheckBox::indicator:checked
 {
-    image: url(resources/Images/checkbox_light.png);
+    image: url(resources/Images/dark/checkbox-on.png)
+}
+
+QCheckBox::indicator:unchecked
+{
+    image: url(resources/Images/dark/checkbox-off.png)
 }
 
 QCheckBox::indicator:disabled
 {
-    border: 1px solid #444;
+    image: url(resources/Images/dark/checkbox-on-disabled.png)
+}
+
+QCheckBox::indicator:unchecked:disabled
+{
+    image: url(resources/Images/dark/checkbox-off-disabled.png)
 }
 
 
@@ -598,17 +608,17 @@ QTreeView::indicator
     /* border: 1px solid rgba(255, 255, 250, 0.5); */
     border-radius: 3px;
 }
-QTreeView::indicator:unchecked 
+/* QTreeView::indicator:unchecked 
 {
     image: url(:/icons/eye_grey.png);
-}
+} */
 QTreeView::indicator:checked 
 {
-    image: url(resources/Images/checkbox_light.png);
+    image: url(resources/Images/dark/checkbox_light.png);
 }
 QTreeView::indicator:indeterminate 
 {
-    image: url(resources/Images/checkbox_indeterminate_light.png);
+    image: url(resources/Images/dark/checkbox_indeterminate_light.png);
 }
 QTreeView::item:hover 
 {
@@ -635,13 +645,13 @@ QTreeView::branch:has-children:!has-siblings:closed,
 QTreeView::branch:closed:has-children:has-siblings 
 {
     border-image: none;
-    image: url(resources/Images/tree-closed-gray.png);
+    image: url(resources/Images/dark/tree-closed-gray.png);
 }
 QTreeView::branch:open:has-children:!has-siblings,
 QTreeView::branch:open:has-children:has-siblings  
 {
     border-image: none;
-    image: url(resources/Images/tree-open-gray.png);
+    image: url(resources/Images/dark/tree-open-gray.png);
 }
 QTreeView::branch:hover 
 {

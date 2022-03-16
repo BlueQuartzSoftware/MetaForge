@@ -12,6 +12,8 @@ __pycache__/
 .Python
 build/
 Build/
+build-512/
+build-515/
 develop-eggs/
 dist/
 downloads/
