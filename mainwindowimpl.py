@@ -216,9 +216,7 @@ class MainWindow(QMainWindow):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
         self.restoreGeometry(settings.value("geometry"))
         self.restoreState(settings.value("window_state"))
-        index = settings.value(self.K_PARSER_COMBO_INDEX_NAME)
-        if index == None:
-            index = 0
+        index = settings.value(self.K_PARSER_COMBO_INDEX_NAME, 0, type=int)
         self.ui.fileParserCombo.setCurrentIndex(index)
 
     def acceptKey(self, apikey):
