@@ -714,7 +714,7 @@ class MainWindow(QMainWindow):
             try:
                 datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%X.%f%z')
             except ValueError:
-                datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%X%z')
+                datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%H:%M:%S%z')
             expires_at = datetime_obj.strftime("%m/%d/%Y %I:%M:%S %p")
             self.ui.hyperThoughtExpiresIn.setText(expires_at)
 

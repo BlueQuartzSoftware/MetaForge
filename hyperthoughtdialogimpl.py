@@ -112,7 +112,7 @@ class HyperthoughtDialogImpl(QDialog):
             try:
                 datetime_obj = datetime.strptime(self.authcontrol.expires_at, '%Y-%m-%dT%X.%f%z')
             except ValueError:
-                datetime_obj = datetime.strptime(self.authcontrol.expires_at, '%Y-%m-%dT%X%z')
+                datetime_obj = datetime.strptime(self.authcontrol.expires_at, '%Y-%m-%dT%H:%M:%S%z')
             expires_at = datetime_obj.strftime("%m/%d/%Y %I:%M:%S %p")
             self.ui.token_expiration.setText(expires_at)
             self.project_dict = ht_requests.list_projects(self.authcontrol)
