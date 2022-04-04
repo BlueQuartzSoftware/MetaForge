@@ -216,9 +216,7 @@ class MainWindow(QMainWindow):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
         self.restoreGeometry(settings.value("geometry"))
         self.restoreState(settings.value("window_state"))
-        index = settings.value(self.K_PARSER_COMBO_INDEX_NAME)
-        if index == None:
-            index = 0
+        index = settings.value(self.K_PARSER_COMBO_INDEX_NAME, 0, type=int)
         self.ui.fileParserCombo.setCurrentIndex(index)
 
     def acceptKey(self, apikey):
@@ -716,7 +714,7 @@ class MainWindow(QMainWindow):
             try:
                 datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%X.%f%z')
             except ValueError:
-                datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%X%z')
+                datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%H:%M:%S%z')
             expires_at = datetime_obj.strftime("%m/%d/%Y %I:%M:%S %p")
             self.ui.hyperThoughtExpiresIn.setText(expires_at)
 
