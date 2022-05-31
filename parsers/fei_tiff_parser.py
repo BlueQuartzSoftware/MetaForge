@@ -149,17 +149,17 @@ class FeiTiffParser(MetaForgeParser):
 
     header = self.parse_tiff_tag_34681(filepath)
     if len(header) > 0:
-      file_dict = {"SOURCE": header}
+      file_dict = {"FEI Tag #34681": header}
       return file_dict
 
     header = self.parse_tiff_tag_34682(filepath)
     if len(header) > 0:
-      file_dict = {"SOURCE": header}
+      file_dict = {"FEI Tag #34682": header}
       return file_dict
 
     header = self.parse_tiff_tag_50431(filepath)
     if len(header) > 0:
-      file_dict = {"SOURCE": header}
+      file_dict = {"FEI Tag #50431": header}
       return file_dict
 
     file_dict = {"SOURCE": header}
