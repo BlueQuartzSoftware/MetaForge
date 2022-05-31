@@ -1,5 +1,6 @@
 
 from typing import List
+from uuid import UUID
 
 from parsers.metaforgeparser import MetaForgeParser
 
@@ -12,6 +13,9 @@ class ExampleParser(MetaForgeParser):
 
   def version(self) -> str:
     return 'PICK A VERSION FOR YOUR PARSER'
+  
+  def uuid(self) -> UUID:
+    return 'GENERATE A UUID FOR YOUR PARSER'
 
   def supported_file_extensions(self) -> list:
     return self.ext_list

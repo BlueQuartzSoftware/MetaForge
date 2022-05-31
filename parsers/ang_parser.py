@@ -1,6 +1,8 @@
 import os
 from dataclasses import dataclass
 from typing import Any, Dict, Final, Generator, List, Optional, Type
+from pathlib import Path
+from uuid import UUID
 
 from parsers.metaforgeparser import MetaForgeParser
 
@@ -117,6 +119,9 @@ class AngParser(MetaForgeParser):
 
   def version(self) -> str:
     return '1.0'
+  
+  def uuid(self) -> UUID:
+    return UUID('{e629d07c-b413-45ac-b430-d371f1fbb0f1}')
 
   def supported_file_extensions(self) -> list:
     return self.ext_list
@@ -159,7 +164,7 @@ class AngParser(MetaForgeParser):
   def parse_column_notes(self, file: Generator[str, None, None]) -> str:
     return self.join_lines_until(file, ANG_END_COLUMN_NOTES)
 
-  def parse_header(self, filepath: str) -> AngHeader:
+  def parse_header(self, filepath: Path) -> AngHeader:
     file_gen = file_line_generator(filepath)
 
     ang_header = AngHeader()
@@ -211,7 +216,7 @@ class AngParser(MetaForgeParser):
           ang_header.unknown_entries[keyword] = ' '.join(tokens[1:])
     return ang_header
 
-  def parse_header_as_dict(self, filepath: str) -> dict:
+  def parse_header_as_dict(self, filepath: Path) -> dict:
     header = self.parse_header(filepath)
     entries = header.entries
     phases = header.phases

@@ -3,6 +3,8 @@ import os
 from dataclasses import dataclass
 from enum import IntEnum
 from typing import Any, Callable, Dict, Final, Generator, List, Tuple
+from pathlib import Path
+from uuid import UUID
 
 from parsers.metaforgeparser import MetaForgeParser
 
@@ -103,6 +105,9 @@ class CtfParser(MetaForgeParser):
 
   def version(self) -> str:
     return '1.0'
+  
+  def uuid(self) -> UUID:
+    return UUID('{ec915113-8e3e-4e01-b6bc-029c5e2c3518}')
 
   def supported_file_extensions(self) -> list:
     return self.ext_list
@@ -162,7 +167,7 @@ class CtfParser(MetaForgeParser):
     }
     return entries
 
-  def parse_header(self, filepath: str) -> CtfHeader:
+  def parse_header(self, filepath: Path) -> CtfHeader:
     file_gen = file_line_generator(filepath)
     ctf_header = CtfHeader()
     for line in file_gen:
@@ -189,7 +194,7 @@ class CtfParser(MetaForgeParser):
         ctf_header.unknown_entries[keyword] = CTF_DELIMITER.join(tokens[1:])
     return ctf_header
 
-  def parse_header_as_dict(self, filepath: str) -> dict:
+  def parse_header_as_dict(self, filepath: Path) -> dict:
     header = self.parse_header(filepath)
     entries = header.entries
     phases = header.phases

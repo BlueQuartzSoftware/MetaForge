@@ -1,16 +1,13 @@
-from PySide2.QtNetwork import QNetworkReply
-from PySide2.QtCore import QAbstractListModel, QMimeData, Qt, QModelIndex, QFileInfo, Signal, Slot
-from PySide2.QtGui import QIcon, QColor
-from PySide2.QtWidgets import QApplication, QStyle
-
-
+from PySide2.QtCore import QAbstractListModel, Qt, QModelIndex, QFileInfo, Signal
+from typing import List
+from pathlib import Path
 
 class ListModel(QAbstractListModel):
     rowAdded = Signal()
     rowRemoved = Signal()
     def __init__(self, fileList, parent=None):
         QAbstractListModel.__init__(self, parent)
-        self.metadataList = fileList
+        self.metadataList: List[Path] = fileList
 
     def flags(self, index):
         defaultFlags = QAbstractListModel.flags(self,index)
@@ -39,7 +36,7 @@ class ListModel(QAbstractListModel):
     def data(self, index, role):
         if role == Qt.DisplayRole:
             if index.column() == 0:
-                return self.metadataList[index.row()].split("/")[-1]
+                return self.metadataList[index.row()].name
         return None
 
     def setData(self,index, value, role):

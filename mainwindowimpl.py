@@ -1,41 +1,15 @@
 # This Python file uses the following encoding: utf-8
-import os
-from parsers.metaforgeparser import MetaForgeParser
+from pathlib import Path
 
-from tqdm import tqdm
-from uploader import Uploader
-import json
-from typing import List
-from datetime import datetime
-
-from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QProgressDialog, QDialog
-from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSettings
-from PySide2.QtGui import QCursor, QDesktopServices
+from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QMenu
+from PySide2.QtCore import QStandardPaths, QSettings, Slot
+from PySide2.QtGui import QDesktopServices
 import PySide2.QtCore
+from typing import List
 
-from ezmodel.ezmetadataentry import EzMetadataEntry
-from ezmodel.ezmetadatamodel import EzMetadataModel
-from hyperthoughtdialogimpl import HyperthoughtDialogImpl
 from aboutdialogimpl import AboutDialogImpl
-from qeztablemodel import QEzTableModel
-from uselistmodel import ListModel
-from treemodel import TreeModel
-from trashdelegate import TrashDelegate
-from checkboxdelegate import CheckBoxDelegate
-from qcreateeztablemodel import QCreateEzTableModel
-from quseeztablemodel import QUseEzTableModel
-from usefiledelegate import UseFileDelegate
 from metaforgestyledatahelper import MetaForgeStyleDataHelper
-
-from ht_requests.ht_requests import ht_utilities
-from ht_requests.ht_requests import htauthcontroller
-from ht_requests.ht_requests import ht_requests
-
-from parsers.ctf_parser import CtfParser
-from parsers.ang_parser import AngParser
-from parsers.fei_tiff_parser import FeiTiffParser
-from parsers.ini_parser import IniParser
-
+from available_parsers_model import AvailableParsersModel
 
 qt_version = PySide2.QtCore.__version_info__
 if qt_version[1] == 12:
@@ -45,676 +19,190 @@ elif qt_version[1] == 15:
 
 
 class MainWindow(QMainWindow):
-    K_CREATE_TREE_HEADER = "Available File Metadata"
-    K_MODEL_JSON_FILE_NAME = '.model.json'
-    K_MODEL_KEY_NAME = 'model'
-    K_FILELIST_KEY_NAME = 'file_list'
-    K_TEMPLATEFILE_KEY_NAME = 'template_file'
-    K_FILETOEXTRACT_KEY_NAME = 'file_to_extract'
-    K_MISSINGENTRIES_KEY_NAME = 'missing_entries'
-    K_METADATAFILECHOSEN_KEY_NAME = 'metadata_file_chosen'
-    K_PARSER_COMBO_INDEX_NAME = 'fileParserCombo_Index'
-    
-    available_parsers: List[MetaForgeParser] = (AngParser(), CtfParser(), IniParser(), FeiTiffParser())
-
-    createUpload = Signal(list, htauthcontroller.HTAuthorizationController, str, str, list)
+    K_MAX_RECENT_TEMPLATE_SIZE = 10
+    K_MAX_RECENT_PACKAGE_SIZE = 10
+    K_CLEAR_RECENT_TEMPLATES_STR = "Clear Recent Templates"
+    K_CLEAR_RECENT_PACKAGES_STR = "Clear Recent Packages"
 
     def __init__(self, app: QApplication):
         super(MainWindow, self).__init__()
         
         self.style_sheet_helper: MetaForgeStyleDataHelper = MetaForgeStyleDataHelper(app)
-        self.hyperthoughtui = HyperthoughtDialogImpl()
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
-        self.ui.TabWidget.setCurrentWidget(self.ui.CreateTemplateTab)
-        self.ui.actionHelp.triggered.connect(self.help)
-        self.ui.actionAbout.triggered.connect(self.displayAbout)
-        self.ui.actionOpenPackage.triggered.connect(self.openPackage)
-        self.ui.actionSave_Package.triggered.connect(self.savePackage)
+        self.ui.tab_widget.setCurrentWidget(self.ui.CreateTemplateTab)
+        self.available_parsers_model = AvailableParsersModel(self)
+        self.ui.actionHelp.triggered.connect(self.display_help)
+        self.ui.actionAbout.triggered.connect(self.display_about)
+        self.ui.actionOpenPackage.triggered.connect(self.open_package)
+        self.ui.actionSave_Package.triggered.connect(self.save_package)
         self.ui.actionClose.triggered.connect(self.close)
-        self.ui.actionSave_Template.triggered.connect(self.saveTemplate)
-        self.ui.actionOpen_Template.triggered.connect(self.restoreTemplate)
-        self.ui.dataFileSelect.clicked.connect(self.select_input_data_file)
-        self.ui.hyperthoughtTemplateSelect.clicked.connect(self.selectTemplate)
-        self.ui.saveTemplateButton.clicked.connect(self.saveTemplate)
-        self.ui.otherDataFileSelect.clicked.connect(self.loadOtherDataFile)
-        self.ui.hyperthoughtUploadButton.clicked.connect(self.uploadToHyperthought)
-        self.ui.clearCreateButton.clicked.connect(self.clearCreate)
-        self.ui.clearUseButton.clicked.connect(self.clearUse)
-        self.hyperthoughtui.currentTokenExpired.connect(lambda:  self.ui.hyperThoughtExpiresIn.setText(self.hyperthoughtui.K_EXPIRED_STR))
-        self.setAcceptDrops(True)
-        self.numCustoms = 0
-        self.editableKeys = []
+        self.ui.actionSave_Template.triggered.connect(self.save_template)
+        self.ui.actionOpen_Template.triggered.connect(self.open_template)
 
-        # Setup the blank Create Template table
-        self.setup_create_ez_table()
+        self.action_recent_templates_separator: QAction = self.ui.menu_recent_templates.addSeparator()
+        self.action_recent_templates: QAction = self.ui.menu_recent_templates.addAction(self.K_CLEAR_RECENT_TEMPLATES_STR, self.clear_recent_templates)
+        self.action_recent_packages_separator: QAction = self.ui.menu_recent_packages.addSeparator()
+        self.action_recent_packages: QAction = self.ui.menu_recent_packages.addAction(self.K_CLEAR_RECENT_PACKAGES_STR, self.clear_recent_packages)
+        self.recent_template_list: List[QAction] = []
+        self.recent_package_list: List[QAction] = []
 
-        # Setup the blank Create Template tree
-        self.setup_create_ez_tree()
+        # Set the parsers model down into the Create Template and Use Template widgets
+        self.ui.create_template_widget.set_parsers_model(self.available_parsers_model)
+        self.ui.use_template_widget.set_parsers_model(self.available_parsers_model)
 
-        # Setup the blank Use Template table
-        self.setup_use_ez_table()
-
-        # Setup the blank Use Template file list
-        self.setup_use_ez_list()
-
-        self.ui.addUploadFilesBtn.clicked.connect(self.addUploadFiles)
-        self.ui.clearUploadFilesBtn.clicked.connect(self.clearUploadFiles)
-        self.ui.appendCreateTableRowButton.clicked.connect(self.addCustomRowToCreateTable)
-        self.ui.removeCreateTableRowButton.clicked.connect(self.handleRemoveCreate)
-        self.ui.removeUseTableRowButton.clicked.connect(self.handleRemoveUse)
-        self.ui.appendUseTableRowButton.clicked.connect(self.addUseTableRow)
-        self.ui.hyperthoughtLocationButton.clicked.connect(self.authenticateToHyperThought)
+        # Read settings
+        self.read_settings()
     
-        self.ui.useTemplateListSearchBar.textChanged.connect(self.filter_use_table)
-        self.ui.createTemplateListSearchBar.textChanged.connect(self.filter_create_table)
-        self.ui.createTemplateTreeSearchBar.textChanged.connect(self.filterCreateTree)
-        self.ui.addMetadataFileCheckBox.stateChanged.connect(self.checkFileList)
-
-        # Setup the Combo Box with all of the parsers that we know about
-
-
-        for index, parser in enumerate(self.available_parsers):
-            self.ui.fileParserCombo.addItem(parser.human_label(), index)
-        self.ui.fileParserCombo.currentIndexChanged.connect(self.handleParserComboBoxChange)
-
-        self.fileType = ""
-        self.accessKey = ""
-        self.folderuuid = ""
-        self.mThread = QThread()
-        self.uploader = Uploader()
-        self.uploader.moveToThread(self.mThread)
-        self.mThread.start()
-
-        self.createUpload.connect(self.uploader.performUpload)
-        self.hyperthoughtui.apiSubmitted.connect(self.acceptKey)
-        self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
-        self.ui.otherDataFileLineEdit.installEventFilter(self)
-        self.ui.dataFileLineEdit.installEventFilter(self)
-
-        # Read window settings
-        self.read_window_settings()
-
-    def setup_create_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
-        self.createtrashDelegate = TrashDelegate(stylehelper=self.style_sheet_helper)
-        self.checkboxDelegate = CheckBoxDelegate()
-        self.create_ez_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
-        self.create_ez_table_model_proxy = self.init_create_table_model_proxy(self.create_ez_table_model)
-        self.ui.metadataTableView.setModel(self.create_ez_table_model_proxy)
-        self.filter_create_table()
-        self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_REMOVE_COL_INDEX, self.createtrashDelegate)
-        self.createtrashDelegate.pressed.connect(self.handleRemoveCreate)
-        self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkboxDelegate)
-        self.ui.metadataTableView.setItemDelegateForColumn(self.create_ez_table_model.K_EDITABLE_COL_INDEX, self.checkboxDelegate)
-        self.polish_create_ez_table()
-    
-    def polish_create_ez_table(self):
-        self.ui.metadataTableView.resizeColumnsToContents()
-        self.ui.metadataTableView.setColumnWidth(self.create_ez_table_model.K_HTANNOTATION_COL_INDEX, self.width() * .1)
-        self.ui.metadataTableView.setColumnWidth(self.create_ez_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width() * .125)
-        self.ui.metadataTableView.horizontalHeader().setStretchLastSection(True)
-
-    def setup_use_ez_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
-        self.usetrashDelegate = TrashDelegate(stylehelper=self.style_sheet_helper)
-        self.use_ez_table_model = QEzTableModel(metadata_model, parent=self)
-        self.use_ez_table_model_proxy = self.init_use_table_model_proxy(self.use_ez_table_model)
-        self.ui.useTemplateTableView.setModel(self.use_ez_table_model_proxy)
-        self.filter_use_table()
-        self.ui.useTemplateTableView.setItemDelegateForColumn(self.use_ez_table_model_proxy.K_REMOVE_COL_INDEX, self.usetrashDelegate)
-        self.usetrashDelegate.pressed.connect(self.handleRemoveUse)
-        self.polish_use_ez_table()
-
-    def polish_use_ez_table(self):
-        self.ui.useTemplateTableView.resizeColumnsToContents()
-        self.ui.useTemplateTableView.setColumnWidth(self.use_ez_table_model.K_HTANNOTATION_COL_INDEX, self.width() * .1)
-        self.ui.useTemplateTableView.setColumnWidth(self.use_ez_table_model.K_HTUNITS_COL_INDEX, self.width() * .1)
-        self.ui.useTemplateTableView.horizontalHeader().setStretchLastSection(True)
-
-    def setup_create_ez_tree(self, metadata_model: EzMetadataModel = EzMetadataModel()):
-        headers = [self.K_CREATE_TREE_HEADER]
-        self.treeModel = TreeModel(headers, metadata_model, self)
-        self.createTreeSearchFilterModel = QSortFilterProxyModel(self)
-        self.createTreeSearchFilterModel.setSourceModel(self.treeModel)
-        self.createTreeSearchFilterModel.setFilterKeyColumn(0)
-        self.createTreeSearchFilterModel.setDynamicSortFilter(True)
-        self.createTreeSearchFilterModel.setRecursiveFilteringEnabled(True)
-        self.ui.metadataTreeView.setModel(self.createTreeSearchFilterModel)
-        self.ui.metadataTreeView.expandAll()
-        refresh_func = self.create_ez_table_model.refresh_entry
-        self.treeModel.checkChanged.connect(refresh_func)
-    
-    def setup_use_ez_list(self, file_list: list = []):
-        self.uselistmodel = ListModel(file_list, self)
-        self.ui.useTemplateListView.setModel(self.uselistmodel)
-        self.uselistmodel.rowRemoved.connect(self.toggleButtons)
-        self.uselistmodel.rowAdded.connect(self.toggleButtons)
-
-        self.useFileDelegate = UseFileDelegate(self, stylehelper=self.style_sheet_helper)
-        self.ui.useTemplateListView.setItemDelegate(self.useFileDelegate)
-
-        self.ui.useTemplateListView.clicked.connect(
-            self.removeRowfromUsefileType)
-
-    def clearCreate(self):
-        self.ui.dataFileLineEdit.setText("")
-        self.ui.dataTypeText.setText("None Selected")
-        self.ui.createTemplateListSearchBar.setText("")
-        self.ui.createTemplateTreeSearchBar.setText("")
-        self.setup_create_ez_table()
-        self.setup_create_ez_tree()
-
-    def clearUse(self):
-        self.ui.hyperthoughtTemplateLineEdit.setText("")
-        self.ui.otherDataFileLineEdit.setText("")
-        self.ui.useTemplateListSearchBar.setText("")
-        self.ui.displayedFileLabel.setText("No File Selected")
-        self.ui.addMetadataFileCheckBox.setChecked(True)
-        self.setup_use_ez_table()
-        self.clearUploadFiles()
-
-    def read_window_settings(self):
+    def read_settings(self):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
+        self.read_window_settings(settings)
+        recent_templates = settings.value("recent_templates")
+        recent_packages = settings.value("recent_packages")
+
+        if recent_templates is not None:
+            for file_path in recent_templates:
+                action = QAction(file_path)
+                action.triggered.connect(lambda triggered=False, file_path=file_path: self._open_template(file_path))
+                self.add_recent_action(self.ui.menu_recent_templates, self.recent_template_list, self.action_recent_templates_separator, self.ui.action_clear_recent_templates, action)
+
+        if recent_packages is not None:
+            for file_path in recent_packages:
+                action = QAction(file_path)
+                action.triggered.connect(lambda triggered=False, pkg_file_path=Path(file_path): self.ui.use_template_widget.open_package(pkg_file_path))
+                self.add_recent_action(self.ui.menu_recent_packages, self.recent_package_list, self.action_recent_packages_separator, self.ui.action_clear_recent_packages, action)
+
+    def read_window_settings(self, settings):
         self.restoreGeometry(settings.value("geometry"))
         self.restoreState(settings.value("window_state"))
-        index = settings.value(self.K_PARSER_COMBO_INDEX_NAME, 0, type=int)
-        self.ui.fileParserCombo.setCurrentIndex(index)
-
-    def acceptKey(self, apikey):
-        self.accessKey = apikey
-
-    def addCustomRowToCreateTable(self):
-        self.create_ez_table_model.addCustomRow(self.numCustoms)
-        self.numCustoms += 1
-
-    def addUploadFiles(self):
-        linetexts = QFileDialog.getOpenFileNames(self, self.tr("Select File"), QStandardPaths.displayName(
-            QStandardPaths.HomeLocation), self.tr("Files (*.ctf *.xml *.ang *.tif *.tiff)"))[0]
-        for line in linetexts:
-            self.uselistmodel.addRow(line)
-        self.toggleButtons()
-
-    def clearUploadFiles(self):
-        self.uselistmodel.removeAllRows()
-
-    def addUseTableRow(self):
-        self.use_ez_table_model.addCustomRow(1)
-
-    def checkFileList(self, checked):
-        if checked == Qt.Checked:
-          if self.ui.otherDataFileLineEdit.text() != "":
-              self.uselistmodel.addRow(self.ui.otherDataFileLineEdit.text())
-        elif checked == Qt.Unchecked:
-            if self.ui.otherDataFileLineEdit.text() in self.uselistmodel.metadataList:
-                rowIndex = self.uselistmodel.metadataList.index(self.ui.otherDataFileLineEdit.text())
-                self.uselistmodel.removeRow(rowIndex)
 
     def closeEvent(self, event):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
         settings.setValue("geometry", self.saveGeometry())
         settings.setValue("window_state", self.saveState())
-        settings.setValue(self.K_PARSER_COMBO_INDEX_NAME, self.ui.fileParserCombo.currentIndex())
 
-        self.mThread.quit()
-        self.mThread.wait(250)
+        recent_template_list = [action.text() for action in self.recent_template_list]
+        settings.setValue("recent_templates", recent_template_list)
+
+        recent_package_list = [action.text() for action in self.recent_package_list]
+        settings.setValue("recent_packages", recent_package_list)
+
+        self.ui.create_template_widget.close()
+        self.ui.use_template_widget.close()
 
         super().closeEvent(event)
+    
+    def add_recent_action(self, recent_menu: QMenu, recent_list: List[QAction], separator_action: QAction, clear_action: QAction, action: QAction, index: int = -1):
+        if index == -1 or (index == 0 and len(recent_list) == 0):
+            index = len(recent_list)
+            before_action = separator_action
+        else:
+            before_action = recent_list[index]
+        recent_list.insert(index, action)
+        recent_menu.insertAction(before_action, action)
+        if len(recent_list) > 0:
+            clear_action.setEnabled(True)
+    
+    def remove_recent_action(self, recent_menu: QMenu, recent_list: List[QAction], clear_action: QAction, action: QAction):
+        recent_menu.removeAction(action)
+        recent_list.remove(action)
 
-    def eventFilter(self, object, event):
-        if object == self.ui.hyperthoughtTemplateLineEdit:
-            if event.type() == QEvent.DragEnter:
-                if str(event.mimeData().urls()[0])[-5:-2] == ".ez":
-                    event.acceptProposedAction()
-            if (event.type() == QEvent.Drop):
-                if str(event.mimeData().urls()[0])[-5:-2] == ".ez":
-                    event.acceptProposedAction()
-                    self.ui.hyperthoughtTemplateLineEdit.setText(event.mimeData().urls()[0].toLocalFile())
-                    self.loadTemplateFile()
-        if object == self.ui.otherDataFileLineEdit:
-            if event.type() == QEvent.DragEnter:
-                event.acceptProposedAction()
-            if (event.type() == QEvent.Drop):
-                event.acceptProposedAction()
-                self.ui.otherDataFileLineEdit.setText(event.mimeData().urls()[0].toLocalFile())
-                self.importMetadataFromDataFile()
-        if object == self.ui.dataFileLineEdit:
-            accepted_ext = ['.ang', '.ctf', '.tiff' , '.tif']
-            if event.type() == QEvent.DragEnter:
-                file_ext = str(event.mimeData().urls()[0])[-6:-2]
-                event.acceptProposedAction()
-            if (event.type() == QEvent.Drop):
-                file_ext = str(event.mimeData().urls()[0])[-6:-2]
-                event.acceptProposedAction()
-                self.select_input_data_file(event.mimeData().urls()[0].toLocalFile())              
+        if len(recent_list) == 0:
+            clear_action.setDisabled(True)
+    
+    @Slot(result=None)
+    def clear_recent_templates(self):
+        [self.ui.menu_recent_templates.removeAction(action) for action in self.recent_template_list]
+        self.recent_template_list.clear()
+        self.ui.action_clear_recent_templates.setDisabled(True)
+    
+    @Slot(result=None)
+    def clear_recent_packages(self):
+        [self.ui.menu_recent_packages.removeAction(action) for action in self.recent_package_list]
+        self.recent_package_list.clear()
+        self.ui.action_clear_recent_packages.setDisabled(True)
 
-        return QMainWindow.eventFilter(self, object,  event)
-
-    def filter_create_table(self):
-        proxy = self.create_ez_table_model_proxy
-        text = self.ui.createTemplateListSearchBar.text()
-        self.filter_proxy(proxy, text)
-
-    def filter_use_table(self):
-        proxy = self.use_ez_table_model_proxy
-        text = self.ui.useTemplateListSearchBar.text()
-        self.filter_proxy(proxy, text)
-
-    def filter_proxy(self, proxy_model: QSortFilterProxyModel, filter_text: str):
-        proxy_model.invalidate()
-        proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
-        proxy_model.setFilterWildcard(f'*{filter_text}*')
-
-    def filterCreateTree(self):
-        self.createTreeSearchFilterModel.invalidate()
-        self.createTreeSearchFilterModel.setFilterCaseSensitivity(
-            Qt.CaseInsensitive)
-        self.createTreeSearchFilterModel.setFilterWildcard(
-            "*"+self.ui.createTemplateTreeSearchBar.text()+"*")
-
-    def displayAbout(self):
+    def display_about(self):
         aboutDialog = AboutDialogImpl(self)
         aboutDialog.exec()
 
-
-    def getLocation(self):
-        remoteDirPath = self.hyperthoughtui.getUploadDirectory()
-        
-        self.folderuuid = ht_requests.get_ht_id_path_from_ht_path(self.hyperthoughtui.authcontrol, 
-                                                    ht_path=remoteDirPath, 
-                                                    ht_space = 'project', ht_space_id=self.hyperthoughtui.current_project["content"]["pk"])
-        self.ui.hyperThoughtUploadPath.setText(remoteDirPath)
-        self.toggleButtons()
-
-    def handleRemoveCreate(self, source_row = -1):
-        if source_row != -1:
-            entry = self.create_ez_table_model.metadata_model.entry(source_row)
-            if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                self.create_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
-                self.create_ez_table_model.metadata_model.remove_by_index(source_row)
-                self.create_ez_table_model.endRemoveRows()
-            elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
-                self.treeModel.changeLeafCheck(entry.source_path)
-        else:
-
-            proxy_selected_rows = reversed(self.ui.metadataTableView.selectionModel().selectedRows())
-            source_row = -1
-            for index in proxy_selected_rows:
-                source_row = (index.model().mapToSource(index)).row()
-                entry = self.create_ez_table_model.metadata_model.entry(source_row)
-                # Remove Custom Entries from the mode or just mark FILE sources as disabled.
-                if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                    self.create_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
-                    self.create_ez_table_model.metadata_model.remove_by_index(source_row)
-                    self.create_ez_table_model.endRemoveRows()
-                elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
-                    self.treeModel.changeLeafCheck(entry.source_path)
-        
-        self.create_ez_table_model_proxy.invalidate()
-        index0 = self.create_ez_table_model.index(0, 0)
-        index1 = self.create_ez_table_model.index(self.create_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
-        self.create_ez_table_model_proxy.dataChanged.emit(index0, index1)
-
-
-    def handleRemoveUse(self, source_row = -1):
-        if source_row != -1:
-            entry = self.use_ez_table_model.metadata_model.entry(source_row)
-            if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                self.use_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
-                self.use_ez_table_model.metadata_model.remove_by_index(source_row)
-                self.use_ez_table_model.endRemoveRows()
-            elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
-                entry.enabled = False
-        else:
-            proxy_selected_rows = reversed(self.ui.useTemplateTableView.selectionModel().selectedRows())
-            source_row = -1
-            for index in proxy_selected_rows:
-                source_row = (index.model().mapToSource(index)).row()
-                entry = self.use_ez_table_model.metadata_model.entry(source_row)
-                if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                    self.use_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
-                    self.use_ez_table_model.metadata_model.remove_by_index(source_row)
-                    self.use_ez_table_model.endRemoveRows()
-                elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
-                    entry.enabled = False
-        
-        self.use_ez_table_model_proxy.invalidate()
-        index0 = self.use_ez_table_model_proxy.index(0, 0)
-        index1 = self.use_ez_table_model_proxy.index(self.use_ez_table_model_proxy.rowCount() - 1, self.use_ez_table_model_proxy.K_COL_COUNT)
-        self.use_ez_table_model_proxy.dataChanged.emit(index0, index1)
-        # This toggle is for macOS Catalina to actual visually show the updated checkboxes.
-        self.ui.useTemplateTableView.setVisible(False)
-        self.ui.useTemplateTableView.setVisible(True)
-        self.ui.useTemplateTableView.update()
-        # End stupid macOS Catalina workaround.
-
-
-    def help(self):
+    def display_help(self):
         QDesktopServices.openUrl("http://www.bluequartz.net/")
-
-    def openPackage(self):
-        pkgpath = QFileDialog.getExistingDirectory(self, caption=self.tr("Select MetaForge Package"), dir=QStandardPaths.displayName(
-            QStandardPaths.HomeLocation))
-        if pkgpath != "":
-            # Load model
-            model_input_path = os.path.join(pkgpath, self.K_MODEL_JSON_FILE_NAME)
-
-            with open(model_input_path, 'r') as infile:
-                model_dict = json.load(infile)
-
-                self.use_ez_table_model.metadata_model = EzMetadataModel.from_json_dict(model_dict[self.K_MODEL_KEY_NAME])
-
-                # Load file list
-                upload_file_paths = model_dict[self.K_FILELIST_KEY_NAME]
-                for file_path in upload_file_paths:
-                    self.uselistmodel.metadataList.append(file_path)
-                
-                index0 = self.uselistmodel.index(0, 0)
-                index1 = self.uselistmodel.index(len(self.uselistmodel.metadataList) - 1, 0)
-                self.uselistmodel.dataChanged.emit(index0, index1)
-
-                # Load template file
-                template_file_path = model_dict[self.K_TEMPLATEFILE_KEY_NAME]
-                self.ui.hyperthoughtTemplateLineEdit.setText(template_file_path)
-
-                # Load file to extract metadata from
-                extraction_file_path = model_dict[self.K_FILETOEXTRACT_KEY_NAME]
-                self.ui.otherDataFileLineEdit.setText(extraction_file_path)
-            
-                # Load missing entries and metadata_file_chosen boolean
-                missing_entry_srcs = model_dict[self.K_MISSINGENTRIES_KEY_NAME]
-                metadata_model = self.use_ez_table_model.metadata_model
-                missing_entries = []
-                for missing_entry_src in missing_entry_srcs:
-                    metadata_entry = metadata_model.entry_by_source(missing_entry_src)
-                    missing_entries.append(metadata_entry)
-                self.use_ez_table_model_proxy.missing_entries = missing_entries
-                self.use_ez_table_model_proxy.metadata_file_chosen = model_dict[self.K_METADATAFILECHOSEN_KEY_NAME]
-
-            self.use_ez_table_model_proxy.invalidate()
-            self.ui.menuOpen_Recent.addAction(pkgpath)
-
-    def saveTemplate(self):
-        dialog = QFileDialog(self, "Save File", "", "Templates (*.ez)")
-        dialog.setDefaultSuffix(".ez")
-        dialog.setAcceptMode(QFileDialog.AcceptSave)
-        fileName = ""
-        if dialog.exec():
-            fileName = dialog.selectedFiles()[0]
-        if fileName != "":
-            self._saveTemplate(fileName)
     
-    def _saveTemplate(self, file_path: str):
-        with open(file_path, 'w') as outfile:
-                model_string = self.create_ez_table_model.metadata_model.to_json_string()
-                outfile.write(model_string)
-
-    def restoreTemplate(self):
+    def open_template(self):
         # open template
         template_file_path = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(
             QStandardPaths.HomeLocation), self.tr("Files (*.ez)"))[0]
         if template_file_path != "":
-            metadata_model = EzMetadataModel.from_json_file(template_file_path)
+            self._open_template(template_file_path)
 
-            # Setup the Create Template table
-            self.setup_create_ez_table(metadata_model=metadata_model)
+    @Slot(str, result=None)
+    def _open_template(self, file_path: str):
+        self.ui.create_template_widget.load_template(template_file_path=Path(file_path))
 
-            # Setup the Create Template tree
-            self.setup_create_ez_tree(metadata_model=metadata_model)
+        # Find action in the list and remove it (if it's there)
+        for action in self.recent_template_list:
+            if action.text() == file_path:
+                self.remove_recent_action(self.ui.menu_recent_templates, self.recent_template_list, self.ui.action_clear_recent_templates, action)
 
-    def init_create_table_model_proxy(self, source_model: QEzTableModel) -> QCreateEzTableModel:
-        proxy = QCreateEzTableModel(self)
-        proxy.setSourceModel(source_model)
-        proxy.setFilterKeyColumn(1)
-        proxy.setDynamicSortFilter(True)
-        return proxy
+        # Add action to the top of the list
+        action = QAction(file_path)
+        action.triggered.connect(lambda triggered=False, file_path=file_path: self._open_template(file_path))
+        self.add_recent_action(self.ui.menu_recent_templates, self.recent_template_list, self.action_recent_templates_separator, self.ui.action_clear_recent_templates, action, 0)
+
+        # Remove last action if the action list is greater than the max
+        if len(self.recent_template_list) > self.K_MAX_RECENT_TEMPLATE_SIZE:
+            action = self.recent_template_list[len(self.recent_template_list) - 1]
+            self.remove_recent_action(self.ui.menu_recent_templates, self.recent_template_list, self.ui.action_clear_recent_templates, action)
+        
+        # Change the tab to the "Create Template" section
+        self.ui.tab_widget.setCurrentIndex(0)
+
+    def save_template(self):
+        dialog = QFileDialog(self, "Save File", "", "Templates (*.ez)")
+        dialog.setDefaultSuffix(".ez")
+        dialog.setAcceptMode(QFileDialog.AcceptSave)
+        file_path = ""
+        if dialog.exec():
+            file_path = dialog.selectedFiles()[0]
+        if file_path != "":
+            self.ui.create_template_widget.save_template(file_path)
+            self.ui.statusbar.showMessage(f"Template saved successfully to '{file_path}'.", 10000)
+
+    def open_package(self):
+        pkgpath = QFileDialog.getExistingDirectory(self, caption=self.tr("Select MetaForge Package"), dir=QStandardPaths.displayName(
+            QStandardPaths.HomeLocation))
+        if pkgpath != "":
+            self._open_package(pkgpath)
     
-    def init_use_table_model_proxy(self, source_model: QEzTableModel) -> QUseEzTableModel:
-        proxy = QUseEzTableModel(self)
-        proxy.setSourceModel(source_model)
-        proxy.setFilterKeyColumn(1)
-        proxy.setDynamicSortFilter(True)
-        return proxy   
+    @Slot(str, result=None)
+    def _open_package(self, pkgpath: str):
+        pkgpath = Path(pkgpath)
+        self.ui.use_template_widget.open_package(pkgpath)
 
-    def removeRowfromUsefileType(self, index):
-        if self.ui.useTemplateListView.width() - 64 < self.ui.useTemplateListView.mapFromGlobal(QCursor.pos()).x():
-            # this is where to remove the row
-            self.uselistmodel.removeRow(index.row())
+        # Find action in the list and remove it (if it's there)
+        for action in self.recent_package_list:
+            if action.text() == str(pkgpath):
+                self.remove_recent_action(self.ui.menu_recent_packages, self.recent_package_list, self.ui.action_clear_recent_packages, action)
 
-    def savePackage(self):
+        # Add action to the top of the list
+        action = QAction(str(pkgpath))
+        action.triggered.connect(lambda triggered=False, file_path=str(pkgpath): self._open_package(file_path))
+        self.add_recent_action(self.ui.menu_recent_packages, self.recent_package_list, self.action_recent_packages_separator, self.ui.action_clear_recent_packages, action, 0)
+
+        # Remove last action if the action list is greater than the max
+        if len(self.recent_package_list) > self.K_MAX_RECENT_PACKAGE_SIZE:
+            action = self.recent_package_list[len(self.recent_package_list) - 1]
+            self.remove_recent_action(self.ui.menu_recent_packages, self.recent_package_list, self.ui.action_clear_recent_packages, action)
+        
+        # Change the tab to the "Use Template" section
+        self.ui.tab_widget.setCurrentIndex(1)
+
+    def save_package(self):
         result = QFileDialog.getSaveFileName(self, "Save File",
                                                "/Packages/",
                                                "Packages (*.ezp)")
         pkgpath = result[0]
         if pkgpath != "":
-            # Create package
-            myDir = QDir()
-            myDir.mkpath(pkgpath)
-
-            # Copy file list to package
-            newfilepaths = []
-            for filepath in self.uselistmodel.metadataList:
-                filename = filepath.split("/")[-1]
-                newfilepath = os.path.join(pkgpath, filename)
-                newfilepaths.append(newfilepath)
-                QFile.copy(filepath, newfilepath)
-            
-            # Copy template file to package
-            template_file_path = self.ui.hyperthoughtTemplateLineEdit.text()
-            new_template_file_path = ""
-            if template_file_path != "":
-                template_file_name = template_file_path.split("/")[-1]
-                new_template_file_path = os.path.join(pkgpath, template_file_name)
-                QFile.copy(template_file_path, new_template_file_path)
-
-            # Copy "file to extract metadata from" to package
-            extraction_file_path = self.ui.otherDataFileLineEdit.text()
-            new_extraction_file_path = ""
-            if extraction_file_path != "":
-                extraction_file_name = extraction_file_path.split("/")[-1]
-                new_extraction_file_path = os.path.join(pkgpath, extraction_file_name)
-                QFile.copy(extraction_file_path, new_extraction_file_path)
-
-            # Save model, file list, template file, file_to_extract,
-            # metadata_file_chosen, and missing_entries to json file
-            model_dict = {}
-            model_dict[self.K_MODEL_KEY_NAME] = self.use_ez_table_model.metadata_model.to_json_dict()
-
-            model_dict[self.K_FILELIST_KEY_NAME] = newfilepaths
-            model_dict[self.K_TEMPLATEFILE_KEY_NAME] = new_template_file_path
-            model_dict[self.K_FILETOEXTRACT_KEY_NAME] = new_extraction_file_path
-            model_dict[self.K_METADATAFILECHOSEN_KEY_NAME] = self.use_ez_table_model_proxy.metadata_file_chosen
-            missing_entries = []
-            for missing_entry in self.use_ez_table_model_proxy.missing_entries:
-                missing_entries.append(missing_entry.source_path)
-            model_dict[self.K_MISSINGENTRIES_KEY_NAME] = missing_entries
-            paths_output_path = os.path.join(pkgpath, self.K_MODEL_JSON_FILE_NAME)
-            with open(paths_output_path, 'w') as outfile:
-                json.dump(model_dict, outfile, indent=4)
-
-    def parseDataFile(self, filePath:str="", parser:MetaForgeParser=None):
-        if parser == None:
-            return
-        if filePath == "":
-            return
-        # parse the metadata from the input data file
-        headerDict = parser.parse_header_as_dict(filePath)
-
-
-        metadata_model = EzMetadataModel.create_model(headerDict,
-                                                filePath,
-                                                source_type=EzMetadataEntry.SourceType.FILE)
-
-        # Setup the Create Template table
-        self.setup_create_ez_table(metadata_model=metadata_model)
-
-        # Setup the Create Template tree
-        self.setup_create_ez_tree(metadata_model=metadata_model)
-
-        self.ui.metadataTableView.setWordWrap(True)
-        self.ui.metadataTableView.setRowHeight(21, 35)
-        self.polish_create_ez_table()
-        self.ui.dataTypeText.setText(parser.human_label())
-
-    def handleParserComboBoxChange(self, index: int=-1):
-        if index != -1:
-            filePath = self.ui.dataFileLineEdit.text()
-            parser = self.available_parsers[index]
-            self.parseDataFile(filePath, parser)
-            
-    def select_input_data_file(self, fileLink=None):
-        if fileLink == False:
-            filePath = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(
-                QStandardPaths.HomeLocation), self.tr("Files (*.*)"))[0]
-        else:
-            filePath = fileLink
-        if filePath != "":
-            self.setWindowTitle(filePath)
-            self.ui.dataFileLineEdit.setText(filePath)
-
-            split = os.path.splitext(filePath)
-            ext = split[1] #.replace('.', '')
-
-            headerDict = {}
-            parser = None
-
-            found_a_parser = False
-            for index, p in enumerate(self.available_parsers):
-                if p.accepts_extension(ext):
-                    parser = p
-                    found_a_parser = True
-                    self.ui.fileParserCombo.setCurrentIndex(index)
-                    break
-            if found_a_parser == False:
-                raise RuntimeError('No parser available for selected file.')
-            
-            self.parseDataFile(filePath, parser)
-
-        return True
-
-    def selectTemplate(self):
-        startLocation = self.ui.hyperthoughtTemplateLineEdit.text()
-        if startLocation == "":
-            startLocation = QStandardPaths.writableLocation(
-                QStandardPaths.HomeLocation)
-
-        templateFilePath = QFileDialog.getOpenFileName(self, self.tr(
-            "Select File"), startLocation, self.tr("Files (*.ez)"))[0]
-
-        self.ui.hyperthoughtTemplateLineEdit.setText(templateFilePath)
-        self.loadTemplateFile()
-
-    def loadTemplateFile(self):
-        templateFilePath = self.ui.hyperthoughtTemplateLineEdit.text()
-
-        if templateFilePath == "":
-            return False
-
-        # Load the EzMetadataModel from the json file (Template file)
-        metadata_model = EzMetadataModel.from_json_file(templateFilePath)
-        self.setup_use_ez_table(metadata_model)
-        self.currentTemplate = templateFilePath.split("/")[-1]
-        self.updateUseTableModel()
-        self.polish_use_ez_table()
-
-    def loadOtherDataFile(self):
-        datafile_input_path = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(
-                QStandardPaths.HomeLocation), self.tr("Files (*"+self.fileType+")"))[0]
-        if datafile_input_path != "":
-            self.ui.otherDataFileLineEdit.setText(datafile_input_path)
-            self.importMetadataFromDataFile()
-
-    def importMetadataFromDataFile(self):
-        filePath = self.ui.otherDataFileLineEdit.text()
-        self.setWindowTitle(filePath)
-        self.ui.dataTypeText.setText(filePath.split(".")[1].upper())
-        if self.ui.addMetadataFileCheckBox.checkState() == Qt.Checked:
-            self.uselistmodel.removeAllRows()
-            self.uselistmodel.addRow(filePath)
-            self.toggleButtons()
-        self.updateUseTableModel()
-
-
-    def updateUseTableModel(self):
-        templateFilePath = self.ui.hyperthoughtTemplateLineEdit.text()
-        filePath = self.ui.otherDataFileLineEdit.text()
-
-        if filePath == "" or templateFilePath == "":
-            self.use_ez_table_model_proxy.metadata_file_chosen = False
-            index0 = self.use_ez_table_model.index(0, 0)
-            index1 = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
-            self.use_ez_table_model.dataChanged.emit(index0, index1)
-            return
-        
-        # Load the dictionary from the newly inserted datafile
-        split = os.path.splitext(filePath)
-        ext = split[1].replace('.', '')
-        if self.ui.fileParserCombo.findText(f'{ext.upper()} Parser') != -1:
-            self.ui.fileParserCombo.setCurrentIndex(
-                self.ui.fileParserCombo.findText(f'{ext.upper()} Parser'))
-        headerDict = {}
-        if ext.upper() == "CTF":
-            headerDict = ctf.parse_header_as_dict(filePath)
-        elif ext.upper() == "ANG":
-            headerDict = ang.parse_header_as_dict(filePath)
-        # elif ext.upper() == "XML":
-        #     print("XML Parser used")
-        else:
-            raise RuntimeError('No parser available for selected file.')
-
-        self.use_ez_table_model_proxy.missing_entries = self.use_ez_table_model.metadata_model.update_model_values_from_dict(headerDict)
-        self.use_ez_table_model_proxy.metadata_file_chosen = True
-
-        index0 = self.use_ez_table_model_proxy.index(0, 0)
-        index1 = self.use_ez_table_model_proxy.index(self.use_ez_table_model_proxy.rowCount() - 1, QUseEzTableModel.K_COL_COUNT)
-        self.use_ez_table_model_proxy.dataChanged.emit(index0, index1)
-
-    def toggleButtons(self):
-        if (self.ui.hyperthoughtTemplateLineEdit.text() != "" and
-            self.ui.useTemplateListView.model().rowCount() > 0 and
-                self.ui.hyperThoughtUploadPath.text() != ""):
-
-            self.ui.hyperthoughtUploadButton.setEnabled(True)
-
-    def uploadToHyperthought(self):
-        auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)
-
-        metadataJson = ht_utilities.ezmodel_to_ht_metadata(self.use_ez_table_model.metadata_model,
-                                                           self.use_ez_table_model_proxy.missing_entries,
-                                                           self.use_ez_table_model_proxy.metadata_file_chosen)
-        progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(
-            self.uselistmodel.metadataList), self)
-
-        progress.setWindowFlags(
-            Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint)
-        progress.setAttribute(Qt.WA_DeleteOnClose)
-        self.createUpload.emit(self.uselistmodel.metadataList, 
-                    auth_control, 
-                    self.hyperthoughtui.current_project["content"]["pk"],
-                    self.folderuuid, 
-                    metadataJson)
-        self.uploader.currentUploadDone.connect(progress.setValue)
-        self.uploader.currentlyUploading.connect(progress.setLabelText)
-        self.uploader.allUploadsDone.connect(progress.accept)
-        progress.canceled.connect(lambda: self.uploader.interruptUpload())
-        progress.setFixedSize(500, 100)
-        progress.exec()
-
-    def authenticateToHyperThought(self):
-        ret = self.hyperthoughtui.exec()
-        if ret == int(QDialog.Accepted):
-            self.getLocation()
-            htUrl = self.hyperthoughtui.ui.ht_server_url.text()
-            if htUrl == "":
-                self.ui.hyperThoughtServer.setText("https://hyperthought.url")
-            else:
-                self.ui.hyperThoughtServer.setText(htUrl)
-                self.ui.hyperThoughtProject.setText(self.hyperthoughtui.current_project["content"]["title"])
-                self.ui.hyperThoughtUploadPath.setText(self.hyperthoughtui.getUploadDirectory())
-        
-        if self.hyperthoughtui.authcontrol is not None:
-            try:
-                datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%X.%f%z')
-            except ValueError:
-                datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%H:%M:%S%z')
-            expires_at = datetime_obj.strftime("%m/%d/%Y %I:%M:%S %p")
-            self.ui.hyperThoughtExpiresIn.setText(expires_at)
+            self.ui.use_template_widget.save_package(Path(pkgpath))
 

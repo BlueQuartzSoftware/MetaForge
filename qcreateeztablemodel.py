@@ -1,6 +1,5 @@
 from PySide2.QtCore import QSortFilterProxyModel, Qt
 
-from ezmodel.ezmetadatamodel import EzMetadataModel
 from ezmodel.ezmetadataentry import EzMetadataEntry
 
 class QCreateEzTableModel(QSortFilterProxyModel):

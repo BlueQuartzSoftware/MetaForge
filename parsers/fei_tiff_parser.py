@@ -3,6 +3,8 @@ import configparser
 from requests.api import head
 from parsers.metaforgeparser import MetaForgeParser
 from typing import List
+from pathlib import Path
+from uuid import UUID
 
 from parsers.metaforgeparser import MetaForgeParser
 
@@ -19,6 +21,9 @@ class FeiTiffParser(MetaForgeParser):
   def version(self) -> str:
     return '1.0'
 
+  def uuid(self) -> UUID:
+    return UUID('{efa0897c-1900-4ce7-854f-61b97722f718}')
+
   def supported_file_extensions(self) -> list:
     return self.ext_list
   
@@ -27,7 +32,7 @@ class FeiTiffParser(MetaForgeParser):
       return True
     return False
 
-  def parse_tiff_tag_34681(self, filepath: str) -> dict:
+  def parse_tiff_tag_34681(self, filepath: Path) -> dict:
     """
     This function parses out the FEI Tiff Tag 34681 which is stored as an INI formatted string.
 
@@ -45,7 +50,7 @@ class FeiTiffParser(MetaForgeParser):
     """
     config = configparser.ConfigParser()
     try:
-      with Image.open(filepath) as img:
+      with Image.open(str(filepath)) as img:
         fei_offset = img.tag_v2.get(34681)
         if fei_offset:
           feiTag = img.tag[34681]
@@ -56,7 +61,7 @@ class FeiTiffParser(MetaForgeParser):
     finally:
       return config._sections
 
-  def parse_tiff_tag_34682(self, filepath: str) -> dict:
+  def parse_tiff_tag_34682(self, filepath: Path) -> dict:
     """
     This function parses out the FEI Tiff Tag 34682 which is stored as an INI formatted string
 
@@ -72,7 +77,7 @@ class FeiTiffParser(MetaForgeParser):
     """
     config = configparser.ConfigParser()
     try:
-      with Image.open(filepath) as img:
+      with Image.open(str(filepath)) as img:
         fei_offset = img.tag_v2.get(34682)
         if fei_offset:
           feiTag = img.tag[34682]
@@ -83,7 +88,7 @@ class FeiTiffParser(MetaForgeParser):
     finally:
       return config._sections
 
-  def parse_tiff_tag_50431(self, filepath: str) -> dict:
+  def parse_tiff_tag_50431(self, filepath: Path) -> dict:
     """
     This function parses out the TESCAN Tiff Tag 50431. Part of the tag is a binary file probably of
     the Jasper Format. There is some ASCII text towards the end of the array which is duplicated in the
@@ -103,7 +108,7 @@ class FeiTiffParser(MetaForgeParser):
     return config._sections
 
     # try:
-    #   with Image.open(filepath) as img:
+    #   with Image.open(str(filepath)) as img:
         
     #     fei_offset = img.tag_v2[50431]
     #     if fei_offset:
@@ -116,7 +121,7 @@ class FeiTiffParser(MetaForgeParser):
     #   return config._sections
 
 
-  def parse_header_as_dict(self, filepath: str) -> dict:
+  def parse_header_as_dict(self, filepath: Path) -> dict:
     """
     Description:
 

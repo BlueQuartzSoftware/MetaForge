@@ -1,6 +1,8 @@
 import configparser
 from parsers.metaforgeparser import MetaForgeParser
 from typing import List
+from pathlib import Path
+from uuid import UUID
 
 from parsers.metaforgeparser import MetaForgeParser
 
@@ -17,6 +19,9 @@ class IniParser(MetaForgeParser):
   def version(self) -> str:
     return '1.0'
 
+  def uuid(self) -> UUID:
+    return UUID('{7420a76b-f0de-4fb1-a932-b6cb943f7af6}')
+
   def supported_file_extensions(self) -> list:
     return self.ext_list
   
@@ -25,7 +30,7 @@ class IniParser(MetaForgeParser):
       return True
     return False
 
-  def parse_header_as_dict(self, filepath: str) -> dict:
+  def parse_header_as_dict(self, filepath: Path) -> dict:
     """
     Description:
 
@@ -54,7 +59,7 @@ class IniParser(MetaForgeParser):
     config = configparser.ConfigParser()
     header = config._sections
     try:
-      config.read(filepath)
+      config.read(str(filepath))
       header = config._sections
     except (configparser.NoSectionError, configparser.MissingSectionHeaderError):
         pass

@@ -1,8 +1,9 @@
 from abc import ABC, abstractmethod
 from typing import List, Tuple, Union
+from pathlib import Path
+from uuid import UUID
 
 class MetaForgeParser(ABC):
-
   @abstractmethod
   def human_label(self) -> str:
     """
@@ -17,6 +18,12 @@ class MetaForgeParser(ABC):
     """
     raise NotImplementedError
 
+  @abstractmethod
+  def uuid(self) -> UUID:
+    """
+    Returns the uuid of this parser. It is up to the developer to set uuids for their own parsers
+    """
+    raise NotImplementedError
 
   @abstractmethod
   def supported_file_extensions(self) -> list:
@@ -39,7 +46,7 @@ class MetaForgeParser(ABC):
     raise NotImplementedError
 
   @abstractmethod
-  def parse_header_as_dict(self, filepath: str) -> dict:
+  def parse_header_as_dict(self, filepath: Path) -> dict:
     """
     This function returns a dictionary of the 'header' information, i.e., the metadata from the file
 

@@ -1,32 +1,93 @@
 from __future__ import annotations
+from ast import parse
 from dataclasses import dataclass, field
+from email import parser
 from dataclasses_json import dataclass_json
 import json
-from typing import List
+from pathlib import Path
+from typing import List, Tuple
+from uuid import UUID
 
 from ezmodel.ezmetadataentry import EzMetadataEntry
 
+# K_TEMPLATE_VERSION_KEY = 'template_version'
+# K_DATA_FILE_KEY = 'data_file_path'
+# K_PARSER_UUID_KEY = 'parser_uuid'
+# K_MODEL_ENTRIES_KEY = 'entries'
+
+@dataclass_json
+@dataclass
+class TemplateModel_V1:
+    data_file_path: str
+    entries: List[EzMetadataEntry] = field(default_factory=list)
+    template_version: str = '1.0'
+    
+    def extract_data(self) -> Tuple[Path, EzMetadataModel]:
+        data_file_path = self.data_file_path
+        if data_file_path is not None:
+            data_file_path = Path(self.data_file_path)
+
+        return data_file_path, EzMetadataModel(entries=self.entries)
+    
+    @staticmethod
+    def from_json_file(file_path: str) -> TemplateModel_V1:
+        with open(file_path) as json_file:
+            json_string = json.load(json_file)
+            return TemplateModel_V1.from_dict(json_string)
+
+@dataclass_json
+@dataclass
+class TemplateModel_V2:
+    data_file_path: str
+    parser_uuid: str
+    entries: List[EzMetadataEntry] = field(default_factory=list)
+    template_version: str = '2.0'
+
+    @staticmethod
+    def create_model(data_file_path: str, parser_uuid: UUID, entries: List[EzMetadataEntry]) -> TemplateModel_V2:
+        return TemplateModel_V2(data_file_path=data_file_path, parser_uuid=parser_uuid, entries=entries)
+    
+    def extract_data(self) -> Tuple[Path, UUID, EzMetadataModel]:
+        data_file_path = self.data_file_path
+        if data_file_path is not None:
+            data_file_path = Path(self.data_file_path)
+        
+        parser_uuid = self.parser_uuid
+        if parser_uuid is not None:
+            parser_uuid = UUID(self.parser_uuid)
+        return data_file_path, parser_uuid, EzMetadataModel(entries=self.entries)
+    
+    def to_json_file(self, file_path: str, indent: int = 4):
+        json_string = self.to_json(indent=indent)
+        with open(file_path, 'w') as outfile:
+            outfile.write(json_string)
+    
+    @staticmethod
+    def from_json_file(file_path: str) -> TemplateModel_V2:
+        with open(file_path) as json_file:
+            json_string = json.load(json_file)
+            return TemplateModel_V2.from_dict(json_string)
+
+# This is an alias used throughout the project to access the current EzMetadataModelIO class
+TemplateModel = TemplateModel_V2
 
 @dataclass_json
 @dataclass
 class EzMetadataModel:
     entries: List[EzMetadataEntry] = field(default_factory=list)
-    original_data_file: str = ''
-    template_version: str = '1.0'
 
     @staticmethod
-    def create_model(model_dict: dict, data_file_path: str, source_type: EzMetadataEntry.SourceType) -> EzMetadataModel:
-        model = EzMetadataModel([], original_data_file=data_file_path)
-        EzMetadataModel._add_model_entry(model_dict, '', model, source_type)
+    def create_model_from_dict(model_dict: dict, source_type: EzMetadataEntry.SourceType) -> EzMetadataModel:
+        model = EzMetadataModel()
+        if model_dict is not None:
+            model.add_model_entry(item=model_dict, parent_path='', source_type=source_type)
         return model
 
-    @staticmethod
-    def _add_model_entry(item, parent_path: str, model: EzMetadataModel, source_type: EzMetadataEntry.SourceType):
+    def add_model_entry(self, item, parent_path: str, source_type: EzMetadataEntry.SourceType):
         for key, value in item.items():
             if type(value) is dict:
                 new_parent_path = parent_path + key + '/'
-                EzMetadataModel._add_model_entry(
-                    value, new_parent_path, model, source_type)
+                self.add_model_entry(item=value, parent_path=new_parent_path, source_type=source_type)
             else:
                 item_path = parent_path + key
                 if value is None:
@@ -38,7 +99,7 @@ class EzMetadataModel:
                                                  ht_value=value,
                                                  ht_annotation='',
                                                  ht_units='')
-                model.append(metadata_entry)
+                self.entries.append(metadata_entry)
 
     def update_model_values_from_dict(self, item: dict, parent_path: str = "") -> List[EzMetadataEntry]:
         visited = [False for _ in range (self.size())]
@@ -137,17 +198,6 @@ class EzMetadataModel:
                 tree_obj = tree_obj[token]
         return tree_dict
 
-    def to_json_file(self, file_path: str, indent: int = 4):
-        json_string = self.to_json_string(indent=indent)
-        with open(file_path, 'w') as outfile:
-            outfile.write(json_string)
-
-    def to_json_string(self, indent: int = 4):
-        return self.to_json(indent=indent)
-    
-    def to_json_dict(self):
-        return self.to_dict()
-
     def size(self) -> int:
         return len(self.entries)
 
@@ -157,17 +207,14 @@ class EzMetadataModel:
             if entry.enabled is True:
                 count = count + 1
         return count
+    
+    def to_json_file(self, file_path: str, indent: int = 4):
+            json_string = self.to_json(indent=indent)
+            with open(file_path, 'w') as outfile:
+                outfile.write(json_string)
 
     @staticmethod
     def from_json_file(file_path: str) -> EzMetadataModel:
         with open(file_path) as json_file:
             json_string = json.load(json_file)
-            return EzMetadataModel.from_json_dict(json_string)
-
-    @staticmethod
-    def from_json_string(json_string: str) -> EzMetadataModel:
-        return EzMetadataModel.from_json(json_string)
-
-    @staticmethod
-    def from_json_dict(json: dict) -> EzMetadataModel:
-        return EzMetadataModel.from_dict(json)
+            return EzMetadataModel.from_dict(json_string)
