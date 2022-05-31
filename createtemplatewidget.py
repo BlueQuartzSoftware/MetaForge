@@ -45,7 +45,6 @@ class CreateTemplateWidget(QWidget):
         self.ui.setupUi(self)
         self.available_parsers_model = None
         self.ui.dataFileSelect.clicked.connect(self.select_input_data_file)
-        self.ui.saveTemplateButton.clicked.connect(self.save_template)
         self.ui.clearCreateButton.clicked.connect(self.clear)
         self.setAcceptDrops(True)
         self.numCustoms = 0

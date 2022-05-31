@@ -32,6 +32,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.ui.tab_widget.setCurrentWidget(self.ui.CreateTemplateTab)
         self.available_parsers_model = AvailableParsersModel(self)
+        self.ui.create_template_widget.ui.saveTemplateButton.clicked.connect(self.save_template)
         self.ui.actionHelp.triggered.connect(self.display_help)
         self.ui.actionAbout.triggered.connect(self.display_about)
         self.ui.actionOpenPackage.triggered.connect(self.open_package)
