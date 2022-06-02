@@ -26,7 +26,8 @@ set(UI_FILES
     usetemplatewidget
     hyperthoughtdialog
     newfolderdialog
-    aboutdialog)
+    aboutdialog
+    metaforge_preferences)
 
 #--------------------------------------------------------------------------------------------------
 # Depending if you use Pip or Conda to install pyside2 you will get either Qt 5.12 (Conda) or 5.12 (Pip)

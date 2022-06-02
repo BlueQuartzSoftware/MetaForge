@@ -16,7 +16,14 @@ class AvailableParsersModel(QAbstractListModel):
 
   def __init__(self, parent=None):
     super().__init__(parent)
-    self._available_parsers: List[MetaForgeParser] = [AngParser(), CtfParser(), IniParser(), FeiTiffParser()]
+    self._available_parsers: List[MetaForgeParser]
+  
+  def clear_parsers(self):
+    self._available_parsers.clear()
+
+  def load_parsers(self, parser_file_paths: List[Path]):
+    # This method needs to dynamically load parsers from the file paths into the _available_parsers class member variable
+    self._available_parsers = [AngParser(), CtfParser(), IniParser(), FeiTiffParser()]
 
   def data(self, index: QModelIndex, role: int):
     if role == AvailableParsersModel.HumanLabel:
