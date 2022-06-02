@@ -12,6 +12,8 @@ from PIL import Image
 from PIL.TiffTags import TAGS
 
 class FeiTiffParser(MetaForgeParser):
+  K_FEI_TAGS = [34681, 34682, 50431]
+
   def __init__(self) -> None:
     self.ext_list: list = ('.tif', '.tiff')
 
@@ -51,9 +53,9 @@ class FeiTiffParser(MetaForgeParser):
     config = configparser.ConfigParser()
     try:
       with Image.open(str(filepath)) as img:
-        fei_offset = img.tag_v2.get(34681)
+        fei_offset = img.tag_v2.get(self.K_FEI_TAGS[0])
         if fei_offset:
-          feiTag = img.tag[34681]
+          feiTag = img.tag[self.K_FEI_TAGS[0]]
           if feiTag[0] is not None:
             feiTagStr = feiTag[0]
             if len(feiTagStr) > 0:
@@ -78,9 +80,9 @@ class FeiTiffParser(MetaForgeParser):
     config = configparser.ConfigParser()
     try:
       with Image.open(str(filepath)) as img:
-        fei_offset = img.tag_v2.get(34682)
+        fei_offset = img.tag_v2.get(self.K_FEI_TAGS[1])
         if fei_offset:
-          feiTag = img.tag[34682]
+          feiTag = img.tag[self.K_FEI_TAGS[1]]
           if feiTag[0] is not None:
             feiTagStr = feiTag[0]
             if len(feiTagStr) > 0:
@@ -120,6 +122,32 @@ class FeiTiffParser(MetaForgeParser):
     # finally:
     #   return config._sections
 
+  def parse_standard_tags(self, filepath: Path) -> dict:
+    """
+    This function parses out all tags that are not FEI tags
+
+    Parameters
+    ----------
+    filepath
+        The path to the tiff image to be parsed
+
+    Returns
+    -------
+    Dictionary
+        A dictionary containing the header information
+    """
+
+    with Image.open(str(filepath)) as img:
+      meta_dict = {}
+      for tag_key in img.tag.keys():
+        if tag_key not in self.K_FEI_TAGS:
+          metadata_key = TAGS[tag_key]
+          tag = img.tag[tag_key]
+          if tag[0] is not None:
+              metadata_value = tag[0]
+              meta_dict[metadata_key] = metadata_value
+      return meta_dict
+
 
   def parse_header_as_dict(self, filepath: Path) -> dict:
     """
@@ -147,20 +175,22 @@ class FeiTiffParser(MetaForgeParser):
 
     """
 
+    file_dict = {}
+
     header = self.parse_tiff_tag_34681(filepath)
     if len(header) > 0:
-      file_dict = {"FEI Tag #34681": header}
-      return file_dict
+      file_dict["FEI Tag #34681"] = header
 
     header = self.parse_tiff_tag_34682(filepath)
     if len(header) > 0:
-      file_dict = {"FEI Tag #34682": header}
-      return file_dict
+      file_dict["FEI Tag #34682"] = header
 
     header = self.parse_tiff_tag_50431(filepath)
     if len(header) > 0:
-      file_dict = {"FEI Tag #50431": header}
-      return file_dict
+      file_dict["FEI Tag #50431"] = header
 
-    file_dict = {"SOURCE": header}
+    header = self.parse_standard_tags(filepath)
+    if len(header) > 0:
+      file_dict["Standard"] = header
+
     return file_dict
