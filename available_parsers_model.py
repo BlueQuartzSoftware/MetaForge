@@ -16,7 +16,7 @@ class AvailableParsersModel(QAbstractListModel):
 
   def __init__(self, parent=None):
     super().__init__(parent)
-    self._available_parsers: List[MetaForgeParser] = (AngParser(), CtfParser(), IniParser(), FeiTiffParser())
+    self._available_parsers: List[MetaForgeParser] = [AngParser(), CtfParser(), IniParser(), FeiTiffParser()]
 
   def data(self, index: QModelIndex, role: int):
     if role == AvailableParsersModel.HumanLabel:
