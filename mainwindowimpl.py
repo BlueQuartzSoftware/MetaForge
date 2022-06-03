@@ -25,8 +25,6 @@ class MainWindow(QMainWindow):
     K_MAX_RECENT_PACKAGE_SIZE = 10
     K_CLEAR_RECENT_TEMPLATES_STR = "Clear Recent Templates"
     K_CLEAR_RECENT_PACKAGES_STR = "Clear Recent Packages"
-    K_PARSER_YAML_FILE_NAME = "parsers.yaml"
-    K_PARSER_YAML_KEY = "metaforge-parsers"
 
     def __init__(self, app: QApplication):
         super(MainWindow, self).__init__()
@@ -152,10 +150,10 @@ class MainWindow(QMainWindow):
         return parser_file_paths
 
     def _find_parser_files(self, parser_folder_path: Path) -> List[Path]:
-        yaml_file_path = parser_folder_path / self.K_PARSER_YAML_FILE_NAME
+        yaml_file_path = parser_folder_path / self.preferences_dialog.K_PARSER_YAML_FILE_NAME
         with yaml_file_path.open("r") as yml:
             yaml_data: dict = yaml.safe_load(yml)
-            return [parser_folder_path / file_name for file_name in yaml_data[self.K_PARSER_YAML_KEY]]
+            return [parser_folder_path / file_name for file_name in yaml_data[self.preferences_dialog.K_PARSER_YAML_KEY]]
 
     def display_about(self):
         aboutDialog = AboutDialogImpl(self)
