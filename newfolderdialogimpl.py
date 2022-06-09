@@ -16,7 +16,7 @@ class NewFolderDialogImpl(QDialog):
         super(NewFolderDialogImpl, self).__init__(parent)
         self.promptui = Ui_NewFolderDialog()
         self.promptui.setupUi(self)
-        self.finished.connect(self.sendName)
+        self.accepted.connect(self.sendName)
 
     def sendName(self):
         self.nameSubmitted.emit(self.promptui.folderNameLineEdit.text())

@@ -144,10 +144,10 @@ class Ui_HyperthoughtDialog(object):
 
         self.gridLayout_2.addLayout(self.horizontalLayout, 2, 1, 1, 1)
 
-        self.projectListView = QListWidget(HyperthoughtDialog)
-        self.projectListView.setObjectName(u"projectListView")
+        self.workspaceListView = QListWidget(HyperthoughtDialog)
+        self.workspaceListView.setObjectName(u"workspaceListView")
 
-        self.gridLayout_2.addWidget(self.projectListView, 1, 0, 2, 1)
+        self.gridLayout_2.addWidget(self.workspaceListView, 1, 0, 2, 1)
 
         self.folderListView = DeselectableTableView(HyperthoughtDialog)
         self.folderListView.setObjectName(u"folderListView")
@@ -228,11 +228,11 @@ class Ui_HyperthoughtDialog(object):
     def retranslateUi(self, HyperthoughtDialog):
         HyperthoughtDialog.setWindowTitle("")
         self.label.setText(QCoreApplication.translate("HyperthoughtDialog", u"Server:", None))
-        self.ht_server_url.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Autheticated", None))
+        self.ht_server_url.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Authenticated", None))
         self.label_3.setText(QCoreApplication.translate("HyperthoughtDialog", u"User:", None))
-        self.ht_username.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Autheticated", None))
+        self.ht_username.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Authenticated", None))
         self.label_2.setText(QCoreApplication.translate("HyperthoughtDialog", u"Expires:", None))
-        self.token_expiration.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Autheticated", None))
+        self.token_expiration.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Authenticated", None))
 #if QT_CONFIG(tooltip)
         self.parentDirectoryButton.setToolTip(QCoreApplication.translate("HyperthoughtDialog", u"Move Up a Directory", None))
 #endif // QT_CONFIG(tooltip)
@@ -245,7 +245,7 @@ class Ui_HyperthoughtDialog(object):
         self.newFolderButton.setToolTip(QCoreApplication.translate("HyperthoughtDialog", u"Create Remote Folder", None))
 #endif // QT_CONFIG(tooltip)
         self.newFolderButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"New Remote Folder", None))
-        self.label_4.setText(QCoreApplication.translate("HyperthoughtDialog", u"Project List:", None))
+        self.label_4.setText(QCoreApplication.translate("HyperthoughtDialog", u"Workspace List:", None))
         self.locationLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"Folder:", None))
         self.apiKeyButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"Authenticate", None))
 #if QT_CONFIG(tooltip)

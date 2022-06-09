@@ -71,7 +71,7 @@
      <item>
       <widget class="QLabel" name="ht_server_url">
        <property name="text">
-        <string>Not Autheticated</string>
+        <string>Not Authenticated</string>
        </property>
       </widget>
      </item>
@@ -94,7 +94,7 @@
      <item>
       <widget class="QLabel" name="ht_username">
        <property name="text">
-        <string>Not Autheticated</string>
+        <string>Not Authenticated</string>
        </property>
       </widget>
      </item>
@@ -117,7 +117,7 @@
      <item>
       <widget class="QLabel" name="token_expiration">
        <property name="text">
-        <string>Not Autheticated</string>
+        <string>Not Authenticated</string>
        </property>
       </widget>
      </item>
@@ -164,7 +164,7 @@
           <string>Up</string>
          </property>
          <property name="icon">
-          <iconset resource="resources.qrc">
+          <iconset resource="../resources.qrc">
            <normaloff>:/resources/Images/arrow-top.png</normaloff>:/resources/Images/arrow-top.png</iconset>
          </property>
          <property name="iconSize">
@@ -219,7 +219,7 @@
           <string>New Remote Folder</string>
          </property>
          <property name="icon">
-          <iconset resource="resources.qrc">
+          <iconset resource="../resources.qrc">
            <normaloff>:/resources/Images/folder@2x.png</normaloff>:/resources/Images/folder@2x.png</iconset>
          </property>
          <property name="iconSize">
@@ -235,7 +235,7 @@
      <item row="0" column="0">
       <widget class="QLabel" name="label_4">
        <property name="text">
-        <string>Project List:</string>
+        <string>Workspace List:</string>
        </property>
       </widget>
      </item>
@@ -260,7 +260,7 @@
       </layout>
      </item>
      <item row="1" column="0" rowspan="2">
-      <widget class="QListWidget" name="projectListView"/>
+      <widget class="QListWidget" name="workspaceListView"/>
      </item>
      <item row="1" column="1">
       <widget class="DeselectableTableView" name="folderListView">
@@ -354,7 +354,7 @@
       <string/>
      </property>
      <property name="icon">
-      <iconset resource="resources.qrc">
+      <iconset resource="../resources.qrc">
        <normaloff>:/resources/Images/key@2x.png</normaloff>:/resources/Images/key@2x.png</iconset>
      </property>
      <property name="iconSize">
@@ -398,7 +398,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="resources.qrc"/>
+  <include location="../resources.qrc"/>
  </resources>
  <connections>
   <connection>

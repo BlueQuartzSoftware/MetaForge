@@ -96,7 +96,7 @@ sub_folder_list = ht_requests.get_item_dict_from_ht_path(auth_control,
               ht_space = 'project',
               ht_space_id=project_folder_0_pk)
 
-folderlist = ht_requests._list_location_contents(auth_control, ht_id_path = path)
+folderlist = ht_requests.list_location_contents(auth_control, ht_id_path = path)
 for j in folderlist:
   print(j)
 

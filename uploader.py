@@ -1,12 +1,12 @@
-from PySide2.QtCore import QFileInfo, QObject, Signal
-from ht_requests.ht_requests import ht_utilities
-from ht_requests.ht_requests import htauthcontroller
+from PySide2.QtCore import QObject, Signal
 from ht_requests.ht_requests import ht_requests
 from tqdm import tqdm
+from pathlib import Path
+from typing import List
 
 
 class Uploader(QObject):
-    currentUploadDone = Signal(int)
+    notifyProgress = Signal(int)
     allUploadsDone = Signal()
     currentlyUploading = Signal(str)
 
@@ -14,35 +14,36 @@ class Uploader(QObject):
         super(Uploader, self).__init__(parent)
         self.interrupt = False
 
-    def performUpload(self, filelist, authControl, ht_space_id, ht_id_path, metadata):
+    def performUpload(self, filelist: List[Path], authControl, workspace_id, ht_id_path, metadata):
         self.interrupt = False
+
+        print(filelist)
 
         # Check that all files initially exist. This is a quick sanity check. The user could
         # *still* delete a file out from under the codes.
         for i in tqdm(range(len(filelist)), desc="Checking Files"):
-            if not QFileInfo.exists(filelist[i]):
-                self.currentlyUploading.emit(
-                    "File Missing: " + filelist[i].split("/")[-1])
+            if not filelist[i].exists():
+                self.currentlyUploading.emit(f"File Missing: {filelist[i].name}")
                 self.interrupt = True
 
         for i in tqdm(range(len(filelist)), desc="Uploading Files"):
             if self.interrupt:
                 break
 
-            if not QFileInfo.exists(filelist[i]):
-                self.currentlyUploading.emit(
-                    "File Missing: " + filelist[i].split("/")[-1])
+            if not filelist[i].exists():
+                self.currentlyUploading.emit(f"File Missing: {filelist[i].name}")
                 break
             else:
-                self.currentlyUploading.emit(
-                    "Currently uploading: " + filelist[i].split("/")[-1])
                 ht_requests.upload_file(auth_control=authControl, 
-                                local_path=filelist[i],
-                                ht_space='project',
-                                ht_space_id=ht_space_id,
-                                ht_id_path=ht_id_path, 
-                                metadata=metadata)
-                self.currentUploadDone.emit(i+1)
+                                        local_path=str(filelist[i]),
+                                        workspace_id=workspace_id,
+                                        ht_id_path=ht_id_path, 
+                                        metadata=metadata,
+                                        msg_delegate=self.currentlyUploading.emit)
+                files_finished = float(i+1)
+                total_files = float(len(filelist))
+                current_progress = int((files_finished/total_files) * 100)
+                self.notifyProgress.emit(current_progress)
         self.allUploadsDone.emit()
 
     def interruptUpload(self):

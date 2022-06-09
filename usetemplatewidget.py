@@ -1,7 +1,6 @@
 # This Python file uses the following encoding: utf-8
-import os
+import shutil
 from typing import List
-from pyexpat import model
 
 from uploader import Uploader
 import json
@@ -191,15 +190,6 @@ class UseTemplateWidget(QWidget):
         proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
         proxy_model.setFilterWildcard(f'*{filter_text}*')
 
-    def get_location(self):
-        remoteDirPath = self.hyperthoughtui.getUploadDirectory()
-        
-        self.folderuuid = ht_requests.get_ht_id_path_from_ht_path(self.hyperthoughtui.authcontrol, 
-                                                    ht_path=remoteDirPath, 
-                                                    ht_space = 'project', ht_space_id=self.hyperthoughtui.current_project["content"]["pk"])
-        self.ui.hyperThoughtUploadPath.setText(remoteDirPath)
-        self.toggle_buttons()
-
     def remove_model_entry(self, source_row = -1):
         if source_row != -1:
             entry = self.use_ez_table_model.metadata_model.entry(source_row)
@@ -285,7 +275,10 @@ class UseTemplateWidget(QWidget):
 
     def save_package(self, pkgpath: Path):
         # Create package
-        pkgpath.mkdir(parents=True, exist_ok=True)
+        if pkgpath.exists():
+            shutil.rmtree(str(pkgpath))
+            
+        pkgpath.mkdir(parents=True)
 
         # Copy file list to package
         newfilepaths: List[str] = []
@@ -419,10 +412,10 @@ class UseTemplateWidget(QWidget):
         progress.setAttribute(Qt.WA_DeleteOnClose)
         self.createUpload.emit(self.uselistmodel.metadataList, 
                     auth_control, 
-                    self.hyperthoughtui.current_project["content"]["pk"],
-                    self.folderuuid, 
+                    self.chosen_ht_workspace["id"],
+                    self.chosen_ht_folder['path'] + self.chosen_ht_folder['pk'] + ',',
                     metadataJson)
-        self.uploader.currentUploadDone.connect(progress.setValue)
+        self.uploader.notifyProgress.connect(progress.setValue)
         self.uploader.currentlyUploading.connect(progress.setLabelText)
         self.uploader.allUploadsDone.connect(progress.accept)
         progress.canceled.connect(lambda: self.uploader.interruptUpload())
@@ -432,14 +425,17 @@ class UseTemplateWidget(QWidget):
     def authenticate_to_hyperthought(self):
         ret = self.hyperthoughtui.exec()
         if ret == int(QDialog.Accepted):
-            self.get_location()
+            self.chosen_ht_workspace = self.hyperthoughtui.get_workspace()
+            self.chosen_ht_folder = self.hyperthoughtui.get_chosen_folder()
+            self.ui.hyperThoughtUploadPath.setText(self.chosen_ht_folder['path_string'])
+            self.toggle_buttons()
+
             htUrl = self.hyperthoughtui.ui.ht_server_url.text()
             if htUrl == "":
                 self.ui.hyperThoughtServer.setText("https://hyperthought.url")
             else:
                 self.ui.hyperThoughtServer.setText(htUrl)
-                self.ui.hyperThoughtProject.setText(self.hyperthoughtui.current_project["content"]["title"])
-                self.ui.hyperThoughtUploadPath.setText(self.hyperthoughtui.getUploadDirectory())
+                self.ui.hyperThoughtProject.setText(self.chosen_ht_workspace["name"])
         
         if self.hyperthoughtui.authcontrol is not None:
             try:

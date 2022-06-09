@@ -32,9 +32,9 @@ class HTRemoteFileListModel(QAbstractTableModel):
 
         for i in range(len(folderlist)):
             self.beginInsertRows(self.index(len(self.item_list),0), len(self.item_list),len(self.item_list))
-            self.item_list.append(folderlist[i]["Name"])
-            self.uuid_list.append(folderlist[i]["UUID"])
-            self.type_list.append(folderlist[i]["Type"])
+            self.item_list.append(folderlist[i]["name"])
+            self.uuid_list.append(folderlist[i]["pk"])
+            self.type_list.append(folderlist[i]["ftype"])
             self.endInsertRows()
 
     def rowCount(self, parent=QModelIndex()):

@@ -1,3 +1,4 @@
+from cgitb import text
 import os
 
 from typing import List
@@ -37,8 +38,9 @@ class HyperthoughtDialogImpl(QDialog):
         # initialize variables
         self.accessKey = ""
         self.authcontrol = None
-        self.project_dict = {}
-        self.current_project = {}
+        self.workspace_dict = {}
+        self.current_workspace = {}
+        self.current_folder = {}
         self.bread_crumb_path = list()
         self.remote_file_list_model = HTRemoteFileListModel(self)
         self.newfolderDialog = NewFolderDialogImpl()
@@ -54,7 +56,7 @@ class HyperthoughtDialogImpl(QDialog):
         self.newfolderDialog.nameSubmitted.connect(self.createNewFolder)
         self.ui.folderListView.selectionCleared.connect(self.clearLocationLineEdit)
         self.ui.pasteFromClipboardBtn.clicked.connect(self.pasteAPIKey)
-        self.ui.projectListView.currentRowChanged.connect(self.projectRowChanged)
+        self.ui.workspaceListView.currentRowChanged.connect(self.workspace_row_changed)
         self.setWindowTitle("Authenticate To HyperThought")
         self.tokenverifier.currentTokenExpired.connect(self.handle_token_expired)
 
@@ -63,7 +65,7 @@ class HyperthoughtDialogImpl(QDialog):
     @Slot()    
     def handle_token_expired(self):
         self.ui.token_expiration.setText(self.K_EXPIRED_STR)
-        self.ui.projectListView.setDisabled(True)
+        self.ui.workspaceListView.setDisabled(True)
         self.ui.folderListView.setDisabled(True)
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setDisabled(True)
         self.currentTokenExpired.emit()
@@ -93,10 +95,13 @@ class HyperthoughtDialogImpl(QDialog):
         # self.ui.breadcrumbLabel.update()        
     
     def htPathFromBreadCrumbs(self) -> str:
+        if len(self.bread_crumb_path) == 0:
+            return ''
+        
         path = "/"
-        for p in self.bread_crumb_path:
-            path = path + p + "/"
-        return path        
+        path = path.join(self.bread_crumb_path)
+        path = "/" + path + "/"
+        return path
 
     def acceptApiKey(self):
         self.accessKey = self.ui.apiKeyLineEdit.text()
@@ -115,14 +120,14 @@ class HyperthoughtDialogImpl(QDialog):
                 datetime_obj = datetime.strptime(self.authcontrol.expires_at, '%Y-%m-%dT%H:%M:%S%z')
             expires_at = datetime_obj.strftime("%m/%d/%Y %I:%M:%S %p")
             self.ui.token_expiration.setText(expires_at)
-            self.project_dict = ht_requests.list_projects(self.authcontrol)
-            self.ui.projectListView.clear()
+            self.workspace_dict = ht_requests.list_workspaces(self.authcontrol)
+            self.ui.workspaceListView.clear()
             self.tokenverifier.setExpireTime(self.authcontrol.expires_in)
-            self.ui.projectListView.setEnabled(True)
+            self.ui.workspaceListView.setEnabled(True)
             self.ui.folderListView.setEnabled(True)
             self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
-            for project in self.project_dict:
-                self.ui.projectListView.addItem(project["content"]["title"])
+            for workspace in self.workspace_dict:
+                self.ui.workspaceListView.addItem(workspace["name"])
             self.setWindowTitle("Authenticated to: " + self.authcontrol.base_url + " with User: " + self.authcontrol.get_username())
 
         except Exception as e:
@@ -130,27 +135,26 @@ class HyperthoughtDialogImpl(QDialog):
 
 
     @Slot()
-    def projectRowChanged(self, currentRow: int):
-        project_title = self.ui.projectListView.currentItem().text()
+    def workspace_row_changed(self, currentRow: int):
+        workspace_title = self.ui.workspaceListView.currentItem().text()
 
         # Find the projects uuid
-        for project in self.project_dict:
-            if project_title == project["content"]["title"]:
-                self.current_project = project
+        for workspace in self.workspace_dict:
+            if workspace_title == workspace["name"]:
+                self.current_workspace = workspace
+                self.current_folder = None
                 break
         
         # If the UUID is valid then get the item list from that location
-        puid = self.current_project["content"]["pk"]
+        workspace_id = self.current_workspace["id"]
         
-        if puid == "":
+        if workspace_id == "":
             return
 
-        folderlist = ht_requests.get_item_dict_from_ht_path(self.authcontrol, 
-            ht_path = '/', 
-            ht_space = 'project',
-            ht_space_id=puid)
+        self.current_folder_contents = ht_requests.list_location_contents(self.authcontrol,
+            workspace_id=workspace_id)
 
-        self.remote_file_list_model.setRemoteItemList(folderlist)
+        self.remote_file_list_model.setRemoteItemList(self.current_folder_contents)
         self.ui.selectedFolderLabel.setText("")
         self.ui.folderListView.setModel(self.remote_file_list_model)
         self.bread_crumb_path = list()
@@ -169,15 +173,28 @@ class HyperthoughtDialogImpl(QDialog):
                 return
 
             folder_name = self.remote_file_list_model.data(myIndex, Qt.DisplayRole)
+
+            current_ht_path_id = ','
+            if self.current_folder is not None:
+                current_ht_path_id = self.current_folder['path'] + self.current_folder['pk'] + ','
+
+            ht_item_list = ht_requests.list_location_contents(self.authcontrol, 
+                ht_path = current_ht_path_id,
+                workspace_id=self.current_workspace['id'])
+            
+            for ht_item in ht_item_list:
+                if ht_item['ftype'] == 'Folder' and ht_item['name'] == folder_name:
+                    self.current_folder = ht_item
+                    break
+
             self.bread_crumb_path.append(folder_name)
             self.updateBreadCrumbLabel()
 
-            folderlist = ht_requests.get_item_dict_from_ht_path(self.authcontrol, 
-                ht_path = self.htPathFromBreadCrumbs(), 
-                ht_space = 'project',
-                ht_space_id=self.current_project["content"]["pk"])
+            self.current_folder_contents = ht_requests.list_location_contents(self.authcontrol, 
+                ht_path = self.current_folder['path'] + self.current_folder['pk'] + ',',
+                workspace_id=self.current_workspace['id'])
 
-            self.remote_file_list_model.setRemoteItemList(folderlist)
+            self.remote_file_list_model.setRemoteItemList(self.current_folder_contents)
             self.ui.selectedFolderLabel.setText("")
             self.ui.folderListView.selectionModel().clearSelection()
 
@@ -197,26 +214,18 @@ class HyperthoughtDialogImpl(QDialog):
 
     def createNewFolder(self, name):
         try:
-
-            ht_id_path = ht_requests.get_ht_id_path_from_ht_path(self.authcontrol, 
-                                ht_path = self.htPathFromBreadCrumbs(),
-                                ht_space = 'project',
-                                ht_space_id=self.current_project["content"]["pk"]
-                                )
-
+            current_folder_ht_id_path = self.current_folder['path'] + self.current_folder['pk'] + ','
 
             folder_id = ht_requests.create_folder(self.authcontrol,
                         folder_name = name,  
-                        ht_space = 'project',
-                        ht_space_id = self.current_project["content"]["pk"],
-                        ht_id_path= ht_id_path)
+                        workspace_id = self.current_workspace["id"],
+                        ht_id_path = current_folder_ht_id_path)
 
-            folderlist = ht_requests.get_item_dict_from_ht_path(self.authcontrol, 
-                    ht_path = self.htPathFromBreadCrumbs(), 
-                    ht_space = 'project',
-                    ht_space_id=self.current_project["content"]["pk"])
+            self.current_folder_contents = ht_requests.list_location_contents(self.authcontrol, 
+                    ht_path = current_folder_ht_id_path, 
+                    workspace_id = self.current_workspace["id"])
 
-            self.remote_file_list_model.setRemoteItemList(folderlist)
+            self.remote_file_list_model.setRemoteItemList(self.current_folder_contents)
             self.ui.selectedFolderLabel.setText("")
             self.ui.folderListView.selectionModel().clearSelection()
 
@@ -232,12 +241,20 @@ class HyperthoughtDialogImpl(QDialog):
             self.bread_crumb_path.pop()
             self.updateBreadCrumbLabel()
 
-            folderlist = ht_requests.get_item_dict_from_ht_path(self.authcontrol, 
-                ht_path = self.htPathFromBreadCrumbs(), 
-                ht_space = 'project',
-                ht_space_id=self.current_project["content"]["pk"])
+            parent_ht_path_id: str = self.current_folder['path']
+            if parent_ht_path_id == ',':
+                self.current_folder = None
+            else:
+                parent_ht_path_id_parts = [x for x in parent_ht_path_id.split(',') if x != '']
+                parent_ht_id = parent_ht_path_id_parts.pop()
+                parent_folder_info = ht_requests.get_item_info(self.authcontrol, parent_ht_id)
+                parent_ht_path_id = parent_folder_info['path'] + parent_folder_info['pk'] + ','
 
-            self.remote_file_list_model.setRemoteItemList(folderlist)
+            self.current_folder_contents = ht_requests.list_location_contents(self.authcontrol, 
+                ht_path = parent_ht_path_id,
+                workspace_id = self.current_workspace['id'])
+
+            self.remote_file_list_model.setRemoteItemList(self.current_folder_contents)
             self.ui.selectedFolderLabel.setText("")
             self.ui.folderListView.selectionModel().clearSelection()
 
@@ -247,5 +264,15 @@ class HyperthoughtDialogImpl(QDialog):
         except Exception as e:
             QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error getting the parent directory.\n" + str(e))
 
-    def getUploadDirectory(self):
-        return self.ui.breadcrumbLabel.text() + self.ui.selectedFolderLabel.text()
+    def get_workspace(self):
+        return self.current_workspace
+
+    def get_parent_folder(self):
+        return self.current_folder
+
+    def get_chosen_folder(self):
+        for ht_item in self.current_folder_contents:
+            if ht_item['ftype'] == 'Folder' and ht_item['name'] == self.ui.selectedFolderLabel.text():
+                return ht_item
+        
+        return None

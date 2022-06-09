@@ -2,12 +2,13 @@ from enum import Enum
 import os
 import platform
 import urllib3
+from pathlib import Path
 
 import requests
 
 from . import ht_requests_errors as ht_rerrors
 
-PATH_SEPERATOR = '/'
+PATH_SEPARATOR = '/'
 ID_ROOT_PATH = ','
 ID_PATH_SEPARATOR = ','
 MAX_ERROR_CODE = 300
@@ -22,170 +23,35 @@ class ItemType(Enum):
     """
     folders = 1
     folders_and_files = 2
+    files = 3
 
-
-def get_item_dict_from_ht_path(auth_control, ht_path = '/',
-                               ht_space='user', ht_space_id=None,
-                               item_type=ItemType.folders_and_files):
+def get_item_info(auth_control, item_id):
     """
-    Returns a dictionary containing each item's name, UUID, and type at the
-    location indicated by the given `ht_path` in HyperThought.
+    Returns the info details for the item in HyperThought with id `item_id`.
 
     Parameters
     ----------
     auth_control
         HTAuthorizationController object used to get all the info
         needed to call the HyperThought endpoint.
-    ht_path
-        The path to the file/folder in HyperThought, separated by
-        forward slashes
-    ht_space
-        The space type that you would like to use in HyperThought.
-        This must be set to 'group', 'project', or 'user'.
-    ht_space_id
-        The id of a group or project, or the username for a user.
-        If the value is None, it will default to the current user's
-        username.
-    item_type
-        An enum value for the type of file system items to return.
-        A None value will default to ItemType.folders_and_files.
+    item_id
+        The id of an item in HyperThought. This can be a workspace, file, or folder.
 
     Returns
     -------
-    Dictionary
-        A dictionary containing each item's name, UUID, and type
+    item_info
+        The details for a given item with id `item_id`
     
     Example
     -------
     ```
-    name_list = ht_reqs.get_item_list_from_ht_path(auth_control, ht_path='/')
-    ```
-    This code returns:
-    ```
-    {
-        'Name': 'TestFolder',
-        'UUID': 'f8b96e46-5e6d-4e3e-a14d-cf1ef6ca4bcf',
-        'Type': 'Folder'
-    }
+    item_info = ht_reqs.get_item_info(auth_control, '31d0c623-250e-47a6-a424-3ecbdf384746')
     ```
 
-    ```
-    name_list = ht_reqs.get_item_list_from_ht_path(auth_control, ht_path='/TestFolder')
-    ```
-    This code returns:
-    ```
-    {
-        'Name': '011.ang',
-        'UUID': '0a6c3953-cca8-488f-9d57-11bc85961b86',
-        'Type': 'File'
-    }
-    ```
-
-    """
-
-    ht_id_path = get_ht_id_path_from_ht_path(auth_control, ht_path=ht_path,\
-                                             ht_space=ht_space, ht_space_id=ht_space_id)
-    
-    contents = _list_location_contents(auth_control, ht_id_path=ht_id_path, ht_space=ht_space, ht_space_id=ht_space_id, item_type=item_type)
-
-    name_id_list = []
-    for item in contents:
-        item_content = item['content']
-        ftype = 'Folder'
-        if item_content['ftype'] != 'Folder':
-            ftype = 'File'
-        name_id_list.append({'Name': item_content['name'], 'UUID': item_content['pk'], 'Type': ftype})
-    
-    return name_id_list
-
-def get_ht_id_path_from_ht_path(auth_control, ht_path = '/',
-                                  ht_space='user', ht_space_id=None):
-    """
-    Returns the `ht_id_path` to the location indicated by the given `ht_path` in HyperThought.
-
-    Parameters
-    ----------
-    auth_control
-        HTAuthorizationController object used to get all the info
-        needed to call the HyperThought endpoint.
-    ht_path
-        The path to the file/folder in HyperThought, separated by
-        forward slashes
-    ht_space
-        The space type that you would like to use in HyperThought.
-        This must be set to 'group', 'project', or 'user'.
-    ht_space_id
-        The id of a group or project, or the username for a user.
-        If the value is None, it will default to the current user's
-        username.
-
-    Returns
-    -------
-    ht_id_path
-        The path to the location inside a given space in HyperThought.
-    
-    Example
-    -------
-    ```
-    ht_id_path = ht_reqs.get_ht_id_path_from_ht_path(auth_control, '/TestFolder/TestFolder2')
-    ```
-    Assuming TestFolder's UUID is 31d0c623-250e-47a6-a424-3ecbdf384746 and TestFolder2's
-    UUID is 0a6c3953-cca8-488f-9d57-11bc85961b86, this code returns
-    `,31d0c623-250e-47a6-a424-3ecbdf384746,0a6c3953-cca8-488f-9d57-11bc85961b86,`
-
-    """
-
-    # Break the file path down into components
-    normalized_path = os.path.normpath(ht_path)
-    path_components = normalized_path.split(os.sep)
-
-    # Strip first component if empty
-    if path_components[0] == "":
-        path_components.pop(0)
-    
-    # Strip last component if empty
-    if path_components[len(path_components)-1] == "":
-        path_components.pop(len(path_components)-1)
-    
-    if len(path_components) == 0:
-        return ','
-
-    current_id = None
-    ht_id_path = ','
-    for comp in path_components:
-        contents = _list_location_contents(auth_control, ht_id_path=ht_id_path, ht_space=ht_space, ht_space_id=ht_space_id)
-        for item in contents:
-            item_content = item['content']
-            if item_content['name'] == comp:
-                current_id = item_content['pk']
-                break
-        if current_id is None:
-            raise FileNotFoundError(f'Could not find file/folder located at {ht_path} in HyperThought: {comp} does not exist!')
-        ht_id_path += current_id + ','
-        current_id = None
-
-    return ht_id_path
-
-
-def list_projects(auth_control):
-    """
-    List projects that the currently logged in user can access in HyperThought.
-
-    Parameters
-    ----------
-    auth_control
-        HTAuthorizationController object used to get all the info
-        needed to call the HyperThought endpoint.
-
-    Returns
-    -------
-    List
-        A list of projects with their metadata and other details, represented
-        as dicts
     """
 
     # Build the request URL
-    url = f'{auth_control.base_url}/api/projects/project/'
+    url = f'{auth_control.base_url}/api/files/v1/{item_id}'
 
     cookies = auth_control.cookies
     auth_header = auth_control.get_auth_header()
@@ -202,7 +68,42 @@ def list_projects(auth_control):
     return response_json
 
 
-def create_folder(auth_control, folder_name, ht_space='user', ht_space_id=None,
+def list_workspaces(auth_control):
+    """
+    List workspaces that the currently logged in user can access in HyperThought.
+
+    Parameters
+    ----------
+    auth_control
+        HTAuthorizationController object used to get all the info
+        needed to call the HyperThought endpoint.
+
+    Returns
+    -------
+    List
+        A list of workspaces with their metadata and other details, represented
+        as dicts
+    """
+
+    # Build the request URL
+    url = f'{auth_control.base_url}/api/workspace/'
+
+    cookies = auth_control.cookies
+    auth_header = auth_control.get_auth_header()
+
+    # Send the request to HyperThought
+    response = requests.get(url, headers=auth_header,
+                            cookies=cookies, verify=False)
+
+    # Report any errors that are above the max error code
+    if response.status_code >= MAX_ERROR_CODE:
+        ht_rerrors.report_error(response=response)
+
+    response_json = response.json()
+    return response_json
+
+
+def create_folder(auth_control, folder_name, workspace_id,
                   ht_id_path=ID_ROOT_PATH, metadata=None):
     """
     Create a folder in HyperThought.
@@ -214,15 +115,10 @@ def create_folder(auth_control, folder_name, ht_space='user', ht_space_id=None,
         needed to call the HyperThought endpoint.
     folder_name
         The name of the folder that you want to create.
-    ht_space
-        The space type that you would like to use in HyperThought.
-        This must be set to 'group', 'project', or 'user'.
-    ht_space_id
-        The id of a group or project, or the username for a user.
-        If the value is None, it will default to the current user's
-        username.
+    workspace_id
+        The id of the workspace that the folder will be created in.
     ht_id_path
-        The path to the location inside a given space in HyperThought.
+        The path to the location inside a given workspace in HyperThought.
 
         Example: a path for '/folder1/folder2/folder3' would look like
         ',folder1_uuid,folder2_uuid,folder3_uuid,'
@@ -235,22 +131,16 @@ def create_folder(auth_control, folder_name, ht_space='user', ht_space_id=None,
     The id of the new folder.
     """
 
-    # Set default space_id parameter
-    if ht_space == 'user' and ht_space_id is None:
-        ht_space_id = auth_control.get_username()
-
     # Validate parameters
-    _validate_parameters(name=folder_name, ht_space=ht_space,
-                         ht_space_id=ht_space_id, ht_id_path=ht_id_path,
-                         metadata=metadata)
+    _validate_parameters(name=folder_name, workspace_id=workspace_id,
+                         ht_id_path=ht_id_path, metadata=metadata)
 
     # Build the request URL
     url = f'{auth_control.base_url}/api/files/create-folder/'
 
     # Gather other data needed for the request
     request_data = {
-        'space': ht_space,
-        'space_id': ht_space_id,
+        'space_id': workspace_id,
         'path': ht_id_path,
         'name': folder_name,
         'metadata': metadata,
@@ -272,8 +162,8 @@ def create_folder(auth_control, folder_name, ht_space='user', ht_space_id=None,
     return folder_id
 
 
-def upload_file(auth_control, local_path, ht_space='user', ht_space_id=None,
-                ht_id_path=ID_ROOT_PATH, metadata=None):
+def upload_file(auth_control, local_path, workspace_id=None,
+                ht_id_path=ID_ROOT_PATH, metadata=None, msg_delegate=None):
     """
     Upload a file to HyperThought.
 
@@ -284,21 +174,18 @@ def upload_file(auth_control, local_path, ht_space='user', ht_space_id=None,
         the HyperThought endpoint.
     local_path
         The path to a file on the local file system.
-    ht_space
-        The space type that you would like to use in HyperThought.
-        This must be set to 'group', 'project', or 'user'.
-    ht_space_id
-        The id of a group or project, or the username for a user.
-        If the value is None, it will default to the current user's
-        username.
+    workspace_id
+        The id of a workspace.
     ht_id_path
-        The path to the location inside a given space in HyperThought.
+        The path to the location inside a given workspace in HyperThought.
 
         Example: a path for '/folder1/folder2/folder3' would look like
         ',folder1_uuid,folder2_uuid,folder3_uuid,'
     metadata
         The metadata for the file, which will be attached to the file
         in HyperThought.
+    msg_delegate
+        The delegate used to communicate output messages from this method.
 
     Returns
     -------
@@ -306,38 +193,49 @@ def upload_file(auth_control, local_path, ht_space='user', ht_space_id=None,
         A tuple that contains the file id and the file name.
     """
 
-    # Set default space_id parameter
-    if ht_space == 'user' and ht_space_id is None:
-        ht_space_id = auth_control.get_username()
-
     # Validate the parameters.
-    _validate_parameters(local_path=local_path, ht_space=ht_space,
-                         ht_space_id=ht_space_id, ht_id_path=ht_id_path,
+    if msg_delegate is not None:
+        msg_delegate(f'Uploading {Path(local_path).name} - Validating parameters...')
+    _validate_parameters(local_path=local_path,
+                         workspace_id=workspace_id, ht_id_path=ht_id_path,
                          metadata=metadata)
 
     # Create an upload URL and then upload the file.
+    if msg_delegate is not None:
+        msg_delegate(f'Uploading {Path(local_path).name} - Creating upload URL...')
+
     active_local_path = _get_active_path(local_path)
-    name = active_local_path.split(os.path.sep)[-1]
+    name = Path(active_local_path).name
     size = os.path.getsize(active_local_path)
 
     url, file_id = _create_upload_url(auth_control,
-                                      ht_space=ht_space,
-                                      ht_space_id=ht_space_id,
+                                      workspace_id=workspace_id,
                                       name=name,
                                       size=size,
                                       ht_id_path=ht_id_path,
                                       metadata=metadata)
 
+    if msg_delegate is not None:
+        msg_delegate(f'Uploading {Path(local_path).name} - Uploading the file...')
+
     _upload_file(auth_control, url, active_local_path)
 
-    file_name = _finalize_upload(auth_control, file_id)
+    if msg_delegate is not None:
+        msg_delegate(f'Uploading {Path(local_path).name} - Finalizing the upload...')
+
+    _finalize_upload(auth_control, file_id)
+
+    if msg_delegate is not None:
+        msg_delegate(f'Uploading {Path(local_path).name} - Upload finalized!')
+    
+    file_info = get_item_info(auth_control=auth_control, item_id=file_id)
 
     # Return the file id and file name
-    return (file_id, file_name)
+    return (file_id, file_info['name'])
 
 
-def _create_upload_url(auth_control, name, size, ht_space='user',
-                       ht_space_id=None, ht_id_path=ID_ROOT_PATH,
+def _create_upload_url(auth_control, name, size,
+                       workspace_id=None, ht_id_path=ID_ROOT_PATH,
                        metadata=None):
     """
     Create an upload URL to use to upload a file.
@@ -351,15 +249,10 @@ def _create_upload_url(auth_control, name, size, ht_space='user',
         The name of the file.
     size
         The size of the file in bytes.
-    ht_space
-        The space type that you would like to use in HyperThought.
-        This must be set to 'group', 'project', or 'user'.
-    ht_space_id
-        The id of a group or project, or the username for a user.
-        If the value is None, it will default to the current user's
-        username.
+    workspace_id
+        The id of the workspace that the file will be uploaded to.
     ht_id_path
-        The path to the location inside a given space in HyperThought.
+        The path to the location inside a given workspace in HyperThought.
 
         Example: a path for '/folder1/folder2/folder3' would look like
         ',folder1_uuid,folder2_uuid,folder3_uuid,'
@@ -374,23 +267,18 @@ def _create_upload_url(auth_control, name, size, ht_space='user',
         for the file to be uploaded.
     """
 
-    # Set default space_id parameter
-    if ht_space == 'user' and ht_space_id is None:
-        ht_space_id = auth_control.get_username()
-
     # Validate the parameters.
-    _validate_parameters(ht_space=ht_space, ht_space_id=ht_space_id,
+    _validate_parameters(workspace_id=workspace_id,
                          ht_id_path=ht_id_path, metadata=metadata)
 
     # Gather other data needed for the request
-    url = f'{auth_control.base_url}/api/files/generate-upload-url/'
+    url = f'{auth_control.base_url}/api/files/v1/generate-upload-url/'
 
     auth_header = auth_control.get_auth_header()
     cookies = auth_control.cookies
 
     request_data = {
-        'space': ht_space,
-        'space_id': ht_space_id,
+        'workspaceId': workspace_id,
         'path': ht_id_path,
         'name': name,
         'size': size,
@@ -453,7 +341,7 @@ def _upload_file(auth_control, upload_url, local_path):
         'headers': auth_control.get_auth_header()
     }
 
-    file_name = local_path.strip(PATH_SEPERATOR).split(PATH_SEPERATOR)[-1]
+    file_name = local_path.strip(PATH_SEPARATOR).split(PATH_SEPARATOR)[-1]
     c_disp_str = f"inline;filename={file_name}"
     request_data['headers']['Content-Disposition'] = c_disp_str
 
@@ -482,37 +370,25 @@ def _finalize_upload(auth_control, file_id):
 
     Returns
     -------
-    String
-        The file name that was converted from temporary to permanent.
+    None
     """
 
     # Build up the request URL
     base_url = auth_control.base_url.rstrip('/')
-    update_url = '{}/api/files/temp-to-perm/'.format(base_url)
+    update_url = f'{base_url}/api/files/v1/{file_id}/temp-to-perm/'
 
     # Gather other data needed for the request
     headers = auth_control.get_auth_header()
     cookies = auth_control.cookies
-    request_data = {'file_ids': [file_id]}
 
     # Send the request to HyperThought
-    response = requests.patch(update_url, headers=headers, cookies=cookies,
-                              json=request_data, verify=False)
+    response = requests.patch(update_url, headers=headers, cookies=cookies, verify=False)
 
     # Report any errors that are above the max error code
     if response.status_code >= MAX_ERROR_CODE:
         ht_rerrors.report_error(response)
 
-    # Retrieve the file name from the response
-    file_name = None
-    response_json = response.json()
-
-    updated_files = response_json['updated']
-    if file_id in updated_files:
-        file_name = updated_files[file_id]
-
-    return file_name
-
+    return
 
 def _validate_metadata(metadata):
     """
@@ -590,7 +466,7 @@ def _validate_metadata(metadata):
                              f"item {invalid_keys_str}.")
 
 
-def _validate_parameters(name=None, ht_space=None, ht_space_id=None,
+def _validate_parameters(name=None, workspace_id=None,
                          ht_id_path=None, metadata=None, ht_url=None,
                          local_path=None, item_type=None):
     """
@@ -603,12 +479,8 @@ def _validate_parameters(name=None, ht_space=None, ht_space_id=None,
         The name of a file/folder in HyperThought.
 
         Must be a string.
-    ht_space
-        A HyperThought space type.
-
-        Must have a value of either 'group', 'project', or 'user'.
-    ht_space_id
-        The id of a group or project, or the username for a user.
+    workspace_id
+        The id of a workspace.
 
         Must be a string.
     ht_id_path
@@ -647,13 +519,9 @@ def _validate_parameters(name=None, ht_space=None, ht_space_id=None,
     if name is not None:
         assert isinstance(name, str)
 
-    # Validate space
-    if ht_space is not None:
-        assert ht_space in ('group', 'project', 'user')
-
-    # Validate space_id
-    if ht_space_id is not None:
-        assert isinstance(ht_space_id, str)
+    # Validate workspace_id
+    if workspace_id is not None:
+        assert isinstance(workspace_id, str)
 
     # Validate path
     if ht_id_path is not None:
@@ -694,12 +562,11 @@ def _get_active_path(path):
 
     windows_path_prefix = '//?/'
     path = path.lstrip(windows_path_prefix)
-    return f'{windows_path_prefix}{path}'.replace(PATH_SEPERATOR, os.path.sep)
+    return f'{windows_path_prefix}{path}'.replace(PATH_SEPARATOR, os.path.sep)
 
 
-def _list_location_contents(auth_control, ht_space='user',
-                           ht_space_id=None, ht_id_path=ID_ROOT_PATH,
-                           item_type=ItemType.folders):
+def list_location_contents(auth_control, workspace_id=None, ht_path=ID_ROOT_PATH,
+                           item_type=ItemType.folders_and_files):
     """
     Return file and folder items from a location in HyperThought.
 
@@ -708,15 +575,10 @@ def _list_location_contents(auth_control, ht_space='user',
     auth_control
         HTAuthorizationController object used to get all the info
         needed to call the HyperThought endpoint.
-    ht_space
-        The space type that you would like to use in HyperThought.
-        This must be set to 'group', 'project', or 'user'.
-    ht_space_id
-        The id of a group or project, or the username for a user.
-        If the value is None, it will default to the current user's
-        username.
+    workspace_id
+        The id of the workspace whose contents will be returned.
     ht_id_path
-        The path to the location inside a given space in HyperThought.
+        The path to the location inside a given workspace in HyperThought.
 
         Example: a path for '/folder1/folder2/folder3' would look like
         ',folder1_uuid,folder2_uuid,folder3_uuid,'
@@ -732,33 +594,37 @@ def _list_location_contents(auth_control, ht_space='user',
         HyperThought path in the given space.
     """
 
-    # Set default space_id parameter
-    if ht_space == 'user' and ht_space_id is None:
-        ht_space_id = auth_control.get_username()
+    # # Set default space_id parameter
+    # if ht_space == 'user' and ht_space_id is None:
+    #     ht_space_id = auth_control.get_username()
 
-    # Validate parameters.
-    _validate_parameters(ht_space=ht_space, ht_space_id=ht_space_id,
-                         ht_id_path=ht_id_path, item_type=item_type)
+    # # Validate parameters.
+    # _validate_parameters(ht_space=ht_space, ht_space_id=ht_space_id,
+    #                      ht_id_path=ht_id_path, item_type=item_type)
 
     # Build the request URL
-    files_url = f'{auth_control.base_url}/api/files/'
+    files_url = f'{auth_control.base_url}/api/files/v1/workspace/{workspace_id}'
 
     # Gather other data needed for the request
     auth_header = auth_control.get_auth_header()
     cookies = auth_control.cookies
-    request_data = {'path': ht_id_path}
+    request_data = {'path': ht_path}
 
     if item_type == ItemType.folders:
-        request_data['type'] = 'Folder'
-
-    if ht_space == 'user':
-        request_data['method'] = 'user_files'
-    elif ht_space == 'project':
-        request_data['method'] = 'project_files'
-        request_data['project'] = ht_space_id
+        request_data['type'] = 'folder'
+    elif item_type == ItemType.files:
+        request_data['type'] = 'file'
     else:
-        request_data['method'] = 'group_files'
-        request_data['group'] = ht_space_id
+        request_data['type'] = 'all'
+
+    # if ht_space == 'user':
+    #     request_data['method'] = 'user_files'
+    # elif ht_space == 'project':
+    #     request_data['method'] = 'project_files'
+    #     request_data['project'] = ht_space_id
+    # else:
+    #     request_data['method'] = 'group_files'
+    #     request_data['group'] = ht_space_id
 
     # Send the request to HyperThought
     r = requests.get(files_url, headers=auth_header, cookies=cookies,
