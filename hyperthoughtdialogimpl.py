@@ -168,7 +168,8 @@ class HyperthoughtDialogImpl(QDialog):
     def ascendingDirectories(self, myIndex):
         try:
             selected_row = myIndex.row()
-            selected_type = self.remote_file_list_model.type_list[selected_row]
+            ht_item = self.remote_file_list_model.item_list[selected_row]
+            selected_type = ht_item['ftype']
             if selected_type is not None and selected_type != "Folder":
                 return
 
@@ -206,7 +207,8 @@ class HyperthoughtDialogImpl(QDialog):
 
     def changeLocationText(self, myIndex):
         selected_row = myIndex.row()
-        selected_type = self.remote_file_list_model.type_list[selected_row]
+        ht_item = self.remote_file_list_model.item_list[selected_row]
+        selected_type = ht_item['ftype']
         
         if myIndex.isValid() and selected_type == "Folder":
             self.ui.selectedFolderLabel.setText(myIndex.data())
