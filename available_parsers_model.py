@@ -2,6 +2,11 @@ from typing import List, Tuple
 from pathlib import Path
 from uuid import UUID
 
+import re
+import os
+import importlib
+from inspect import isclass
+
 from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt
 
 from parsers.metaforgeparser import MetaForgeParser
@@ -16,14 +21,35 @@ class AvailableParsersModel(QAbstractListModel):
 
   def __init__(self, parent=None):
     super().__init__(parent)
-    self._available_parsers: List[MetaForgeParser]
+    self._available_parsers: List[MetaForgeParser] = []
+
+  def _search(self):
+    # Look for files ending in _parser.py on the parsers directory.
+    plugin_re = re.compile('_parser.py$')
+    plugin_files = filter(plugin_re.search,
+                          os.listdir(os.path.join(os.path.dirname(__file__),
+                                                  'parsers')))
+    form_module = lambda fp: '.' + os.path.splitext(fp)[0]
+    plugins = map(form_module, plugin_files)
+    plugin_modules = []
+    for plugin in plugins:
+      if not plugin.startswith('.example'):
+        plugin_modules.append(importlib.import_module(plugin, package="parsers"))
+    # Now check that they copntain a MetaForgeParser subclass and add them if so.
+    for mod in plugin_modules:
+      for attribute_name in dir(mod):
+        attribute = getattr(mod, attribute_name)
+        if isclass(attribute) and issubclass(attribute, MetaForgeParser) \
+           and attribute_name != 'MetaForgeParser':
+          # This adds an instance of the class to the parsers.
+          self._available_parsers.append(attribute())
   
   def clear_parsers(self):
     self._available_parsers.clear()
 
   def load_parsers(self, parser_file_paths: List[Path]):
-    # This method needs to dynamically load parsers from the file paths into the _available_parsers class member variable
-    self._available_parsers = [AngParser(), CtfParser(), IniParser(), FeiTiffParser()]
+    # This method dynamically loads parsers from the plugins directory.
+    self._search()
 
   def data(self, index: QModelIndex, role: int):
     if role == AvailableParsersModel.HumanLabel:
