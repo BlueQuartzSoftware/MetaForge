@@ -10,10 +10,6 @@ from inspect import isclass
 from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt
 
 from parsers.metaforgeparser import MetaForgeParser
-from parsers.ctf_parser import CtfParser
-from parsers.ang_parser import AngParser
-from parsers.fei_tiff_parser import FeiTiffParser
-from parsers.ini_parser import IniParser
 
 class AvailableParsersModel(QAbstractListModel):
   HumanLabel = Qt.DisplayRole
