@@ -22,8 +22,18 @@ class AvailableParsersModel(QAbstractListModel):
   def __init__(self, parent=None):
     super().__init__(parent)
     self._available_parsers: List[MetaForgeParser] = []
-
-  def _search(self):
+  
+  def _add_plugins(self, plugin_modules):
+    # Add the supplied plugins if they are of the correct type.
+    for mod in plugin_modules:
+      for attribute_name in dir(mod):
+        attribute = getattr(mod, attribute_name)
+        if isclass(attribute) and issubclass(attribute, MetaForgeParser) \
+           and attribute_name != 'MetaForgeParser':
+          # This adds an instance of the class to the parsers.
+          self._available_parsers.append(attribute())
+  
+  def _search_dynamic(self):
     # Look for files ending in _parser.py on the parsers directory.
     plugin_re = re.compile('_parser.py$')
     plugin_files = filter(plugin_re.search,
@@ -35,21 +45,23 @@ class AvailableParsersModel(QAbstractListModel):
     for plugin in plugins:
       if not plugin.startswith('.example'):
         plugin_modules.append(importlib.import_module(plugin, package="parsers"))
+
     # Now check that they copntain a MetaForgeParser subclass and add them if so.
-    for mod in plugin_modules:
-      for attribute_name in dir(mod):
-        attribute = getattr(mod, attribute_name)
-        if isclass(attribute) and issubclass(attribute, MetaForgeParser) \
-           and attribute_name != 'MetaForgeParser':
-          # This adds an instance of the class to the parsers.
-          self._available_parsers.append(attribute())
-  
+    self._add_plugins(plugin_modules)
+
   def clear_parsers(self):
     self._available_parsers.clear()
 
   def load_parsers(self, parser_file_paths: List[Path]):
     # This method dynamically loads parsers from the plugins directory.
-    self._search()
+    plugin_modules = []
+    for path in parser_file_paths:
+      spec =importlib.util.spec_from_file_location("parsers", path)
+      mod = importlib.util.module_from_spec(spec)
+      spec.loader.exec_module(mod)
+      plugin_modules.append(mod)
+    self._add_plugins(plugin_modules)
+
 
   def data(self, index: QModelIndex, role: int):
     if role == AvailableParsersModel.HumanLabel:
