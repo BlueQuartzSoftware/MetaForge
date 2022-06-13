@@ -25,6 +25,10 @@ class MainWindow(QMainWindow):
     K_MAX_RECENT_PACKAGE_SIZE = 10
     K_CLEAR_RECENT_TEMPLATES_STR = "Clear Recent Templates"
     K_CLEAR_RECENT_PACKAGES_STR = "Clear Recent Packages"
+    K_SETTINGS_GEOMETRY_KEY = "geometry"
+    K_SETTINGS_WINDOW_STATE_KEY = "window_state"
+    K_SETTINGS_RECENT_TEMPLATES_KEY = "recent_templates"
+    K_SETTINGS_RECENT_PACKAGES_KEY = "recent_packages"
 
     def __init__(self, app: QApplication):
         super(MainWindow, self).__init__()
@@ -70,8 +74,8 @@ class MainWindow(QMainWindow):
     def read_settings(self):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
         self.read_window_settings(settings)
-        recent_templates = settings.value("recent_templates")
-        recent_packages = settings.value("recent_packages")
+        recent_templates = settings.value(self.K_SETTINGS_RECENT_TEMPLATES_KEY)
+        recent_packages = settings.value(self.K_SETTINGS_RECENT_PACKAGES_KEY)
 
         if recent_templates is not None:
             for file_path in recent_templates:
@@ -86,19 +90,19 @@ class MainWindow(QMainWindow):
                 self.add_recent_action(self.ui.menu_recent_packages, self.recent_package_list, self.action_recent_packages_separator, self.ui.action_clear_recent_packages, action)
 
     def read_window_settings(self, settings):
-        self.restoreGeometry(settings.value("geometry"))
-        self.restoreState(settings.value("window_state"))
+        self.restoreGeometry(settings.value(self.K_SETTINGS_GEOMETRY_KEY))
+        self.restoreState(settings.value(self.K_SETTINGS_WINDOW_STATE_KEY))
 
     def closeEvent(self, event):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
-        settings.setValue("geometry", self.saveGeometry())
-        settings.setValue("window_state", self.saveState())
+        settings.setValue(self.K_SETTINGS_GEOMETRY_KEY, self.saveGeometry())
+        settings.setValue(self.K_SETTINGS_WINDOW_STATE_KEY, self.saveState())
 
         recent_template_list = [action.text() for action in self.recent_template_list]
-        settings.setValue("recent_templates", recent_template_list)
+        settings.setValue(self.K_SETTINGS_RECENT_TEMPLATES_KEY, recent_template_list)
 
         recent_package_list = [action.text() for action in self.recent_package_list]
-        settings.setValue("recent_packages", recent_package_list)
+        settings.setValue(self.K_SETTINGS_RECENT_PACKAGES_KEY, recent_package_list)
 
         self.ui.create_template_widget.close()
         self.ui.use_template_widget.close()
