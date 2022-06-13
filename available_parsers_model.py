@@ -27,7 +27,9 @@ class AvailableParsersModel(QAbstractListModel):
         if isclass(attribute) and issubclass(attribute, MetaForgeParser) \
            and attribute_name != 'MetaForgeParser':
           # This adds an instance of the class to the parsers.
+          self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
           self._available_parsers.append(attribute())
+          self.endInsertRows()
   
   def _search_dynamic(self):
     # Look for files ending in _parser.py on the parsers directory.
@@ -46,7 +48,9 @@ class AvailableParsersModel(QAbstractListModel):
     self._add_plugins(plugin_modules)
 
   def clear_parsers(self):
+    self.beginRemoveRows(QModelIndex(), 0, self.rowCount() - 1)
     self._available_parsers.clear()
+    self.endRemoveRows()
 
   def load_parsers(self, parser_file_paths: List[Path]):
     # This method dynamically loads parsers from the plugins directory.
