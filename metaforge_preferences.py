@@ -73,11 +73,12 @@ class MetaForgePreferencesDialog(QDialog):
     
     def _add_files(self):
         dir_path = QFileDialog.getExistingDirectory(self, 'Open Directory', self.current_directory)
-        self.current_directory = dir_path
-        self.ui.parser_locations_list.addItem(dir_path)
-        self.staged_prefs.parser_folder_paths.append(dir_path)
+        if dir_path != "":
+            self.current_directory = dir_path
+            self.ui.parser_locations_list.addItem(dir_path)
+            self.staged_prefs.parser_folder_paths.append(dir_path)
 
-        self.validate()            
+            self.validate()
 
     def _remove_selected_files(self):
         selected_items: List[QListWidgetItem] = self.ui.parser_locations_list.selectedItems()
