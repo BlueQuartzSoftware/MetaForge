@@ -102,6 +102,7 @@ class MainWindow(QMainWindow):
 
         self.ui.create_template_widget.close()
         self.ui.use_template_widget.close()
+        self.preferences_dialog.close()
 
         super().closeEvent(event)
     
