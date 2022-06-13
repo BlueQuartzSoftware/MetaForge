@@ -33,12 +33,12 @@ class HTRemoteFileListModel(QAbstractTableModel):
 
     def setRemoteItemList(self, folderlist):
         if self.item_list != []:
-            self.beginRemoveRows(self.index(0,0), len(self.item_list),len(self.item_list))
+            self.beginRemoveRows(QModelIndex(), len(self.item_list),len(self.item_list))
             self.item_list = []
             self.endRemoveRows()
 
         for i in range(len(folderlist)):
-            self.beginInsertRows(self.index(len(self.item_list),0), len(self.item_list),len(self.item_list))
+            self.beginInsertRows(QModelIndex(), len(self.item_list),len(self.item_list))
             self.item_list.append(folderlist[i])
             self.endInsertRows()
 

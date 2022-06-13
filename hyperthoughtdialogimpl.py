@@ -49,6 +49,7 @@ class HyperthoughtDialogImpl(QDialog):
 
         #Setup Signals/Slots connections
         self.ui.apiKeyButton.clicked.connect(self.acceptApiKey)
+        self.ui.show_files.stateChanged.connect(self.show_files_changed)
         self.ui.folderListView.clicked.connect(self.changeLocationText)
         self.ui.folderListView.doubleClicked.connect(self.ascendingDirectories)
         self.ui.parentDirectoryButton.clicked.connect(self.parentDirectory)
@@ -61,6 +62,12 @@ class HyperthoughtDialogImpl(QDialog):
         self.tokenverifier.currentTokenExpired.connect(self.handle_token_expired)
 
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setDisabled(True)
+
+        self.ui.folderListView.setModel(self.remote_file_list_model)
+    
+    @Slot()
+    def show_files_changed(self, state: int):
+        self.refresh_location_contents()
 
     @Slot()    
     def handle_token_expired(self):
@@ -146,24 +153,17 @@ class HyperthoughtDialogImpl(QDialog):
                 break
         
         # If the UUID is valid then get the item list from that location
-        workspace_id = self.current_workspace["id"]
-        
-        if workspace_id == "":
+        if self.current_workspace["id"] == "":
             return
-
-        self.current_folder_contents = ht_requests.list_location_contents(self.authcontrol,
-            workspace_id=workspace_id)
-
-        self.remote_file_list_model.setRemoteItemList(self.current_folder_contents)
-        self.ui.selectedFolderLabel.setText("")
-        self.ui.folderListView.setModel(self.remote_file_list_model)
+        
         self.bread_crumb_path = list()
         self.updateBreadCrumbLabel()
-            
+
+        self.refresh_location_contents()
+
         if self.init_col_width == False:
             self.init_col_width = True
             self.ui.folderListView.setColumnWidth(0, 250)
-
 
     def ascendingDirectories(self, myIndex):
         try:
@@ -174,16 +174,8 @@ class HyperthoughtDialogImpl(QDialog):
                 return
 
             folder_name = self.remote_file_list_model.data(myIndex, Qt.DisplayRole)
-
-            current_ht_path_id = ','
-            if self.current_folder is not None:
-                current_ht_path_id = self.current_folder['path'] + self.current_folder['pk'] + ','
-
-            ht_item_list = ht_requests.list_location_contents(self.authcontrol, 
-                ht_path = current_ht_path_id,
-                workspace_id=self.current_workspace['id'])
             
-            for ht_item in ht_item_list:
+            for ht_item in self.current_folder_contents:
                 if ht_item['ftype'] == 'Folder' and ht_item['name'] == folder_name:
                     self.current_folder = ht_item
                     break
@@ -191,16 +183,7 @@ class HyperthoughtDialogImpl(QDialog):
             self.bread_crumb_path.append(folder_name)
             self.updateBreadCrumbLabel()
 
-            self.current_folder_contents = ht_requests.list_location_contents(self.authcontrol, 
-                ht_path = self.current_folder['path'] + self.current_folder['pk'] + ',',
-                workspace_id=self.current_workspace['id'])
-
-            self.remote_file_list_model.setRemoteItemList(self.current_folder_contents)
-            self.ui.selectedFolderLabel.setText("")
-            self.ui.folderListView.selectionModel().clearSelection()
-
-            if len(self.bread_crumb_path) > 0:
-                self.ui.parentDirectoryButton.setEnabled(True)
+            self.refresh_location_contents()
             
         except Exception as e:
             QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error during directory traversal.\n" + str(e))
@@ -216,27 +199,38 @@ class HyperthoughtDialogImpl(QDialog):
 
     def createNewFolder(self, name):
         try:
-            current_folder_ht_id_path = self.current_folder['path'] + self.current_folder['pk'] + ','
+            current_folder_ht_id_path = self._get_current_folder_ht_id_path()
 
-            folder_id = ht_requests.create_folder(self.authcontrol,
-                        folder_name = name,  
-                        workspace_id = self.current_workspace["id"],
-                        ht_id_path = current_folder_ht_id_path)
-
-            self.current_folder_contents = ht_requests.list_location_contents(self.authcontrol, 
-                    ht_path = current_folder_ht_id_path, 
-                    workspace_id = self.current_workspace["id"])
-
-            self.remote_file_list_model.setRemoteItemList(self.current_folder_contents)
-            self.ui.selectedFolderLabel.setText("")
-            self.ui.folderListView.selectionModel().clearSelection()
-
-            if len(self.bread_crumb_path) == 0:
-                self.ui.parentDirectoryButton.setEnabled(False)
+            ht_requests.create_folder(self.authcontrol,
+                                      folder_name = name,  
+                                      workspace_id = self.current_workspace["id"],
+                                      ht_id_path = current_folder_ht_id_path)
+            
+            self.refresh_location_contents()
 
         except Exception as e:
             QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error creating remote directory.\n" + str(e))
+    
+    def refresh_location_contents(self):
+        current_folder_ht_id_path = self._get_current_folder_ht_id_path()
 
+        self.list_location_contents(current_folder_ht_id_path)
+
+    def list_location_contents(self, ht_id_path: str):
+        item_type = ht_requests.ItemType.folders
+        if self.ui.show_files.isChecked():
+            item_type = ht_requests.ItemType.folders_and_files
+
+        self.current_folder_contents = ht_requests.list_location_contents(self.authcontrol, 
+                    ht_path = ht_id_path, 
+                    workspace_id = self.current_workspace["id"],
+                    item_type=item_type)
+
+        self.remote_file_list_model.setRemoteItemList(self.current_folder_contents)
+        self.ui.selectedFolderLabel.setText("")
+        self.ui.folderListView.selectionModel().clearSelection()
+
+        self.ui.parentDirectoryButton.setEnabled(len(self.bread_crumb_path) > 0)
 
     def parentDirectory(self):
         try:
@@ -249,19 +243,9 @@ class HyperthoughtDialogImpl(QDialog):
             else:
                 parent_ht_path_id_parts = [x for x in parent_ht_path_id.split(',') if x != '']
                 parent_ht_id = parent_ht_path_id_parts.pop()
-                parent_folder_info = ht_requests.get_item_info(self.authcontrol, parent_ht_id)
-                parent_ht_path_id = parent_folder_info['path'] + parent_folder_info['pk'] + ','
-
-            self.current_folder_contents = ht_requests.list_location_contents(self.authcontrol, 
-                ht_path = parent_ht_path_id,
-                workspace_id = self.current_workspace['id'])
-
-            self.remote_file_list_model.setRemoteItemList(self.current_folder_contents)
-            self.ui.selectedFolderLabel.setText("")
-            self.ui.folderListView.selectionModel().clearSelection()
-
-            if len(self.bread_crumb_path) == 0:
-                self.ui.parentDirectoryButton.setEnabled(False)
+                self.current_folder = ht_requests.get_item_info(self.authcontrol, parent_ht_id)
+            
+            self.refresh_location_contents()
 
         except Exception as e:
             QMessageBox.warning(None, QApplication.applicationDisplayName(), "Error getting the parent directory.\n" + str(e))
@@ -278,3 +262,9 @@ class HyperthoughtDialogImpl(QDialog):
                 return ht_item
         
         return None
+    
+    def _get_current_folder_ht_id_path(self) -> str:
+        if self.current_folder is not None:
+            return self.current_folder['path'] + self.current_folder['pk'] + ','
+        
+        return ','

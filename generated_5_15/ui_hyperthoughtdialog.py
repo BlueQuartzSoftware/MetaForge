@@ -106,6 +106,11 @@ class Ui_HyperthoughtDialog(object):
 
         self.horizontalLayout_5.addWidget(self.breadcrumbLabel)
 
+        self.show_files = QCheckBox(HyperthoughtDialog)
+        self.show_files.setObjectName(u"show_files")
+
+        self.horizontalLayout_5.addWidget(self.show_files)
+
         self.horizontalSpacer_2 = QSpacerItem(20, 20, QSizePolicy.Minimum, QSizePolicy.Minimum)
 
         self.horizontalLayout_5.addItem(self.horizontalSpacer_2)
@@ -241,6 +246,7 @@ class Ui_HyperthoughtDialog(object):
 #endif // QT_CONFIG(statustip)
         self.parentDirectoryButton.setText(QCoreApplication.translate("HyperthoughtDialog", u"Up", None))
         self.breadcrumbLabel.setText(QCoreApplication.translate("HyperthoughtDialog", u"/Some/Path/to/Store/Data", None))
+        self.show_files.setText(QCoreApplication.translate("HyperthoughtDialog", u"Show Files", None))
 #if QT_CONFIG(tooltip)
         self.newFolderButton.setToolTip(QCoreApplication.translate("HyperthoughtDialog", u"Create Remote Folder", None))
 #endif // QT_CONFIG(tooltip)
