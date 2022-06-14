@@ -2,13 +2,14 @@ from typing import List, Tuple
 from pathlib import Path
 from uuid import UUID
 
+import re
+import os
+import importlib
+from inspect import isclass
+
 from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt
 
 from parsers.metaforgeparser import MetaForgeParser
-from parsers.ctf_parser import CtfParser
-from parsers.ang_parser import AngParser
-from parsers.fei_tiff_parser import FeiTiffParser
-from parsers.ini_parser import IniParser
 
 class AvailableParsersModel(QAbstractListModel):
   HumanLabel = Qt.DisplayRole
@@ -16,7 +17,51 @@ class AvailableParsersModel(QAbstractListModel):
 
   def __init__(self, parent=None):
     super().__init__(parent)
-    self._available_parsers: List[MetaForgeParser] = [AngParser(), CtfParser(), IniParser(), FeiTiffParser()]
+    self._available_parsers: List[MetaForgeParser] = []
+  
+  def _add_plugins(self, plugin_modules):
+    # Add the supplied plugins if they are of the correct type.
+    for mod in plugin_modules:
+      for attribute_name in dir(mod):
+        attribute = getattr(mod, attribute_name)
+        if isclass(attribute) and issubclass(attribute, MetaForgeParser) \
+           and attribute_name != 'MetaForgeParser':
+          # This adds an instance of the class to the parsers.
+          self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+          self._available_parsers.append(attribute())
+          self.endInsertRows()
+  
+  def _search_dynamic(self):
+    # Look for files ending in _parser.py on the parsers directory.
+    plugin_re = re.compile('_parser.py$')
+    plugin_files = filter(plugin_re.search,
+                          os.listdir(os.path.join(os.path.dirname(__file__),
+                                                  'parsers')))
+    form_module = lambda fp: '.' + os.path.splitext(fp)[0]
+    plugins = map(form_module, plugin_files)
+    plugin_modules = []
+    for plugin in plugins:
+      if not plugin.startswith('.example'):
+        plugin_modules.append(importlib.import_module(plugin, package="parsers"))
+
+    # Now check that they copntain a MetaForgeParser subclass and add them if so.
+    self._add_plugins(plugin_modules)
+
+  def clear_parsers(self):
+    self.beginRemoveRows(QModelIndex(), 0, self.rowCount() - 1)
+    self._available_parsers.clear()
+    self.endRemoveRows()
+
+  def load_parsers(self, parser_file_paths: List[Path]):
+    # This method dynamically loads parsers from the plugins directory.
+    plugin_modules = []
+    for path in parser_file_paths:
+      spec =importlib.util.spec_from_file_location("parsers", path)
+      mod = importlib.util.module_from_spec(spec)
+      spec.loader.exec_module(mod)
+      plugin_modules.append(mod)
+    self._add_plugins(plugin_modules)
+
 
   def data(self, index: QModelIndex, role: int):
     if role == AvailableParsersModel.HumanLabel:

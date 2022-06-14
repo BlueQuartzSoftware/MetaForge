@@ -1,0 +1,6 @@
+---
+metaforge-parsers:
+  - ang_parser.py
+  - ctf_parser.py
+  - fei_tiff_parser.py
+  - ini_parser.py

@@ -1,13 +1,15 @@
 # This Python file uses the following encoding: utf-8
 from pathlib import Path
+import yaml
 
-from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QMenu
+from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QMenu, QDialog
 from PySide2.QtCore import QStandardPaths, QSettings, Slot
 from PySide2.QtGui import QDesktopServices
 import PySide2.QtCore
 from typing import List
 
 from aboutdialogimpl import AboutDialogImpl
+from metaforge_preferences import MetaForgePreferencesDialog, MetaForgePreferences
 from metaforgestyledatahelper import MetaForgeStyleDataHelper
 from available_parsers_model import AvailableParsersModel
 
@@ -23,6 +25,10 @@ class MainWindow(QMainWindow):
     K_MAX_RECENT_PACKAGE_SIZE = 10
     K_CLEAR_RECENT_TEMPLATES_STR = "Clear Recent Templates"
     K_CLEAR_RECENT_PACKAGES_STR = "Clear Recent Packages"
+    K_SETTINGS_GEOMETRY_KEY = "geometry"
+    K_SETTINGS_WINDOW_STATE_KEY = "window_state"
+    K_SETTINGS_RECENT_TEMPLATES_KEY = "recent_templates"
+    K_SETTINGS_RECENT_PACKAGES_KEY = "recent_packages"
 
     def __init__(self, app: QApplication):
         super(MainWindow, self).__init__()
@@ -31,6 +37,7 @@ class MainWindow(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.tab_widget.setCurrentWidget(self.ui.CreateTemplateTab)
+        self.preferences_dialog = MetaForgePreferencesDialog(self)
         self.available_parsers_model = AvailableParsersModel(self)
         self.ui.create_template_widget.ui.saveTemplateButton.clicked.connect(self.save_template)
         self.ui.actionHelp.triggered.connect(self.display_help)
@@ -48,6 +55,15 @@ class MainWindow(QMainWindow):
         self.recent_template_list: List[QAction] = []
         self.recent_package_list: List[QAction] = []
 
+        self.action_preferences: QAction = QAction("Preferences")
+        self.action_preferences.triggered.connect(self.display_preferences)
+        self.action_preferences.setMenuRole(QAction.PreferencesRole)
+        self.ui.menuFile.addAction(self.action_preferences)
+
+        # Load the parsers
+        parser_file_paths = self._parser_file_paths()
+        self.available_parsers_model.load_parsers(parser_file_paths)
+
         # Set the parsers model down into the Create Template and Use Template widgets
         self.ui.create_template_widget.set_parsers_model(self.available_parsers_model)
         self.ui.use_template_widget.set_parsers_model(self.available_parsers_model)
@@ -58,8 +74,8 @@ class MainWindow(QMainWindow):
     def read_settings(self):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
         self.read_window_settings(settings)
-        recent_templates = settings.value("recent_templates")
-        recent_packages = settings.value("recent_packages")
+        recent_templates = settings.value(self.K_SETTINGS_RECENT_TEMPLATES_KEY)
+        recent_packages = settings.value(self.K_SETTINGS_RECENT_PACKAGES_KEY)
 
         if recent_templates is not None:
             for file_path in recent_templates:
@@ -74,22 +90,23 @@ class MainWindow(QMainWindow):
                 self.add_recent_action(self.ui.menu_recent_packages, self.recent_package_list, self.action_recent_packages_separator, self.ui.action_clear_recent_packages, action)
 
     def read_window_settings(self, settings):
-        self.restoreGeometry(settings.value("geometry"))
-        self.restoreState(settings.value("window_state"))
+        self.restoreGeometry(settings.value(self.K_SETTINGS_GEOMETRY_KEY))
+        self.restoreState(settings.value(self.K_SETTINGS_WINDOW_STATE_KEY))
 
     def closeEvent(self, event):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
-        settings.setValue("geometry", self.saveGeometry())
-        settings.setValue("window_state", self.saveState())
+        settings.setValue(self.K_SETTINGS_GEOMETRY_KEY, self.saveGeometry())
+        settings.setValue(self.K_SETTINGS_WINDOW_STATE_KEY, self.saveState())
 
         recent_template_list = [action.text() for action in self.recent_template_list]
-        settings.setValue("recent_templates", recent_template_list)
+        settings.setValue(self.K_SETTINGS_RECENT_TEMPLATES_KEY, recent_template_list)
 
         recent_package_list = [action.text() for action in self.recent_package_list]
-        settings.setValue("recent_packages", recent_package_list)
+        settings.setValue(self.K_SETTINGS_RECENT_PACKAGES_KEY, recent_package_list)
 
         self.ui.create_template_widget.close()
         self.ui.use_template_widget.close()
+        self.preferences_dialog.close()
 
         super().closeEvent(event)
     
@@ -111,17 +128,37 @@ class MainWindow(QMainWindow):
         if len(recent_list) == 0:
             clear_action.setDisabled(True)
     
-    @Slot(result=None)
     def clear_recent_templates(self):
         [self.ui.menu_recent_templates.removeAction(action) for action in self.recent_template_list]
         self.recent_template_list.clear()
         self.ui.action_clear_recent_templates.setDisabled(True)
     
-    @Slot(result=None)
     def clear_recent_packages(self):
         [self.ui.menu_recent_packages.removeAction(action) for action in self.recent_package_list]
         self.recent_package_list.clear()
         self.ui.action_clear_recent_packages.setDisabled(True)
+    
+    def display_preferences(self):
+        result: QDialog.DialogCode = self.preferences_dialog.exec()
+        if result == QDialog.DialogCode.Accepted:
+            parser_file_paths = self._parser_file_paths()
+
+            self.available_parsers_model.clear_parsers()
+            self.available_parsers_model.load_parsers(parser_file_paths)
+    
+    def _parser_file_paths(self) -> List[Path]:
+        prefs: MetaForgePreferences = self.preferences_dialog.preferences()
+        parser_folder_paths = [Path(path) for path in prefs.parser_folder_paths]
+        parser_file_paths = []
+        for parser_folder_path in parser_folder_paths:
+            parser_file_paths = parser_file_paths + self._find_parser_files(parser_folder_path)
+        return parser_file_paths
+
+    def _find_parser_files(self, parser_folder_path: Path) -> List[Path]:
+        yaml_file_path = parser_folder_path / self.preferences_dialog.K_PARSER_YAML_FILE_NAME
+        with yaml_file_path.open("r") as yml:
+            yaml_data: dict = yaml.safe_load(yml)
+            return [parser_folder_path / file_name for file_name in yaml_data[self.preferences_dialog.K_PARSER_YAML_KEY]]
 
     def display_about(self):
         aboutDialog = AboutDialogImpl(self)
