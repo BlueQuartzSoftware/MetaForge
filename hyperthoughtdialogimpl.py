@@ -257,6 +257,9 @@ class HyperthoughtDialogImpl(QDialog):
         return self.current_folder
 
     def get_chosen_folder(self):
+        if not self.ui.selectedFolderLabel.text():
+            return self.current_folder
+
         for ht_item in self.current_folder_contents:
             if ht_item['ftype'] == 'Folder' and ht_item['name'] == self.ui.selectedFolderLabel.text():
                 return ht_item
