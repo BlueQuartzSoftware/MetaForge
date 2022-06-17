@@ -23,7 +23,7 @@ class ListModel(QAbstractListModel):
     def dropMimeData(self, data, action, row, column, parent):
         for file in data.urls():
             #if file.isLocalDirectory():
-            self.addRow(file.path())
+            self.addRow(Path(file.path()))
         return True
 
 
