@@ -46,7 +46,7 @@ class MetaForgePreferencesDialog(QDialog):
     
     def read_settings(self):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
-        parser_folder_paths: List[str] = settings.value(self.K_SETTINGS_PARSER_PATHS_KEY)
+        parser_folder_paths: List[str] = settings.value(self.K_SETTINGS_PARSER_PATHS_KEY, type=list)
 
         if parser_folder_paths is None:
             parser_folder_paths: List[str] = []
