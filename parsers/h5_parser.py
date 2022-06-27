@@ -47,8 +47,22 @@ class H5Parser(MetaForgeParser):
     print(f'value confused us: {value} {type(value)}')
     return None
 
+  def attributes(self, name: str) -> bool:
+    """
+    Step through the attributes for the node, add them to the dictionary.
+    """
+    data = self.file[name]
+    if isinstance(data, (h5py.Dataset, h5py.Group)):
+      for (key, value) in data.attrs.items():
+        print(f'atttributes for {name} -> {key}: {value}')
+        v = self.type_dispatch(value)
+        if v is not None:
+          path = f'{name}/{key}'
+          self.file_dict[path] = v
+
   def visit_entry(self, name: str) -> None:
     data = self.file[name]
+    self.attributes(name)
     if isinstance(data, h5py.Dataset):
       if data.len() == 1:
         # Handle the simple cases.
