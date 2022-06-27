@@ -97,7 +97,6 @@ class H5Parser(MetaForgeParser):
     """
     # Check our file exists before trying to open it!
     if os.path.isfile(filepath):
-      print("File found!")
       self.file = h5py.File(filepath, 'r')
       self.file.visit(self.visit_entry)
 
