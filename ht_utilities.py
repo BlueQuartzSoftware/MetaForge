@@ -1,14 +1,12 @@
-import os
-import json
-
 from typing import List
+from hyperthought.metadata import MetadataItem
 
 from ezmodel.ezmetadatamodel import EzMetadataModel
 from ezmodel.ezmetadataentry import EzMetadataEntry
 
 
 
-def dict_to_ht_metadata(metadata_dict):
+def dict_to_ht_metadata(metadata_dict) -> List[MetadataItem]:
     """
     Converts the incoming metadata dictionary into a list of metadata json
     objects usable by HyperThought endpoints.
@@ -49,58 +47,67 @@ def dict_to_ht_metadata(metadata_dict):
     #     }
     # ]
 
-    metadataJson = []
+    ht_metadata_items: List[MetadataItem] = []
     for i in range(len(metadata_dict)):
         if metadata_dict[i]['Default'] == 2:
-            ht_entry = _create_ht_entry(metadata_dict[i]['Key'],
+            ht_metadata_item = _create_ht_metadata_item(metadata_dict[i]['Key'],
                                         metadata_dict[i]['Value'],
                                         metadata_dict[i]['Units'],
                                         metadata_dict[i]['Annotation'])
-            metadataJson.append(ht_entry)
+            ht_metadata_items.append(ht_metadata_item)
         elif metadata_dict[i]['Default'] == 0:
-            ht_entry = _create_ht_entry(metadata_dict[i]['Key'],
+            ht_metadata_item = _create_ht_metadata_item(metadata_dict[i]['Key'],
                                         metadata_dict[i]['HT Value'],
                                         metadata_dict[i]['Units'],
                                         metadata_dict[i]['Annotation'])
-            metadataJson.append(ht_entry)
-    return metadataJson
+            ht_metadata_items.append(ht_metadata_item)
+    return ht_metadata_items
 
 
 def ezmodel_to_ht_metadata(model: EzMetadataModel,
                            missing_entries: List[EzMetadataEntry],
-                           metadata_file_chosen: bool):
+                           metadata_file_chosen: bool) -> List[MetadataItem]:
     """
 
     """
 
-    metadataJson = []
+    ht_metadata_items: List[MetadataItem] = []
     entries = model.entries
     for e in entries:
         if e.enabled:
             if e.source_type is EzMetadataEntry.SourceType.FILE:
                 if e.override_source_value is True:
-                    ht_entry = _create_ht_entry(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
-                    metadataJson.append(ht_entry)
+                    ht_metadata_item = _create_ht_metadata_item(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
+                    ht_metadata_items.append(ht_metadata_item)
                 elif e not in missing_entries:
                     if metadata_file_chosen is True:
-                        ht_entry = _create_ht_entry(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
+                        ht_metadata_item = _create_ht_metadata_item(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
                     else:
-                        ht_entry = _create_ht_entry(e.ht_name, e.source_value, e.ht_units, e.ht_annotation)
-                    metadataJson.append(ht_entry)
+                        ht_metadata_item = _create_ht_metadata_item(e.ht_name, e.source_value, e.ht_units, e.ht_annotation)
+                    ht_metadata_items.append(ht_metadata_item)
             elif e.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                ht_entry = _create_ht_entry(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
-                metadataJson.append(ht_entry)
-    return metadataJson
+                ht_metadata_item = _create_ht_metadata_item(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
+                ht_metadata_items.append(ht_metadata_item)
+    return ht_metadata_items
 
-def _create_ht_entry(ht_name: str, ht_value: str, ht_units: str, ht_annotation: str):
-    return {
-                "keyName": ht_name,
-                "value":
-                        {
-                            "type": "string",
-                            "link": ht_value
-                        },
-                "unit": ht_units,
-                "annotation": ht_annotation
-            }
+def _create_ht_metadata_item(ht_name: str, ht_value: str, ht_units: str, ht_annotation: str) -> MetadataItem:
+    value_type_name = type(ht_value).__name__
+    if value_type_name == 'list':
+        s = ', '
+        ht_value = '[' + s.join([str(val) for val in ht_value]) + ']'
+
+    return MetadataItem(key=ht_name,
+                        value=ht_value,
+                        units=ht_units,
+                        annotation=ht_annotation)
+    # return {
+    #             "keyName": ht_name,
+    #             "value":
+    #                     {
+    #                         "type": "string",
+    #                         "link": ht_value
+    #                     },
+    #             "unit": ht_units,
+    #             "annotation": ht_annotation
+    #         }
 

@@ -22,14 +22,118 @@ class Ui_UseTemplateWidget(object):
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout_2.setVerticalSpacing(-1)
         self.gridLayout_2.setContentsMargins(0, 0, 0, 8)
-        self.clearUseButton = QPushButton(UseTemplateWidget)
-        self.clearUseButton.setObjectName(u"clearUseButton")
+        self.horizontalLayout_7 = QHBoxLayout()
+        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
+        self.horizontalLayout_7.setContentsMargins(-1, -1, 10, 10)
+        self.label_3 = QLabel(UseTemplateWidget)
+        self.label_3.setObjectName(u"label_3")
+        font = QFont()
+        font.setBold(True)
+        font.setWeight(75)
+        self.label_3.setFont(font)
 
-        self.gridLayout_2.addWidget(self.clearUseButton, 6, 0, 1, 1)
+        self.horizontalLayout_7.addWidget(self.label_3)
 
-        self.horizontalSpacer_3 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.hyperThoughtServer = QLabel(UseTemplateWidget)
+        self.hyperThoughtServer.setObjectName(u"hyperThoughtServer")
+        font1 = QFont()
+        font1.setItalic(True)
+        self.hyperThoughtServer.setFont(font1)
 
-        self.gridLayout_2.addItem(self.horizontalSpacer_3, 6, 1, 1, 1)
+        self.horizontalLayout_7.addWidget(self.hyperThoughtServer)
+
+        self.horizontalSpacer_9 = QSpacerItem(12, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_7.addItem(self.horizontalSpacer_9)
+
+        self.label_4 = QLabel(UseTemplateWidget)
+        self.label_4.setObjectName(u"label_4")
+        self.label_4.setFont(font)
+
+        self.horizontalLayout_7.addWidget(self.label_4)
+
+        self.hyperThoughtProject = QLabel(UseTemplateWidget)
+        self.hyperThoughtProject.setObjectName(u"hyperThoughtProject")
+        self.hyperThoughtProject.setFont(font1)
+
+        self.horizontalLayout_7.addWidget(self.hyperThoughtProject)
+
+        self.horizontalSpacer_10 = QSpacerItem(12, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+
+        self.horizontalLayout_7.addItem(self.horizontalSpacer_10)
+
+        self.label_5 = QLabel(UseTemplateWidget)
+        self.label_5.setObjectName(u"label_5")
+        self.label_5.setFont(font)
+
+        self.horizontalLayout_7.addWidget(self.label_5)
+
+        self.hyperThoughtUploadPath = QLabel(UseTemplateWidget)
+        self.hyperThoughtUploadPath.setObjectName(u"hyperThoughtUploadPath")
+        self.hyperThoughtUploadPath.setFont(font1)
+
+        self.horizontalLayout_7.addWidget(self.hyperThoughtUploadPath)
+
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout_7.addItem(self.horizontalSpacer_6)
+
+        self.hyperthoughtLocationButton = QPushButton(UseTemplateWidget)
+        self.hyperthoughtLocationButton.setObjectName(u"hyperthoughtLocationButton")
+        self.hyperthoughtLocationButton.setEnabled(True)
+
+        self.horizontalLayout_7.addWidget(self.hyperthoughtLocationButton)
+
+
+        self.gridLayout_2.addLayout(self.horizontalLayout_7, 5, 0, 1, 2)
+
+        self.gridLayout_3 = QGridLayout()
+        self.gridLayout_3.setObjectName(u"gridLayout_3")
+        self.gridLayout_3.setContentsMargins(-1, -1, 0, 0)
+        self.list_progress_label = QLabel(UseTemplateWidget)
+        self.list_progress_label.setObjectName(u"list_progress_label")
+
+        self.gridLayout_3.addWidget(self.list_progress_label, 2, 0, 1, 1)
+
+        self.hyperthoughtUploadButton = QPushButton(UseTemplateWidget)
+        self.hyperthoughtUploadButton.setObjectName(u"hyperthoughtUploadButton")
+        self.hyperthoughtUploadButton.setEnabled(False)
+
+        self.gridLayout_3.addWidget(self.hyperthoughtUploadButton, 1, 2, 3, 1)
+
+        self.file_progress_bar_label = QLabel(UseTemplateWidget)
+        self.file_progress_bar_label.setObjectName(u"file_progress_bar_label")
+
+        self.gridLayout_3.addWidget(self.file_progress_bar_label, 1, 1, 1, 1)
+
+        self.file_progress_bar = QProgressBar(UseTemplateWidget)
+        self.file_progress_bar.setObjectName(u"file_progress_bar")
+        self.file_progress_bar.setValue(0)
+        self.file_progress_bar.setOrientation(Qt.Horizontal)
+        self.file_progress_bar.setInvertedAppearance(False)
+
+        self.gridLayout_3.addWidget(self.file_progress_bar, 1, 0, 1, 1)
+
+        self.list_progress_bar_label = QLabel(UseTemplateWidget)
+        self.list_progress_bar_label.setObjectName(u"list_progress_bar_label")
+
+        self.gridLayout_3.addWidget(self.list_progress_bar_label, 3, 1, 1, 1)
+
+        self.list_progress_bar = QProgressBar(UseTemplateWidget)
+        self.list_progress_bar.setObjectName(u"list_progress_bar")
+        self.list_progress_bar.setValue(0)
+        self.list_progress_bar.setOrientation(Qt.Horizontal)
+        self.list_progress_bar.setInvertedAppearance(False)
+
+        self.gridLayout_3.addWidget(self.list_progress_bar, 3, 0, 1, 1)
+
+        self.file_progress_label = QLabel(UseTemplateWidget)
+        self.file_progress_label.setObjectName(u"file_progress_label")
+
+        self.gridLayout_3.addWidget(self.file_progress_label, 0, 0, 1, 1)
+
+
+        self.gridLayout_2.addLayout(self.gridLayout_3, 6, 0, 1, 1)
 
         self.horizontalLayout_13 = QHBoxLayout()
         self.horizontalLayout_13.setSpacing(6)
@@ -164,6 +268,15 @@ class Ui_UseTemplateWidget(object):
         self.use_frame_2.setFrameShadow(QFrame.Raised)
         self.gridLayout_6 = QGridLayout(self.use_frame_2)
         self.gridLayout_6.setObjectName(u"gridLayout_6")
+        self.removeUseTableRowButton = QPushButton(self.use_frame_2)
+        self.removeUseTableRowButton.setObjectName(u"removeUseTableRowButton")
+        sizePolicy.setHeightForWidth(self.removeUseTableRowButton.sizePolicy().hasHeightForWidth())
+        self.removeUseTableRowButton.setSizePolicy(sizePolicy)
+        self.removeUseTableRowButton.setMinimumSize(QSize(40, 0))
+        self.removeUseTableRowButton.setMaximumSize(QSize(40, 16777215))
+
+        self.gridLayout_6.addWidget(self.removeUseTableRowButton, 2, 3, 1, 1)
+
         self.useTemplateTableView = QTableView(self.use_frame_2)
         self.useTemplateTableView.setObjectName(u"useTemplateTableView")
         self.useTemplateTableView.setSizeAdjustPolicy(QAbstractScrollArea.AdjustToContents)
@@ -178,32 +291,9 @@ class Ui_UseTemplateWidget(object):
 
         self.gridLayout_6.addWidget(self.useTemplateTableView, 1, 0, 1, 4)
 
-        self.use_label_3 = QLabel(self.use_frame_2)
-        self.use_label_3.setObjectName(u"use_label_3")
-
-        self.gridLayout_6.addWidget(self.use_label_3, 0, 0, 1, 1)
-
-        self.removeUseTableRowButton = QPushButton(self.use_frame_2)
-        self.removeUseTableRowButton.setObjectName(u"removeUseTableRowButton")
-        sizePolicy.setHeightForWidth(self.removeUseTableRowButton.sizePolicy().hasHeightForWidth())
-        self.removeUseTableRowButton.setSizePolicy(sizePolicy)
-        self.removeUseTableRowButton.setMinimumSize(QSize(40, 0))
-        self.removeUseTableRowButton.setMaximumSize(QSize(40, 16777215))
-
-        self.gridLayout_6.addWidget(self.removeUseTableRowButton, 2, 3, 1, 1)
-
         self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
 
         self.gridLayout_6.addItem(self.horizontalSpacer_7, 2, 0, 1, 2)
-
-        self.appendUseTableRowButton = QPushButton(self.use_frame_2)
-        self.appendUseTableRowButton.setObjectName(u"appendUseTableRowButton")
-        sizePolicy.setHeightForWidth(self.appendUseTableRowButton.sizePolicy().hasHeightForWidth())
-        self.appendUseTableRowButton.setSizePolicy(sizePolicy)
-        self.appendUseTableRowButton.setMinimumSize(QSize(40, 0))
-        self.appendUseTableRowButton.setMaximumSize(QSize(40, 16777215))
-
-        self.gridLayout_6.addWidget(self.appendUseTableRowButton, 2, 2, 1, 1)
 
         self.useTemplateListSearchBar = QLineEdit(self.use_frame_2)
         self.useTemplateListSearchBar.setObjectName(u"useTemplateListSearchBar")
@@ -216,6 +306,20 @@ class Ui_UseTemplateWidget(object):
 
         self.gridLayout_6.addWidget(self.useTemplateListSearchBar, 0, 1, 1, 3)
 
+        self.use_label_3 = QLabel(self.use_frame_2)
+        self.use_label_3.setObjectName(u"use_label_3")
+
+        self.gridLayout_6.addWidget(self.use_label_3, 0, 0, 1, 1)
+
+        self.appendUseTableRowButton = QPushButton(self.use_frame_2)
+        self.appendUseTableRowButton.setObjectName(u"appendUseTableRowButton")
+        sizePolicy.setHeightForWidth(self.appendUseTableRowButton.sizePolicy().hasHeightForWidth())
+        self.appendUseTableRowButton.setSizePolicy(sizePolicy)
+        self.appendUseTableRowButton.setMinimumSize(QSize(40, 0))
+        self.appendUseTableRowButton.setMaximumSize(QSize(40, 16777215))
+
+        self.gridLayout_6.addWidget(self.appendUseTableRowButton, 2, 2, 1, 1)
+
 
         self.verticalLayout.addWidget(self.use_frame_2)
 
@@ -226,101 +330,25 @@ class Ui_UseTemplateWidget(object):
 
         self.gridLayout_2.addLayout(self.horizontalLayout_13, 4, 0, 1, 2)
 
-        self.horizontalLayout_7 = QHBoxLayout()
-        self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
-        self.horizontalLayout_7.setContentsMargins(-1, -1, 10, 10)
-        self.label_3 = QLabel(UseTemplateWidget)
-        self.label_3.setObjectName(u"label_3")
-        font = QFont()
-        font.setBold(True)
-        font.setWeight(75)
-        self.label_3.setFont(font)
+        self.horizontalLayout = QHBoxLayout()
+        self.horizontalLayout.setObjectName(u"horizontalLayout")
+        self.horizontalLayout.setContentsMargins(0, -1, -1, 0)
+        self.clearUseButton = QPushButton(UseTemplateWidget)
+        self.clearUseButton.setObjectName(u"clearUseButton")
 
-        self.horizontalLayout_7.addWidget(self.label_3)
-
-        self.hyperThoughtServer = QLabel(UseTemplateWidget)
-        self.hyperThoughtServer.setObjectName(u"hyperThoughtServer")
-        font1 = QFont()
-        font1.setItalic(True)
-        self.hyperThoughtServer.setFont(font1)
-
-        self.horizontalLayout_7.addWidget(self.hyperThoughtServer)
-
-        self.horizontalSpacer_9 = QSpacerItem(12, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
-
-        self.horizontalLayout_7.addItem(self.horizontalSpacer_9)
-
-        self.label_4 = QLabel(UseTemplateWidget)
-        self.label_4.setObjectName(u"label_4")
-        self.label_4.setFont(font)
-
-        self.horizontalLayout_7.addWidget(self.label_4)
-
-        self.hyperThoughtProject = QLabel(UseTemplateWidget)
-        self.hyperThoughtProject.setObjectName(u"hyperThoughtProject")
-        self.hyperThoughtProject.setFont(font1)
-
-        self.horizontalLayout_7.addWidget(self.hyperThoughtProject)
-
-        self.horizontalSpacer_10 = QSpacerItem(12, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
-
-        self.horizontalLayout_7.addItem(self.horizontalSpacer_10)
-
-        self.label_5 = QLabel(UseTemplateWidget)
-        self.label_5.setObjectName(u"label_5")
-        self.label_5.setFont(font)
-
-        self.horizontalLayout_7.addWidget(self.label_5)
-
-        self.hyperThoughtUploadPath = QLabel(UseTemplateWidget)
-        self.hyperThoughtUploadPath.setObjectName(u"hyperThoughtUploadPath")
-        self.hyperThoughtUploadPath.setFont(font1)
-
-        self.horizontalLayout_7.addWidget(self.hyperThoughtUploadPath)
-
-        self.horizontalSpacer_11 = QSpacerItem(12, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
-
-        self.horizontalLayout_7.addItem(self.horizontalSpacer_11)
-
-        self.label_6 = QLabel(UseTemplateWidget)
-        self.label_6.setObjectName(u"label_6")
-        self.label_6.setFont(font)
-
-        self.horizontalLayout_7.addWidget(self.label_6)
-
-        self.hyperThoughtExpiresIn = QLabel(UseTemplateWidget)
-        self.hyperThoughtExpiresIn.setObjectName(u"hyperThoughtExpiresIn")
-        self.hyperThoughtExpiresIn.setFont(font1)
-
-        self.horizontalLayout_7.addWidget(self.hyperThoughtExpiresIn)
-
-        self.horizontalSpacer_12 = QSpacerItem(12, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
-
-        self.horizontalLayout_7.addItem(self.horizontalSpacer_12)
-
-        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
-
-        self.horizontalLayout_7.addItem(self.horizontalSpacer_6)
-
-        self.hyperthoughtLocationButton = QPushButton(UseTemplateWidget)
-        self.hyperthoughtLocationButton.setObjectName(u"hyperthoughtLocationButton")
-        self.hyperthoughtLocationButton.setEnabled(True)
-
-        self.horizontalLayout_7.addWidget(self.hyperthoughtLocationButton)
-
-        self.hyperthoughtUploadButton = QPushButton(UseTemplateWidget)
-        self.hyperthoughtUploadButton.setObjectName(u"hyperthoughtUploadButton")
-        self.hyperthoughtUploadButton.setEnabled(False)
-
-        self.horizontalLayout_7.addWidget(self.hyperthoughtUploadButton)
-
-
-        self.gridLayout_2.addLayout(self.horizontalLayout_7, 5, 0, 1, 2)
+        self.horizontalLayout.addWidget(self.clearUseButton)
 
         self.error_label = QLabel(UseTemplateWidget)
         self.error_label.setObjectName(u"error_label")
 
-        self.gridLayout_2.addWidget(self.error_label, 7, 0, 1, 2)
+        self.horizontalLayout.addWidget(self.error_label)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+
+        self.horizontalLayout.addItem(self.horizontalSpacer)
+
+
+        self.gridLayout_2.addLayout(self.horizontalLayout, 7, 0, 1, 2)
 
 
         self.retranslateUi(UseTemplateWidget)
@@ -330,10 +358,24 @@ class Ui_UseTemplateWidget(object):
 
     def retranslateUi(self, UseTemplateWidget):
         UseTemplateWidget.setWindowTitle(QCoreApplication.translate("UseTemplateWidget", u"Use Template Widget", None))
+        self.label_3.setText(QCoreApplication.translate("UseTemplateWidget", u"Server:", None))
+        self.hyperThoughtServer.setText(QCoreApplication.translate("UseTemplateWidget", u"Server Not Selected", None))
+        self.label_4.setText(QCoreApplication.translate("UseTemplateWidget", u"Project:", None))
+        self.hyperThoughtProject.setText(QCoreApplication.translate("UseTemplateWidget", u"Project Not Selected", None))
+        self.label_5.setText(QCoreApplication.translate("UseTemplateWidget", u"Project Directory Path:", None))
+        self.hyperThoughtUploadPath.setText(QCoreApplication.translate("UseTemplateWidget", u"Folder Not Selected", None))
 #if QT_CONFIG(tooltip)
-        self.clearUseButton.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Reset all 'Create Template' input fields. All fields will be reset to an empty state.", None))
+        self.hyperthoughtLocationButton.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Allows user to set their API key from HyperThought and set a remote location on the HyperThought server to upload the data files", None))
 #endif // QT_CONFIG(tooltip)
-        self.clearUseButton.setText(QCoreApplication.translate("UseTemplateWidget", u"Reset All Fields", None))
+        self.hyperthoughtLocationButton.setText(QCoreApplication.translate("UseTemplateWidget", u"Select Remote Folder", None))
+        self.list_progress_label.setText("")
+#if QT_CONFIG(tooltip)
+        self.hyperthoughtUploadButton.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Upload all files to the HyperThought server", None))
+#endif // QT_CONFIG(tooltip)
+        self.hyperthoughtUploadButton.setText(QCoreApplication.translate("UseTemplateWidget", u"Upload Files", None))
+        self.file_progress_bar_label.setText(QCoreApplication.translate("UseTemplateWidget", u"0%", None))
+        self.list_progress_bar_label.setText(QCoreApplication.translate("UseTemplateWidget", u"0%", None))
+        self.file_progress_label.setText("")
 #if QT_CONFIG(tooltip)
         self.addUploadFilesBtn.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Add files to the upload list", None))
 #endif // QT_CONFIG(tooltip)
@@ -355,32 +397,20 @@ class Ui_UseTemplateWidget(object):
 #endif // QT_CONFIG(tooltip)
         self.hyperthoughtTemplateSelect.setText(QCoreApplication.translate("UseTemplateWidget", u"Select", None))
         self.addMetadataFileCheckBox.setText(QCoreApplication.translate("UseTemplateWidget", u"Add Extracted Metadata File To File List", None))
-        self.use_label_3.setText(QCoreApplication.translate("UseTemplateWidget", u"Search Table", None))
 #if QT_CONFIG(tooltip)
         self.removeUseTableRowButton.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Removes the selected rows from the table", None))
 #endif // QT_CONFIG(tooltip)
         self.removeUseTableRowButton.setText("")
+        self.useTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("UseTemplateWidget", u"Search table using wildcard (*.*)", None))
+        self.use_label_3.setText(QCoreApplication.translate("UseTemplateWidget", u"Search Table", None))
 #if QT_CONFIG(tooltip)
         self.appendUseTableRowButton.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Add a Custom Value that is only going to be used for this upload", None))
 #endif // QT_CONFIG(tooltip)
         self.appendUseTableRowButton.setText("")
-        self.useTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("UseTemplateWidget", u"Search table using wildcard (*.*)", None))
-        self.label_3.setText(QCoreApplication.translate("UseTemplateWidget", u"Server:", None))
-        self.hyperThoughtServer.setText(QCoreApplication.translate("UseTemplateWidget", u"Server Not Selected", None))
-        self.label_4.setText(QCoreApplication.translate("UseTemplateWidget", u"Project:", None))
-        self.hyperThoughtProject.setText(QCoreApplication.translate("UseTemplateWidget", u"Project Not Selected", None))
-        self.label_5.setText(QCoreApplication.translate("UseTemplateWidget", u"Project Directory Path:", None))
-        self.hyperThoughtUploadPath.setText(QCoreApplication.translate("UseTemplateWidget", u"Folder Not Selected", None))
-        self.label_6.setText(QCoreApplication.translate("UseTemplateWidget", u"Token Expires At:", None))
-        self.hyperThoughtExpiresIn.setText(QCoreApplication.translate("UseTemplateWidget", u"Not Authenticated", None))
 #if QT_CONFIG(tooltip)
-        self.hyperthoughtLocationButton.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Allows user to set their API key from HyperThought and set a remote location on the HyperThought server to upload the data files", None))
+        self.clearUseButton.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Reset all 'Create Template' input fields. All fields will be reset to an empty state.", None))
 #endif // QT_CONFIG(tooltip)
-        self.hyperthoughtLocationButton.setText(QCoreApplication.translate("UseTemplateWidget", u"Select Remote Folder", None))
-#if QT_CONFIG(tooltip)
-        self.hyperthoughtUploadButton.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Upload all files to the HyperThought server", None))
-#endif // QT_CONFIG(tooltip)
-        self.hyperthoughtUploadButton.setText(QCoreApplication.translate("UseTemplateWidget", u"Upload Files", None))
+        self.clearUseButton.setText(QCoreApplication.translate("UseTemplateWidget", u"Reset All Fields", None))
         self.error_label.setText(QCoreApplication.translate("UseTemplateWidget", u"TextLabel", None))
     # retranslateUi
 

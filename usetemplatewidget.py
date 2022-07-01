@@ -1,11 +1,13 @@
 # This Python file uses the following encoding: utf-8
 import shutil
 from typing import List
+from tqdm import tqdm
 
 from uploader import Uploader
 import json
 from datetime import datetime
 from pathlib import Path
+import hyperthought as ht
 
 from PySide2.QtWidgets import QMainWindow, QFileDialog, QProgressDialog, QDialog, QWidget
 from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent
@@ -23,10 +25,7 @@ from usefiledelegate import UseFileDelegate
 from metaforgestyledatahelper import MetaForgeStyleDataHelper
 from available_parsers_model import AvailableParsersModel
 import widget_utilities as widget_utils
-
-from ht_requests.ht_requests import ht_utilities
-from ht_requests.ht_requests import htauthcontroller
-from ht_requests.ht_requests import ht_requests
+import ht_utilities
 
 qt_version = PySide2.QtCore.__version_info__
 if qt_version[1] == 12:
@@ -45,7 +44,7 @@ class UseTemplateWidget(QWidget):
     K_METADATAFILECHOSEN_KEY_NAME = 'metadata_file_chosen'
     K_NO_ERRORS = "No errors."
 
-    createUpload = Signal(list, htauthcontroller.HTAuthorizationController, str, str, list)
+    createUpload = Signal(list, ht.auth.Authorization, str, str, list)
     
     def __init__(self, parent):
         super(UseTemplateWidget, self).__init__(parent)
@@ -59,7 +58,6 @@ class UseTemplateWidget(QWidget):
         self.ui.otherDataFileSelect.clicked.connect(self.load_other_data_file)
         self.ui.hyperthoughtUploadButton.clicked.connect(self.upload_to_hyperthought)
         self.ui.clearUseButton.clicked.connect(self.clear)
-        self.hyperthoughtui.currentTokenExpired.connect(lambda:  self.ui.hyperThoughtExpiresIn.setText(self.hyperthoughtui.K_EXPIRED_STR))
         self.setAcceptDrops(True)
 
         widget_utils.notify_no_errors(self.ui.error_label)
@@ -80,15 +78,13 @@ class UseTemplateWidget(QWidget):
         self.ui.addMetadataFileCheckBox.stateChanged.connect(self.check_file_list)
 
         self.fileType = ""
-        self.accessKey = ""
         self.folderuuid = ""
-        self.mThread = QThread()
         self.uploader = Uploader()
+        self.mThread = QThread()
         self.uploader.moveToThread(self.mThread)
         self.mThread.start()
 
         self.createUpload.connect(self.uploader.performUpload)
-        self.hyperthoughtui.apiSubmitted.connect(self.accept_key)
         self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
         self.ui.otherDataFileLineEdit.installEventFilter(self)
 
@@ -133,9 +129,6 @@ class UseTemplateWidget(QWidget):
         self.ui.addMetadataFileCheckBox.setChecked(True)
         self.setup_metadata_table()
         self.clear_upload_files()
-
-    def accept_key(self, apikey):
-        self.accessKey = apikey
 
     def add_upload_files(self):
         linetexts = QFileDialog.getOpenFileNames(self, self.tr("Select File"), QStandardPaths.displayName(
@@ -399,35 +392,47 @@ class UseTemplateWidget(QWidget):
             self.ui.hyperthoughtUploadButton.setEnabled(True)
 
     def upload_to_hyperthought(self):
-        auth_control = htauthcontroller.HTAuthorizationController(self.accessKey)
-
+        original_btn_text = self.ui.hyperthoughtUploadButton.text()
         metadataJson = ht_utilities.ezmodel_to_ht_metadata(self.use_ez_table_model.metadata_model,
                                                            self.use_ez_table_model_proxy.missing_entries,
                                                            self.use_ez_table_model_proxy.metadata_file_chosen)
-        progress = QProgressDialog("Uploading files...", "Abort Upload", 0, len(
-            self.uselistmodel.metadataList), self)
-
-        progress.setWindowFlags(
-            Qt.Window | Qt.CustomizeWindowHint | Qt.WindowTitleHint)
-        progress.setAttribute(Qt.WA_DeleteOnClose)
+        auth_control = self.hyperthoughtui.get_auth_control()
         self.createUpload.emit(self.uselistmodel.metadataList, 
                     auth_control, 
                     self.chosen_ht_workspace["id"],
                     self.chosen_ht_folder['path'] + self.chosen_ht_folder['pk'] + ',',
                     metadataJson)
-        self.uploader.notifyProgress.connect(progress.setValue)
-        self.uploader.currentlyUploading.connect(progress.setLabelText)
-        self.uploader.allUploadsDone.connect(progress.accept)
-        progress.canceled.connect(lambda: self.uploader.interruptUpload())
-        progress.setFixedSize(500, 100)
-        progress.exec()
+        self.uploader.notify_file_progress_text.connect(self._update_file_progress_label)
+        self.uploader.notify_file_progress.connect(self._update_file_progress)
+        self.uploader.notify_list_progress_text.connect(self._update_list_progress_label)
+        self.uploader.notify_list_progress.connect(self._update_list_progress)
+        self.ui.hyperthoughtUploadButton.pressed.connect(self.uploader.interruptUpload)
+        self.uploader.all_uploads_done.connect(lambda: self.ui.hyperthoughtUploadButton.setText(original_btn_text))
+        self.ui.hyperthoughtUploadButton.setText('Cancel Upload')
+    
+    def _update_file_progress(self, progress: int):
+        self.ui.file_progress_bar.setValue(progress)
+        self.ui.file_progress_bar_label.setText(f"{progress}%")
+
+    def _update_file_progress_label(self, progress_text: str):
+        self.ui.file_progress_label.setText(progress_text)
+    
+    def _update_list_progress(self, progress: int):
+        self.ui.list_progress_bar.setValue(progress)
+        self.ui.list_progress_bar_label.setText(f"{progress}%")
+    
+    def _update_list_progress_label(self, progress_text: str):
+        self.ui.list_progress_label.setText(progress_text)
 
     def authenticate_to_hyperthought(self):
         ret = self.hyperthoughtui.exec()
         if ret == int(QDialog.Accepted):
             self.chosen_ht_workspace = self.hyperthoughtui.get_workspace()
             self.chosen_ht_folder = self.hyperthoughtui.get_chosen_folder()
-            self.ui.hyperThoughtUploadPath.setText(self.chosen_ht_folder['path_string'])
+            if self.chosen_ht_folder is None:
+                self.ui.hyperThoughtUploadPath.setText('/')
+            else:
+                self.ui.hyperThoughtUploadPath.setText(self.chosen_ht_folder['path_string'])
             self.toggle_buttons()
 
             htUrl = self.hyperthoughtui.ui.ht_server_url.text()
@@ -436,14 +441,6 @@ class UseTemplateWidget(QWidget):
             else:
                 self.ui.hyperThoughtServer.setText(htUrl)
                 self.ui.hyperThoughtProject.setText(self.chosen_ht_workspace["name"])
-        
-        if self.hyperthoughtui.authcontrol is not None:
-            try:
-                datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%X.%f%z')
-            except ValueError:
-                datetime_obj = datetime.strptime(self.hyperthoughtui.authcontrol.expires_at, '%Y-%m-%dT%H:%M:%S%z')
-            expires_at = datetime_obj.strftime("%m/%d/%Y %I:%M:%S %p")
-            self.ui.hyperThoughtExpiresIn.setText(expires_at)
     
     def set_parsers_model(self, model: AvailableParsersModel):
         self.available_parsers_model = model

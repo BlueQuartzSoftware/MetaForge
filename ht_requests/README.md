@@ -1,1 +1,0 @@
-This is a module that provides a wrapper around HyperThought API calls, such as file uploading and listing space contents.

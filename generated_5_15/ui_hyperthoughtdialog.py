@@ -61,18 +61,6 @@ class Ui_HyperthoughtDialog(object):
 
         self.horizontalLayout_3.addWidget(self.ht_username)
 
-        self.label_2 = QLabel(HyperthoughtDialog)
-        self.label_2.setObjectName(u"label_2")
-        self.label_2.setFont(font)
-        self.label_2.setAlignment(Qt.AlignRight|Qt.AlignTrailing|Qt.AlignVCenter)
-
-        self.horizontalLayout_3.addWidget(self.label_2)
-
-        self.token_expiration = QLabel(HyperthoughtDialog)
-        self.token_expiration.setObjectName(u"token_expiration")
-
-        self.horizontalLayout_3.addWidget(self.token_expiration)
-
 
         self.gridLayout.addLayout(self.horizontalLayout_3, 1, 0, 1, 7)
 
@@ -236,8 +224,6 @@ class Ui_HyperthoughtDialog(object):
         self.ht_server_url.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Authenticated", None))
         self.label_3.setText(QCoreApplication.translate("HyperthoughtDialog", u"User:", None))
         self.ht_username.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Authenticated", None))
-        self.label_2.setText(QCoreApplication.translate("HyperthoughtDialog", u"Expires:", None))
-        self.token_expiration.setText(QCoreApplication.translate("HyperthoughtDialog", u"Not Authenticated", None))
 #if QT_CONFIG(tooltip)
         self.parentDirectoryButton.setToolTip(QCoreApplication.translate("HyperthoughtDialog", u"Move Up a Directory", None))
 #endif // QT_CONFIG(tooltip)
