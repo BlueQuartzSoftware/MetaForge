@@ -182,6 +182,9 @@
      </property>
      <item row="2" column="0">
       <widget class="QLabel" name="list_progress_label">
+       <property name="toolTip">
+        <string/>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -202,6 +205,9 @@
      </item>
      <item row="1" column="1">
       <widget class="QLabel" name="file_progress_bar_label">
+       <property name="toolTip">
+        <string>This progress bar shows the progress for the current file.</string>
+       </property>
        <property name="text">
         <string>0%</string>
        </property>
@@ -209,6 +215,9 @@
      </item>
      <item row="1" column="0">
       <widget class="QProgressBar" name="file_progress_bar">
+       <property name="toolTip">
+        <string>This progress bar shows the progress for the current file.</string>
+       </property>
        <property name="value">
         <number>0</number>
        </property>
@@ -222,6 +231,9 @@
      </item>
      <item row="3" column="1">
       <widget class="QLabel" name="list_progress_bar_label">
+       <property name="toolTip">
+        <string>This progress bar shows the progress for the overall file list.</string>
+       </property>
        <property name="text">
         <string>0%</string>
        </property>
@@ -229,6 +241,9 @@
      </item>
      <item row="3" column="0">
       <widget class="QProgressBar" name="list_progress_bar">
+       <property name="toolTip">
+        <string>This progress bar shows the progress for the overall file list.</string>
+       </property>
        <property name="value">
         <number>0</number>
        </property>
@@ -242,6 +257,9 @@
      </item>
      <item row="0" column="0">
       <widget class="QLabel" name="file_progress_label">
+       <property name="toolTip">
+        <string/>
+       </property>
        <property name="text">
         <string/>
        </property>
@@ -355,6 +373,9 @@
           <property name="acceptDrops">
            <bool>true</bool>
           </property>
+          <property name="toolTip">
+           <string>This is the list of files that will be tagged with the metadata in the table on the right and uploaded to HyperThought.</string>
+          </property>
           <property name="verticalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOn</enum>
           </property>
@@ -439,6 +460,9 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>This is a .ez template file used to determine which pieces of metadata to extract from the file below.</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
             </property>
@@ -478,8 +502,14 @@
               <verstretch>0</verstretch>
              </sizepolicy>
             </property>
+            <property name="toolTip">
+             <string>This is the data file from which to extract metadata.  The extracted metadata will appear in the table below and will be uploaded with each file in the file list on the left.</string>
+            </property>
             <property name="readOnly">
              <bool>true</bool>
+            </property>
+            <property name="placeholderText">
+             <string>Drag a file here or select one using the 'Select' button to the right===&gt;</string>
             </property>
            </widget>
           </item>
@@ -535,6 +565,9 @@
           </item>
           <item row="1" column="0" colspan="4">
            <widget class="QTableView" name="useTemplateTableView">
+            <property name="toolTip">
+             <string>This table contains the metadata that will be uploaded with each file in the file list on the left.</string>
+            </property>
             <property name="sizeAdjustPolicy">
              <enum>QAbstractScrollArea::AdjustToContents</enum>
             </property>

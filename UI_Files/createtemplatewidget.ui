@@ -81,6 +81,9 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>The metadata structure found inside the Data File.  Checked metadata entries are chosen to be included in the new template file and will appear in the table on the right.</string>
+          </property>
           <property name="verticalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOn</enum>
           </property>
@@ -114,6 +117,9 @@
             <horstretch>1</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="toolTip">
+           <string>The metadata chosen to be included in the new template file.</string>
           </property>
           <property name="verticalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOn</enum>
@@ -282,18 +288,24 @@
        </item>
        <item>
         <widget class="QLineEdit" name="dataFileLineEdit">
+         <property name="toolTip">
+          <string>This data file will be used as the model to create the template file.</string>
+         </property>
          <property name="text">
           <string/>
          </property>
          <property name="readOnly">
           <bool>true</bool>
          </property>
+         <property name="placeholderText">
+          <string>Drag a file here or select one using the 'Select' button to the right===&gt;</string>
+         </property>
         </widget>
        </item>
        <item>
         <widget class="QPushButton" name="dataFileSelect">
          <property name="toolTip">
-          <string>Select data file to use for meta-data extraction</string>
+          <string>Select data file to use for metadata extraction</string>
          </property>
          <property name="text">
           <string>Select</string>
@@ -322,6 +334,9 @@
        </item>
        <item>
         <widget class="QComboBox" name="fileParserCombo">
+         <property name="toolTip">
+          <string>The parser used to parse and extract the metadata from the data file above. </string>
+         </property>
          <property name="currentText">
           <string/>
          </property>
