@@ -46,12 +46,17 @@ class MetaForgePreferencesDialog(QDialog):
     
     def read_settings(self):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
-        parser_folder_paths: List[str] = settings.value(self.K_SETTINGS_PARSER_PATHS_KEY, [])
-
-        if parser_folder_paths is None:
+        parser_folder_size = settings.beginReadArray(self.K_SETTINGS_PARSER_PATHS_KEY)
+        if parser_folder_size == 0:
             parser_folder_paths: List[str] = []
             default_folder_path = Path(ROOT_DIR) / "parsers"
             parser_folder_paths.append(str(default_folder_path))
+        else:
+            parser_folder_paths = []
+            for i in range(parser_folder_size):
+                settings.setArrayIndex(i)
+                parser_path = settings.value(f'{i}')
+                parser_folder_paths.append(parser_path)
         
         self.ui.parser_locations_list.addItems(parser_folder_paths)
         self.prefs = MetaForgePreferences(parser_folder_paths)
@@ -61,7 +66,12 @@ class MetaForgePreferencesDialog(QDialog):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
 
         parser_folder_paths = self.prefs.parser_folder_paths
-        settings.setValue(self.K_SETTINGS_PARSER_PATHS_KEY, parser_folder_paths)
+        settings.beginWriteArray(self.K_SETTINGS_PARSER_PATHS_KEY)
+        for i in range(len(parser_folder_paths)):
+            parser_path = parser_folder_paths[i]
+            settings.setArrayIndex(i)
+            settings.setValue(f'{i}', parser_path)
+        settings.endArray()
 
         super().closeEvent(event)
     
