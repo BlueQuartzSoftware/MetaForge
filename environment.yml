@@ -1,4 +1,4 @@
-name: MetaForge
+name: metaforge
 channels:
   - conda-forge
   - nodefaults
@@ -9,6 +9,11 @@ dependencies:
   - requests
   - dataclasses-json
   - Pillow>=8.2.0
+  - python-dateutil
+  - pyyaml
+  - pip
+  - pip:
+    - hyperthought
 
   
 

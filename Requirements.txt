@@ -1,7 +1,0 @@
-tqdm
-pyside2
-requests
-hyperthought
-dataclasses-json
-pillow
-pyyaml
