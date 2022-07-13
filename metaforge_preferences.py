@@ -20,10 +20,12 @@ elif qt_version[1] == 15:
 @dataclass
 @dataclass_json
 class MetaForgePreferences():
-    def __init__(self, parser_folder_paths):
+    def __init__(self, default_parser_path, parser_folder_paths):
+        self.default_parser_path: str = default_parser_path
         self.parser_folder_paths: List[str] = parser_folder_paths
 
 class MetaForgePreferencesDialog(QDialog):
+    K_SETTINGS_USE_DEFAULT_PARSER_LOCATION_KEY = "use_default_parser_location"
     K_SETTINGS_PARSER_PATHS_KEY = "parser_paths"
     K_PARSER_YAML_FILE_NAME = "parsers.yaml"
     K_PARSER_YAML_KEY = "metaforge-parsers"
@@ -34,35 +36,52 @@ class MetaForgePreferencesDialog(QDialog):
         self.ui = Ui_MetaForgePreferences()
         self.ui.setupUi(self)
         self.current_directory = ''
+
+        self._set_default_parser_location()
+        self._read_settings()
+
         self.ui.addBtn.pressed.connect(self._add_files)
         self.ui.removeBtn.pressed.connect(self._remove_selected_files)
-
-        self.read_settings()
+        self.ui.include_default_parser_location.stateChanged.connect(self._toggle_default_parser_location)
 
         self.ui.buttonBox.button(QDialogButtonBox.Ok).pressed.connect(self.accept)
         self.ui.buttonBox.button(QDialogButtonBox.Cancel).pressed.connect(self.reject)
 
         widget_utils.notify_no_errors(self.ui.error_string)
     
-    def read_settings(self):
-        settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
-        parser_folder_size = settings.beginReadArray(self.K_SETTINGS_PARSER_PATHS_KEY)
-        parser_folder_paths: List[str] = []
-        if parser_folder_size == 0:
-            default_folder_path = Path(ROOT_DIR) / "parsers"
-            parser_folder_paths.append(str(default_folder_path))
+    def _set_default_parser_location(self):
+        default_location = Path(ROOT_DIR) / 'parsers'
+        self.ui.include_default_parser_location.setText(str(default_location))
+    
+    def _toggle_default_parser_location(self, state: PySide2.QtCore.Qt.CheckState):
+        if state == PySide2.QtCore.Qt.CheckState.Checked:
+            self.staged_prefs.default_parser_path = self.ui.include_default_parser_location.text()
         else:
-            for i in range(parser_folder_size):
-                settings.setArrayIndex(i)
-                parser_path = settings.value(f'{i}')
-                parser_folder_paths.append(parser_path)
-        
+            self.staged_prefs.default_parser_path = None
+    
+    def _read_settings(self):
+        settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
+        parser_folder_paths: List[str] = []
+        use_default_location = settings.value(self.K_SETTINGS_USE_DEFAULT_PARSER_LOCATION_KEY, defaultValue=True, type=bool)
+        self.ui.include_default_parser_location.setChecked(use_default_location)
+        default_parser_path = None
+        if use_default_location:
+            default_parser_path = self.ui.include_default_parser_location.text()
+
+        parser_folder_size = settings.beginReadArray(self.K_SETTINGS_PARSER_PATHS_KEY)
+        for i in range(parser_folder_size):
+            settings.setArrayIndex(i)
+            parser_path = settings.value(f'{i}')
+            parser_folder_paths.append(parser_path)
+        settings.endArray()
+
         self.ui.parser_locations_list.addItems(parser_folder_paths)
-        self.prefs = MetaForgePreferences(parser_folder_paths)
-        self.staged_prefs = MetaForgePreferences(parser_folder_paths)
+        self.prefs = MetaForgePreferences(default_parser_path, parser_folder_paths)
+        self.staged_prefs = MetaForgePreferences(default_parser_path, parser_folder_paths)
     
     def closeEvent(self, event):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
+        settings.setValue(self.K_SETTINGS_USE_DEFAULT_PARSER_LOCATION_KEY, self.ui.include_default_parser_location.isChecked())
 
         parser_folder_paths = self.prefs.parser_folder_paths
         settings.beginWriteArray(self.K_SETTINGS_PARSER_PATHS_KEY)
@@ -101,11 +120,6 @@ class MetaForgePreferencesDialog(QDialog):
         return self.prefs
     
     def validate(self) -> bool:
-        if len(self.staged_prefs.parser_folder_paths) == 0:
-            widget_utils.notify_error_message(self.ui.error_string, f'The {self.ui.parser_locations_label.text()} list is empty!')
-            self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-            return False
-
         for parser_folder_path in self.staged_prefs.parser_folder_paths:
             parser_folder_path = Path(parser_folder_path)
             yaml_file_path = parser_folder_path / self.K_PARSER_YAML_FILE_NAME

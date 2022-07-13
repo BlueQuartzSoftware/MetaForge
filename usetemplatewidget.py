@@ -372,9 +372,9 @@ class UseTemplateWidget(QWidget):
         templateFilePath = Path(templateFilePath)
         
         # Load the dictionary from the newly inserted datafile
-        parser_index, parser = self.available_parsers_model.find_compatible_parser(file_path)
+        parser_index, parser = self.available_parsers_model.find_compatible_parser(file_path, self._notify_error_message)
         if (parser is None):
-            widget_utils.notify_error_message(self.ui.error_label, f"No parser available for selected file '{file_path}'.")
+            self._notify_error_message(f"No parser available for selected file '{file_path}'.")
         headerDict = parser.parse_header_as_dict(file_path)
 
         self.use_ez_table_model_proxy.missing_entries = self.use_ez_table_model.metadata_model.update_model_values_from_dict(headerDict)
@@ -444,3 +444,6 @@ class UseTemplateWidget(QWidget):
     
     def set_parsers_model(self, model: AvailableParsersModel):
         self.available_parsers_model = model
+    
+    def _notify_error_message(self, err_msg):
+        widget_utils.notify_error_message(self.ui.error_label, err_msg)

@@ -151,7 +151,7 @@ class CreateTemplateWidget(QWidget):
             elif template_version == '2.0':
                 self._load_template(template_json)
             else:
-                widget_utils.notify_error_message(self.ui.error_label, f"Unable to load template file '{str(template_file_path)}'. Unrecognizable template version.")
+                self._notify_error_message(f"Unable to load template file '{str(template_file_path)}'. Unrecognizable template version.")
     
     def _load_template_v1(self, template_json: dict):
         model: TemplateModel_V1 = TemplateModel_V1.from_dict(template_json)
@@ -173,9 +173,8 @@ class CreateTemplateWidget(QWidget):
         # Set the parser
         parser_index, parser = self.available_parsers_model.find_parser_from_uuid(parser_uuid)
         if parser is None:
-            parser_index, parser = self.available_parsers_model.find_compatible_parser(data_file_path)
+            parser_index, parser = self.available_parsers_model.find_compatible_parser(data_file_path, self._notify_error_message)
             if (parser is None):
-                widget_utils.notify_error_message(self.ui.error_label, f"None of the loaded parsers are compatible with data file '{str(data_file_path)}'.")
                 return
         
         self.ui.fileParserCombo.blockSignals(True)
@@ -234,7 +233,7 @@ class CreateTemplateWidget(QWidget):
         widget_utils.notify_no_errors(self.ui.error_label)
         self.clear_models()
         if not self.ui.dataFileLineEdit.text():
-            widget_utils.notify_error_message(self.ui.error_label, f"'{self.ui.data_file_label.text()}' is empty!")
+            self._notify_error_message(f"'{self.ui.data_file_label.text()}' is empty!")
             return
 
         filePath = Path(self.ui.dataFileLineEdit.text())
@@ -249,7 +248,7 @@ class CreateTemplateWidget(QWidget):
             return False
         
         if not parser.accepts_extension(file_path.suffix):
-            widget_utils.notify_error_message(self.ui.error_label, f"Selected parser '{parser.human_label()}' is not usable with file '{file_path}': File extension not accepted.")
+            self._notify_error_message(f"Selected parser '{parser.human_label()}' is not usable with file '{file_path}': File extension not accepted.")
             return False
 
         # parse the metadata from the input data file
@@ -283,9 +282,9 @@ class CreateTemplateWidget(QWidget):
             self.clear_models()
 
             if self.ui.fileParserCombo.currentIndex() == -1:
-                parser_index, parser = self.available_parsers_model.find_compatible_parser(file_path)
+                parser_index, parser = self.available_parsers_model.find_compatible_parser(file_path, self._notify_error_message)
                 if (parser is None):
-                    widget_utils.notify_error_message(self.ui.error_label, f"None of the loaded parsers are compatible with data file '{file_path}'.")
+                    return
             
                 self.ui.fileParserCombo.setCurrentIndex(parser_index)
             else:
@@ -298,3 +297,6 @@ class CreateTemplateWidget(QWidget):
         self.available_parsers_model = model
         self.ui.fileParserCombo.setModel(model)
         self.ui.fileParserCombo.setCurrentIndex(-1)
+    
+    def _notify_error_message(self, err_msg):
+        widget_utils.notify_error_message(self.ui.error_label, err_msg)

@@ -72,22 +72,44 @@ class AvailableParsersModel(QAbstractListModel):
   def rowCount(self, parent=None):
     return len(self._available_parsers)
   
-  def find_parser_from_uuid(self, uuid: UUID) -> Tuple[int, MetaForgeParser]: 
-    if uuid is not None:
-      for row in range(self.rowCount()):
-        model_index = self.index(row, 0)
-        parser = self.data(model_index, AvailableParsersModel.Parser)
-        if parser.uuid() == uuid:
-            return row, parser
+  def find_parser_from_uuid(self, uuid: UUID, error_callback=None) -> Tuple[int, MetaForgeParser]:
+    if uuid is None:
+      if error_callback is not None:
+        error_callback(f"Unable to find a parser using UUID - The given UUID is set to None!")
+      return None, None
 
+    if self.rowCount() == 0:
+      if error_callback is not None:
+        error_callback(f"Unable to find a parser using UUID - No parsers are loaded!  Please open the Preferences menu to add parser locations.")
+      return None, None
+
+    for row in range(self.rowCount()):
+      model_index = self.index(row, 0)
+      parser = self.data(model_index, AvailableParsersModel.Parser)
+      if parser.uuid() == uuid:
+          return row, parser
+
+    if error_callback is not None:
+      error_callback(f"Unable to find a parser using UUID - The UUID '{str(uuid)}' does not match any of the currently loaded parsers!")
     return None, None
 
-  def find_compatible_parser(self, file_path: Path) -> Tuple[int, MetaForgeParser]: 
+  def find_compatible_parser(self, file_path: Path, error_callback=None) -> Tuple[int, MetaForgeParser]: 
     if file_path == None:
-          return None, None
+      if error_callback is not None:
+        error_callback(f"Unable to find a compatible parser - The given file path is set to None!")
+      return None, None
+    
+    if self.rowCount() == 0:
+      if error_callback is not None:
+        error_callback(f"Unable to find a compatible parser - No parsers are loaded!  Please open the Preferences menu to add parser locations.")
+      return None, None
 
     for row in range(self.rowCount()):
       model_index = self.index(row, 0)
       parser = self.data(model_index, AvailableParsersModel.Parser)
       if parser.accepts_extension(file_path.suffix):
-          return row, parser
+        return row, parser
+    
+    if error_callback is not None:
+      error_callback(f"Unable to find a compatible parser - The file path '{file_path}' is not compatible with any of the currently loaded parsers!  Please open the Preferences menu to add additional parser locations.")
+    return None, None

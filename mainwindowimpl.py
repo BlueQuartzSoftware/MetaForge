@@ -148,7 +148,10 @@ class MainWindow(QMainWindow):
     
     def _parser_file_paths(self) -> List[Path]:
         prefs: MetaForgePreferences = self.preferences_dialog.preferences()
-        parser_folder_paths = [Path(path) for path in prefs.parser_folder_paths]
+        parser_folder_paths = []
+        if prefs.default_parser_path is not None:
+            parser_folder_paths.append(Path(prefs.default_parser_path))
+        [parser_folder_paths.append(Path(path)) for path in prefs.parser_folder_paths]
         parser_file_paths = []
         for parser_folder_path in parser_folder_paths:
             parser_file_paths = parser_file_paths + self._find_parser_files(parser_folder_path)
