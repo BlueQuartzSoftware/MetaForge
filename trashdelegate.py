@@ -12,11 +12,11 @@ elif qt_version[1] == 15:
     from generated_5_15.resources_rc import *
 from metaforgestyledatahelper import MetaForgeStyleDataHelper
 
-class TrashDelegate(QItemDelegate):
+class TrashDelegate(QStyledItemDelegate):
     pressed = Signal(QModelIndex)
 
     def __init__(self, parent=None, stylehelper: MetaForgeStyleDataHelper=None):
-        QItemDelegate.__init__(self, parent)
+        QStyledItemDelegate.__init__(self, parent)
         self.style_helper = stylehelper
 
     def createEditor(self, parent, option, index):
