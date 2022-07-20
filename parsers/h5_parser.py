@@ -60,7 +60,7 @@ class H5Parser(MetaForgeParser):
         result = f'{result}, {f}'
       else:
         result = f'{f}'
-    return result
+    return f'[{result}]'
 
   def attributes(self, name: str) -> bool:
     """
