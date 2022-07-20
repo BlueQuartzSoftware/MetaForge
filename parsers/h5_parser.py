@@ -42,7 +42,10 @@ class H5Parser(MetaForgeParser):
       # These are some weirdly encoded numpy arrays!
       return None
     elif isinstance(value, (numpy.ndarray, numpy.generic)):
-      return str(value)
+      if value.shape == (1,):
+        return str(value[0])
+      else:
+        return str(value)
     
     print(f'value confused us: {value} {type(value)}')
     return None
