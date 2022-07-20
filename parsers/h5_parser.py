@@ -90,7 +90,8 @@ class H5Parser(MetaForgeParser):
           self.file_dict[name] = value
       else:
         # This is where the bigger data sets remain
-        print(f'{name} -> {type(data)} -> {data.len()}') 
+        if isinstance(data, (h5py.Dataset)):
+          self.file_dict[name] = f'Large Dataset ({data.len()} elements)'
       self.count += 1
 
   def parse_header_as_dict(self, filepath: Path) -> dict:
