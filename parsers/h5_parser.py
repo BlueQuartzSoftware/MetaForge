@@ -47,6 +47,18 @@ class H5Parser(MetaForgeParser):
     print(f'value confused us: {value} {type(value)}')
     return None
 
+  def unpack_array(self, value: h5py.Dataset) -> str|None:
+    """
+    Unpack HDF5 arrays into strings that can be shown.
+    """
+    result = ""
+    for f in value:
+      if len(result) > 0:
+        result = f'{result}, {f}'
+      else:
+        result = f'{f}'
+    return result
+
   def attributes(self, name: str) -> bool:
     """
     Step through the attributes for the node, add them to the dictionary.
@@ -54,7 +66,6 @@ class H5Parser(MetaForgeParser):
     data = self.file[name]
     if isinstance(data, (h5py.Dataset, h5py.Group)):
       for (key, value) in data.attrs.items():
-        print(f'atttributes for {name} -> {key}: {value}')
         v = self.type_dispatch(value)
         if v is not None:
           path = f'{name}/{key}*'
@@ -69,8 +80,13 @@ class H5Parser(MetaForgeParser):
         value = self.type_dispatch(data[0])
         if value is not None:
           self.file_dict[name] = value
+      elif data.len() <= 16:
+        # Unpack "small" arrays and show their contents
+        value = self.unpack_array(data)
+        if value is not None:
+          self.file_dict[name] = value
       else:
-        # This is where we should handle small sets.
+        # This is where the bigger data sets remain
         print(f'{name} -> {type(data)} -> {data.len()}') 
       self.count += 1
 
