@@ -48,7 +48,7 @@ class H5Parser(MetaForgeParser):
     print(f'value confused us: {value} {type(value)}')
     return None
 
-  def unpack_array(self, value: h5py.Dataset) -> str|None:
+  def unpack_array(self, value: h5py.Dataset) -> str:
     """
     Unpack HDF5 arrays into strings that can be shown.
     """
