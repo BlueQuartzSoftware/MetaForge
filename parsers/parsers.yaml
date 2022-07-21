@@ -4,3 +4,4 @@ metaforge-parsers:
   - ctf_parser.py
   - fei_tiff_parser.py
   - ini_parser.py
+  - h5_parser.py
