@@ -30,7 +30,7 @@ class H5Parser(MetaForgeParser):
   def accepts_extension(self, extension: str) -> bool:
     return extension in self.ext_list
 
-  def type_dispatch(self, value: any) -> str|None:
+  def type_dispatch(self, value: any) -> str:
     """
     Perform type dispatch and figure out whether to make an entry
     """
