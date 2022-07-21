@@ -28,9 +28,7 @@ class H5Parser(MetaForgeParser):
     return self.ext_list
   
   def accepts_extension(self, extension: str) -> bool:
-    if extension in self.ext_list:
-      return True
-    return False
+    return extension in self.ext_list
 
   def type_dispatch(self, value: any) -> str|None:
     """
