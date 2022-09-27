@@ -35,7 +35,14 @@ class H5Parser(MetaForgeParser):
     Perform type dispatch and figure out whether to make an entry
     """
     if isinstance(value, bytes):
-      return value.decode('utf-8')
+      if len(value) > 0:
+        # Default to UTF-8 (most common encoding), fallback to "old-school"
+        try:
+          return value.decode('utf-8')
+        except:
+          return value.decode('ISO-8859-1')
+      else:
+        return ""
     elif isinstance(value, numpy.void):
       # These are some weirdly encoded numpy arrays!
       return None
