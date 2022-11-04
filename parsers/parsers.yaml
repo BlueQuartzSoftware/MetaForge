@@ -6,3 +6,4 @@ metaforge-parsers:
   - ini_parser.py
   - h5_parser.py
   - json_parser.py
+  - xml_parser.py
