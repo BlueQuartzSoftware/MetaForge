@@ -19,6 +19,27 @@ project(MetaForge VERSION 1.0.0 LANGUAGES NONE)
 
 find_program(RCC_EXE NAMES pyside2-rcc DOC "Pyside2 RCC Executable")
 find_program(UIC_EXE NAMES pyside2-uic DOC "Pyside2 UIC Executable")
+#--------------------------------------------------------------------------------------------------
+# This next sections extracts out the version of Qt5 that is being used
+#--------------------------------------------------------------------------------------------------
+execute_process(
+  COMMAND "${RCC_EXE}" -version
+  OUTPUT_VARIABLE qt_version
+  ERROR_VARIABLE rcc_error
+  OUTPUT_STRIP_TRAILING_WHITESPACE 
+  ERROR_STRIP_TRAILING_WHITESPACE
+)
+set(qt_version ${rcc_error}) # Because the output is in the error variable?
+string(REPLACE " " ";" qt_version "${qt_version}") # Make a list out of the output
+list(LENGTH qt_version qt_version_length) # Get the length of the list
+math(EXPR qt_version_length "${qt_version_length}-1") # Subtract 1 from the length to get the last index
+list(GET qt_version ${qt_version_length} qt_version) # Pull out the version number Major.minor.patch
+string(REPLACE "." ";" qt_version "${qt_version}") # Turn that into a list
+list(GET qt_version 0 Qt_Major) # Extract out the major Qt version
+list(GET qt_version 1 Qt_Minor) # Extract out the minor Qt version
+set(QT_VERSION ${Qt_Major}_${Qt_Minor}) # Set the Qt 5 version variable
+message(STATUS "UI and RCC Files will be generated into '${MetaForge_SOURCE_DIR}/generated_${QT_VERSION}'")
+
 
 set(UI_FILES
     mainwindow
@@ -35,7 +56,7 @@ set(UI_FILES
 # and load from a different directory. Right now you will need to manually change this variable to
 # match which Qt version is installed. THIS ONLY SUPPORTS QT 5.12 AND QT 5.15
 # set(QT_VERSION "5_12")
-set(QT_VERSION "5_15")
+# set(QT_VERSION "5_15")
 
 file(MAKE_DIRECTORY ${MetaForge_SOURCE_DIR}/generated_${QT_VERSION})
 
