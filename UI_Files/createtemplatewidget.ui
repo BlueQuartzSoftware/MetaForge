@@ -193,7 +193,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>Add a custom value to the template</string>
+           <string>Remove a custom value from the template</string>
           </property>
           <property name="text">
            <string/>

@@ -244,7 +244,7 @@ class Ui_CreateTemplateWidget(object):
         self.metadata_table_view.setToolTip(QCoreApplication.translate("CreateTemplateWidget", u"The metadata chosen to be included in the new template file.", None))
 #endif // QT_CONFIG(tooltip)
 #if QT_CONFIG(tooltip)
-        self.removeCreateTableRowButton.setToolTip(QCoreApplication.translate("CreateTemplateWidget", u"Add a custom value to the template", None))
+        self.removeCreateTableRowButton.setToolTip(QCoreApplication.translate("CreateTemplateWidget", u"Remove a custom value from the template", None))
 #endif // QT_CONFIG(tooltip)
         self.removeCreateTableRowButton.setText("")
 #if QT_CONFIG(tooltip)
