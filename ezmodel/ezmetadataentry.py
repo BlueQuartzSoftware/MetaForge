@@ -9,12 +9,6 @@ from typing import List
 @dataclass_json
 @dataclass
 class EzMetadataEntry:
-    """Imports a stack of image files from a directory into a 3D Zarr volume.
-
-    Parameters
-    ----------
-
-    """
     unique_id: int = 0
     parent: int = -1
     children: List[int] = field(default_factory=list)
