@@ -397,10 +397,13 @@ class UseTemplateWidget(QWidget):
                                                            self.use_ez_table_model_proxy.missing_entries,
                                                            self.use_ez_table_model_proxy.metadata_file_chosen)
         auth_control = self.hyperthoughtui.get_auth_control()
+        ht_upload_path = ','
+        if self.chosen_ht_folder is not None:
+            ht_upload_path = self.chosen_ht_folder['path'] + self.chosen_ht_folder['pk'] + ','
         self.createUpload.emit(self.uselistmodel.metadataList, 
                     auth_control, 
                     self.chosen_ht_workspace["id"],
-                    self.chosen_ht_folder['path'] + self.chosen_ht_folder['pk'] + ',',
+                    ht_upload_path,
                     metadataJson)
         self.uploader.notify_file_progress_text.connect(self._update_file_progress_label)
         self.uploader.notify_file_progress.connect(self._update_file_progress)
