@@ -19,31 +19,34 @@ class Uploader(QObject):
         self.bytes_uploaded = 0.0
         self.current_chunk_size = 0
 
-    def performUpload(self, filelist: List[Path], authControl: ht.auth.Authorization, workspace_id, ht_id_path, metadata):
+    def performUpload(self, upload_list: List[Path], authControl: ht.auth.Authorization, workspace_id, ht_id_path, metadata):
         self.interrupt = False
         files_api = ht.api.files.FilesAPI(auth=authControl)
 
         self.total_bytes = 0.0
-        for file in filelist:
-            self.total_bytes = self.total_bytes + os.path.getsize(str(file))
-
-        total_file_count = len(filelist)
-        self.bytes_uploaded = 0.0
         successful_uploads = 0
+        total_file_count = len(upload_list)
+        for upload_obj in upload_list:
+            if os.path.isdir(str(upload_obj)):
+                pass
+
+            self.total_bytes = self.total_bytes + os.path.getsize(str(upload_obj))
+
+        self.bytes_uploaded = 0.0
         n_chunks = 100
-        for i in range(len(filelist)):
+        for i in range(len(upload_list)):
             if self.interrupt:
                 list_progress_text = f"{successful_uploads}/{total_file_count} Files Uploaded - Upload Canceled"
                 break
 
-            if not filelist[i].exists():
-                list_progress_text = f"{successful_uploads}/{total_file_count} Files Uploaded - File Missing: {filelist[i].name}"
+            if not upload_list[i].exists():
+                list_progress_text = f"{successful_uploads}/{total_file_count} Files Uploaded - File Missing: {upload_list[i]}"
                 break
             else:
-                self.notify_file_progress_text.emit(f"Uploading File - {str(filelist[i].name)}")
+                self.notify_file_progress_text.emit(f"Uploading File - {str(upload_list[i])}")
                 self.notify_list_progress_text.emit(f"Uploading Files - {i+1}/{total_file_count}")
-                self.current_chunk_size = float(os.path.getsize(str(filelist[i]))) / n_chunks
-                file_id, file_name = files_api.upload(local_path=str(filelist[i]),
+                self.current_chunk_size = float(os.path.getsize(str(upload_list[i]))) / n_chunks
+                file_id, file_name = files_api.upload(local_path=str(upload_list[i]),
                                                       space_id=workspace_id,
                                                       path=ht_id_path,
                                                       metadata=metadata,
@@ -57,6 +60,9 @@ class Uploader(QObject):
         self.notify_list_progress.emit(0)
         self.notify_list_progress_text.emit(list_progress_text)
         self.all_uploads_done.emit()
+    
+    def _upload(self, upload_list: List[Path], authControl: ht.auth.Authorization, workspace_id, ht_id_path, metadata):
+        pass
     
     def file_progress(self, value: int):
         self.notify_file_progress.emit(value)

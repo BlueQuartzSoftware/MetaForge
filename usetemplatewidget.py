@@ -9,7 +9,7 @@ from datetime import datetime
 from pathlib import Path
 import hyperthought as ht
 
-from PySide2.QtWidgets import QMainWindow, QFileDialog, QProgressDialog, QDialog, QWidget
+from PySide2.QtWidgets import QMainWindow, QFileDialog, QProgressDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit
 from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent
 from PySide2.QtGui import QCursor
 import PySide2.QtCore
@@ -131,11 +131,49 @@ class UseTemplateWidget(QWidget):
         self.clear_upload_files()
 
     def add_upload_files(self):
-        linetexts = QFileDialog.getOpenFileNames(self, self.tr("Select File"), QStandardPaths.displayName(
-            QStandardPaths.HomeLocation), self.tr("Files (*.ctf *.xml *.ang *.tif *.tiff *.ini)"))[0]
+        linetexts = self._getOpenFilesAndDirs(self, self.tr("Select File"), QStandardPaths.displayName(
+            QStandardPaths.HomeLocation), self.tr("Files (*.ctf *.xml *.ang *.tif *.tiff *.ini)"))
         for line in linetexts:
             self.uselistmodel.addRow(Path(line))
         self.toggle_buttons()
+    
+    def _getOpenFilesAndDirs(self, parent=None, caption='', directory='', filter='', initialFilter='', options=None):
+        def updateText():
+            # update the contents of the line edit widget with the selected files
+            selected = []
+            for index in view.selectionModel().selectedRows():
+                selected.append('"{}"'.format(index.data()))
+            lineEdit.setText(' '.join(selected))
+
+        dialog = QFileDialog(parent, windowTitle=caption)
+        dialog.setFileMode(dialog.ExistingFiles)
+        if options:
+            dialog.setOptions(options)
+        dialog.setOption(dialog.DontUseNativeDialog, True)
+        if directory:
+            dialog.setDirectory(directory)
+        if filter:
+            dialog.setNameFilter(filter)
+            if initialFilter:
+                dialog.selectNameFilter(initialFilter)
+
+        # by default, if a directory is opened in file listing mode, 
+        # QFileDialog.accept() shows the contents of that directory, but we 
+        # need to be able to "open" directories as we can do with files, so we 
+        # just override accept() with the default QDialog implementation which 
+        # will just return exec_()
+        dialog.accept = lambda: QDialog.accept(dialog)
+
+        stackedWidget = dialog.findChild(QStackedWidget)
+        view = stackedWidget.findChild(QListView)
+        view.selectionModel().selectionChanged.connect(updateText)
+
+        lineEdit = dialog.findChild(QLineEdit)
+        # clear the line edit contents whenever the current directory changes
+        dialog.directoryEntered.connect(lambda: lineEdit.setText(''))
+
+        dialog.exec_()
+        return dialog.selectedFiles()
 
     def clear_upload_files(self):
         self.uselistmodel.removeAllRows()
