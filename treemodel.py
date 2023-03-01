@@ -19,18 +19,9 @@ class TreeModel(QAbstractItemModel):
         self.metadata_model = metadata_model
         self.setupModelData(self.metadata_model, self.rootItem)
 
-    def changeLeafCheck(self, source):
-        curNode = self.rootItem.child(0)
-        keyNames = source.split("/")
-        curRow = 0
-        for key in keyNames:
-            for i in range(curNode.childCount()):
-                if curNode.child(i).display_name == key:
-                    curNode = curNode.child(i)
-                    curRow = i
-                    break
-        anIndex = self.createIndex(curRow, curNode.columnCount(), curNode)
-        self.setData(anIndex, 0, Qt.CheckStateRole)
+    def changeLeafCheck(self, entry: EzMetadataEntry):
+        index = self._get_index_from_entry(entry)
+        self.setData(index, 0, Qt.CheckStateRole)
 
     def columnCount(self, parent=QModelIndex()):
         return self.rootItem.columnCount()
@@ -184,6 +175,24 @@ class TreeModel(QAbstractItemModel):
 
         path = path.join(path_list)
         return path
+    
+    def _get_item_from_entry(self, entry: EzMetadataEntry) -> TreeItem:
+        def recurse(entry: EzMetadataEntry, item: TreeItem):
+            if item.metadata_entry == entry:
+                return item
+
+            for child_item in item.childItems:
+                item = recurse(entry, child_item)
+                if item is not None:
+                    return item
+            
+            return None
+
+        return recurse(entry, self.rootItem)
+    
+    def _get_index_from_entry(self, entry: EzMetadataEntry) -> QModelIndex:
+        tree_item = self._get_item_from_entry(entry)
+        return self.get_index_from_item(tree_item)
 
     def setHeaderData(self, section, orientation, value, role=Qt.EditRole):
         if role != Qt.EditRole or orientation != Qt.Horizontal:
