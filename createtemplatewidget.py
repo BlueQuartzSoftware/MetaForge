@@ -206,7 +206,7 @@ class CreateTemplateWidget(QWidget):
             self.metadata_table_model.metadata_model.remove_by_index(source_index.row())
             self.metadata_table_model.endRemoveRows()
         elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
-            self.metadata_tree_model.changeLeafCheck(entry.source_path)
+            self.metadata_tree_model.changeLeafCheck(entry)
         
         self.metadata_table_model_proxy.invalidate()
         index0 = self.metadata_table_model.index(0, 0)
