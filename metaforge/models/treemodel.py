@@ -17,7 +17,7 @@ class TreeModel(QAbstractItemModel):
 
         self.rootItem = TreeItem(display_name=header)
         self.metadata_model = metadata_model
-        self.setupModelData(self.metadata_model, self.rootItem)
+        self.setupModelData(self.metadata_model)
 
     def changeLeafCheck(self, entry: EzMetadataEntry):
         index = self._get_index_from_entry(entry)
@@ -204,7 +204,11 @@ class TreeModel(QAbstractItemModel):
 
         return result
 
-    def setupModelData(self, metadata_model: EzMetadataModel, parent):
+    def reload_model_data(self):
+        self.removeRows(0, self.rowCount())
+        self.setupModelData(self.metadata_model)
+
+    def setupModelData(self, metadata_model: EzMetadataModel):
         # treeDict = metadata_model.to_file_tree_dict()
 
         for entry in metadata_model.entries:
