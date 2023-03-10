@@ -278,9 +278,17 @@ class CreateTemplateWidget(QWidget):
                 new_entry = metadata_model.entry_by_source(entry.source_path)
                 if new_entry is None:
                     # Exists in current model but not in incoming model
-                    # Make the entry custom because it's no longer part of the current file model
-                    entry.source_type = EzMetadataEntry.SourceType.CUSTOM
-                    entry.enabled = True
+                    if entry.enabled:
+                        # Make the entry custom because it's no longer part of the current file model
+                        entry.source_type = EzMetadataEntry.SourceType.CUSTOM
+                        
+                        # The overridden value is already stored in ht_value
+                        # IF the entry does not have an overridden value, use the source value as ht_value
+                        if not entry.override_source_value:
+                            entry.ht_value = entry.source_value
+                    else:
+                        # This entry is disabled, so it should not be included as a custom value
+                        self.metadata_model.remove(entry)
                 else:
                     # Exists in both the current model and the incoming model
                     # Keep all settings the same for this entry, just replace the source value
