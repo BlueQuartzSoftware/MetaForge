@@ -72,6 +72,8 @@ class CreateTemplateWidget(QWidget):
         self.metadata_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
         self.metadata_table_model_proxy = self.init_table_model_proxy(self.metadata_table_model)
         self.ui.metadata_table_view.setModel(self.metadata_table_model_proxy)
+        # centered_box_proxy = CenteredBoxProxy()
+        # self.ui.metadata_table_view.setStyle(centered_box_proxy)
         self.filter_metadata_table()
         self.ui.metadata_table_view.setItemDelegateForColumn(self.metadata_table_model.K_REMOVE_COL_INDEX, self.trash_delegate)
         self.trash_delegate.pressed.connect(self.remove_table_entry)
@@ -205,12 +207,13 @@ class CreateTemplateWidget(QWidget):
             return
         
         entry = self.metadata_table_model.metadata_model.entry(source_index.row())
-        if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-            self.metadata_table_model.beginRemoveRows(QModelIndex(), source_index.row(), source_index.row())
-            self.metadata_table_model.metadata_model.remove_by_index(source_index.row())
-            self.metadata_table_model.endRemoveRows()
-        elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
-            self.metadata_tree_model.changeLeafCheck(entry)
+        if entry is not None:
+            if entry.source_type is EzMetadataEntry.SourceType.FILE and entry.loaded is True:
+                self.metadata_tree_model.changeLeafCheck(entry)
+            else:
+                self.metadata_table_model.beginRemoveRows(QModelIndex(), source_index.row(), source_index.row())
+                self.metadata_table_model.metadata_model.remove_by_index(source_index.row())
+                self.metadata_table_model.endRemoveRows()
         
         self.metadata_table_model_proxy.invalidate()
         index0 = self.metadata_table_model.index(0, 0)
@@ -261,12 +264,15 @@ class CreateTemplateWidget(QWidget):
         # Create an EzMetadataModel from the metadata dictionary
         metadata_model = EzMetadataModel.create_model_from_dict(model_dict=headerDict, source_type=EzMetadataEntry.SourceType.FILE)
 
+        # Reload tree view
+        self.metadata_tree_model.clearModel()
+        self.metadata_tree_model.setupModelData(metadata_model)
+        self.ui.metadataTreeView.expandAll()
+
         # Merge the new EzMetadataModel with the existing EzMetadataModel
         self._merge_metadata_model(metadata_model=metadata_model)
 
-        # Reload the views
-        self.metadata_tree_model.reload_model_data()
-        self.ui.metadataTreeView.expandAll()
+        # Reload table view
         self.filter_metadata_table()
         self.polish_metadata_table()
 
@@ -278,20 +284,13 @@ class CreateTemplateWidget(QWidget):
                 new_entry = metadata_model.entry_by_source(entry.source_path)
                 if new_entry is None:
                     # Exists in current model but not in incoming model
-                    if entry.enabled:
-                        # Make the entry custom because it's no longer part of the current file model
-                        entry.source_type = EzMetadataEntry.SourceType.CUSTOM
-                        
-                        # The overridden value is already stored in ht_value
-                        # IF the entry does not have an overridden value, use the source value as ht_value
-                        if not entry.override_source_value:
-                            entry.ht_value = entry.source_value
-                    else:
-                        # This entry is disabled, so it should not be included as a custom value
-                        self.metadata_model.remove(entry)
+                    # Mark the entry as not loaded because it's no longer an entry from the current file
+                    entry.loaded = False
+                    entry.source_value = ""
                 else:
                     # Exists in both the current model and the incoming model
                     # Keep all settings the same for this entry, just replace the source value
+                    entry.loaded = True
                     entry.source_value = new_entry.source_value
 
         for entry in metadata_model.entries:

@@ -16,12 +16,12 @@ class TreeModel(QAbstractItemModel):
         super(TreeModel, self).__init__(parent)
 
         self.rootItem = TreeItem(display_name=header)
-        self.metadata_model = metadata_model
-        self.setupModelData(self.metadata_model)
+        self.setupModelData(metadata_model)
 
     def changeLeafCheck(self, entry: EzMetadataEntry):
         index = self._get_index_from_entry(entry)
-        self.setData(index, 0, Qt.CheckStateRole)
+        if index.isValid():
+            self.setData(index, 0, Qt.CheckStateRole)
 
     def columnCount(self, parent=QModelIndex()):
         return self.rootItem.columnCount()
@@ -204,15 +204,12 @@ class TreeModel(QAbstractItemModel):
 
         return result
 
-    def reload_model_data(self):
+    def clearModel(self):
         self.removeRows(0, self.rowCount())
-        self.setupModelData(self.metadata_model)
 
     def setupModelData(self, metadata_model: EzMetadataModel):
-        # treeDict = metadata_model.to_file_tree_dict()
-
         for entry in metadata_model.entries:
-            if entry.source_type is not EzMetadataEntry.SourceType.FILE:
+            if entry.source_type is not EzMetadataEntry.SourceType.FILE or entry.loaded is False:
                 continue
 
             source_path = entry.source_path

@@ -1,8 +1,9 @@
+from typing import List
+
 from PySide2.QtCore import QSortFilterProxyModel, Qt, QRegExp, QModelIndex
 from PySide2.QtGui import QColor, QIcon, QFont
 
-from typing import List
-
+from metaforge.qt_models.qeztablemodel import QEzTableModel
 from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
 
 class QUseEzTableModel(QSortFilterProxyModel):
@@ -20,9 +21,9 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_FROMFILE_MSG = "Using data file value"
 
     # Row colors
-    K_MISSING_ENTRY_COLOR = QColor(255, 190, 194)
-    K_OVERRIDDEN_ENTRY_COLOR = QColor(253, 255, 190)
-    K_TEMPLATEFILE_ENTRY_COLOR = QColor(253, 255, 190)
+    K_MISSING_ENTRY_COLOR = QEzTableModel.K_RED_BG_COLOR
+    K_OVERRIDDEN_ENTRY_COLOR = QEzTableModel.K_YELLOW_BG_COLOR
+    K_TEMPLATEFILE_ENTRY_COLOR = QEzTableModel.K_YELLOW_BG_COLOR
 
     # These are the user facing header and the index of each column in the table.
     K_SOURCE_COL_NAME = "Source"

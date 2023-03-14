@@ -219,27 +219,28 @@ class UseTemplateWidget(QWidget):
         proxy_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
         proxy_model.setFilterWildcard(f'*{filter_text}*')
 
-    def remove_model_entry(self, source_row = -1):
-        if source_row != -1:
-            entry = self.use_ez_table_model.metadata_model.entry(source_row)
-            if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                self.use_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
-                self.use_ez_table_model.metadata_model.remove_by_index(source_row)
+    def remove_model_entry(self, source_index = QModelIndex()):
+        if source_index.isValid():
+            entry = self.use_ez_table_model.metadata_model.entry(source_index.row())
+            if entry is not None:
+                # if entry.source_type is EzMetadataEntry.SourceType.FILE and entry.loaded is True:
+                #     entry.enabled = False
+                # else:
+                self.use_ez_table_model.beginRemoveRows(QModelIndex(), source_index.row(), source_index.row())
+                self.use_ez_table_model.metadata_model.remove_by_index(source_index.row())
                 self.use_ez_table_model.endRemoveRows()
-            elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
-                entry.enabled = False
         else:
             proxy_selected_rows = reversed(self.ui.useTemplateTableView.selectionModel().selectedRows())
-            source_row = -1
             for index in proxy_selected_rows:
                 source_row = (index.model().mapToSource(index)).row()
                 entry = self.use_ez_table_model.metadata_model.entry(source_row)
-                if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                if entry is not None:
+                    # if entry.source_type is EzMetadataEntry.SourceType.FILE and entry.loaded is True:
+                    #     entry.enabled = False
+                    # else:
                     self.use_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
                     self.use_ez_table_model.metadata_model.remove_by_index(source_row)
                     self.use_ez_table_model.endRemoveRows()
-                elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
-                    entry.enabled = False
         
         self.use_ez_table_model_proxy.invalidate()
         index0 = self.use_ez_table_model_proxy.index(0, 0)
