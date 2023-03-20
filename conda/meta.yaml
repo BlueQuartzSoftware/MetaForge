@@ -1,0 +1,28 @@
+package:
+  name: metaforge
+  version: 1.0.0
+
+source:
+  # git_rev: rc-13
+  # git_url: https://github.com/BlueQuartzSoftware/MetaForge.git
+  #[source information here]
+  # folder: my-destination/folder
+  path: ../
+
+requirements:
+  build:
+    - python
+  run:
+    - python
+    - requests
+    - pyside2
+    - dataclasses-json
+    - pyyaml
+    - Pillow>=8.2.0
+    - python-dateutil
+    - h5py
+    - hyperthought
+
+about:
+  license: BSD
+  home: https://github.com/BlueQuartzSoftware/MetaForge/
