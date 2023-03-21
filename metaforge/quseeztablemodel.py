@@ -1,7 +1,6 @@
 from PySide2.QtCore import QSortFilterProxyModel, Qt, QRegExp, QModelIndex
 from PySide2.QtGui import QColor, QIcon, QFont
 
-
 from ezmodel.ezmetadataentry import EzMetadataEntry
 from typing import List
 

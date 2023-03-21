@@ -21,7 +21,7 @@ from checkboxdelegate import CheckBoxDelegate
 from qcreateeztablemodel import QCreateEzTableModel
 from metaforgestyledatahelper import MetaForgeStyleDataHelper
 from available_parsers_model import AvailableParsersModel
-import widget_utilities as widget_utils
+from widget_utilities import notify_error_message, notify_no_errors
 
 qt_version = PySide2.QtCore.__version_info__
 if qt_version[1] == 12:
@@ -52,7 +52,7 @@ class CreateTemplateWidget(QWidget):
         # Setup the blank Create Template table and tree
         self.load_metadata_entries()
 
-        widget_utils.notify_no_errors(self.ui.error_label)
+        notify_no_errors(self.ui.error_label)
 
         self.ui.appendCreateTableRowButton.clicked.connect(self.add_custom_row_to_table)
         self.ui.removeCreateTableRowButton.clicked.connect(self.remove_row_btn_clicked_slot)
@@ -142,7 +142,7 @@ class CreateTemplateWidget(QWidget):
             "*"+self.ui.createTemplateTreeSearchBar.text()+"*")
     
     def load_template(self, template_file_path: Path):
-        widget_utils.notify_no_errors(self.ui.error_label)
+        notify_no_errors(self.ui.error_label)
         with template_file_path.open('r') as json_file:
             template_json = json.load(json_file)
             template_version: str = template_json[self.K_TEMPLATE_VERSION_KEY]
@@ -230,7 +230,7 @@ class CreateTemplateWidget(QWidget):
         return proxy
 
     def parser_combobox_changed_slot(self, index: int):
-        widget_utils.notify_no_errors(self.ui.error_label)
+        notify_no_errors(self.ui.error_label)
         self.clear_models()
         if not self.ui.dataFileLineEdit.text():
             self._notify_error_message(f"'{self.ui.data_file_label.text()}' is empty!")
@@ -266,7 +266,7 @@ class CreateTemplateWidget(QWidget):
         return True
     
     def select_input_data_file(self, fileLink=None):
-        widget_utils.notify_no_errors(self.ui.error_label)
+        notify_no_errors(self.ui.error_label)
         if fileLink == False:
             file_path = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(
                 QStandardPaths.HomeLocation), self.tr("Files (*.*)"))[0]
@@ -299,4 +299,4 @@ class CreateTemplateWidget(QWidget):
         self.ui.fileParserCombo.setCurrentIndex(-1)
     
     def _notify_error_message(self, err_msg):
-        widget_utils.notify_error_message(self.ui.error_label, err_msg)
+        notify_error_message(self.ui.error_label, err_msg)

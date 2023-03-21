@@ -1,7 +1,6 @@
 # This Python file uses the following encoding: utf-8
 import shutil
 from typing import List
-from tqdm import tqdm
 
 from uploader import Uploader
 import json
@@ -24,8 +23,8 @@ from quseeztablemodel import QUseEzTableModel
 from usefiledelegate import UseFileDelegate
 from metaforgestyledatahelper import MetaForgeStyleDataHelper
 from available_parsers_model import AvailableParsersModel
-import widget_utilities as widget_utils
-import ht_utilities
+from widget_utilities import notify_error_message, notify_no_errors
+from ht_utilities import ezmodel_to_ht_metadata
 
 qt_version = PySide2.QtCore.__version_info__
 if qt_version[1] == 12:
@@ -60,7 +59,7 @@ class UseTemplateWidget(QWidget):
         self.ui.clearUseButton.clicked.connect(self.clear)
         self.setAcceptDrops(True)
 
-        widget_utils.notify_no_errors(self.ui.error_label)
+        notify_no_errors(self.ui.error_label)
 
         # Setup the blank Use Template table
         self.setup_metadata_table()
@@ -431,7 +430,7 @@ class UseTemplateWidget(QWidget):
 
     def upload_to_hyperthought(self):
         original_btn_text = self.ui.hyperthoughtUploadButton.text()
-        metadataJson = ht_utilities.ezmodel_to_ht_metadata(self.use_ez_table_model.metadata_model,
+        metadataJson = ezmodel_to_ht_metadata(self.use_ez_table_model.metadata_model,
                                                            self.use_ez_table_model_proxy.missing_entries,
                                                            self.use_ez_table_model_proxy.metadata_file_chosen)
         auth_control = self.hyperthoughtui.get_auth_control()
@@ -487,4 +486,4 @@ class UseTemplateWidget(QWidget):
         self.available_parsers_model = model
     
     def _notify_error_message(self, err_msg):
-        widget_utils.notify_error_message(self.ui.error_label, err_msg)
+        notify_error_message(self.ui.error_label, err_msg)

@@ -19,7 +19,7 @@ class MetaForgeStyleDataHelper(QObject):
     if platform.system() == 'Darwin':
         # IF YOU DO NOT WANT A STYLE SHEET THEN COMMENT OUT the lines that set the css_file_path
         # there are 2 choices for StyleSheets. Pick one
-        self.css_file_path = "resources/StyleSheets/light.css"
+        self.css_file_path = "metaforge/resources/StyleSheets/light.css"
         # self.css_file_path = "resources/StyleSheets/dark.css"
         self.initFonts()
         self.initStyleSheet()

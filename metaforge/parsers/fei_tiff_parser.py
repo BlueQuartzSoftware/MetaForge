@@ -1,7 +1,6 @@
 import configparser
 
 from requests.api import head
-from parsers.metaforgeparser import MetaForgeParser
 from typing import List
 from pathlib import Path
 from uuid import UUID

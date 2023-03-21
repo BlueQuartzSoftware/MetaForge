@@ -2,9 +2,9 @@ name: metaforge
 channels:
   - conda-forge
   - nodefaults
+  - hyperthought
 dependencies:
   - python=3.8
-  - tqdm=4.60.0
   - pyside2
   - requests
   - dataclasses-json
@@ -12,9 +12,4 @@ dependencies:
   - python-dateutil
   - pyyaml
   - h5py
-  - pip
-  - pip:
-    - hyperthought
-
-  
-
+  - hyperthought

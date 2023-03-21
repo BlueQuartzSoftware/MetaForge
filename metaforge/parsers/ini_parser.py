@@ -1,5 +1,4 @@
 import configparser
-from parsers.metaforgeparser import MetaForgeParser
 from typing import List
 from pathlib import Path
 from uuid import UUID
