@@ -2,7 +2,7 @@
 from typing import List
 from uuid import UUID
 
-from parsers.metaforgeparser import MetaForgeParser
+from metaforge.parsers.metaforgeparser import MetaForgeParser
 
 class ExampleParser(MetaForgeParser):
   def __init__(self) -> None:

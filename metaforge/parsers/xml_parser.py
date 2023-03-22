@@ -6,7 +6,7 @@ import os
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element
 
-from parsers.metaforgeparser import MetaForgeParser
+from metaforge.parsers.metaforgeparser import MetaForgeParser
 
 class XmlParser(MetaForgeParser):
   def __init__(self) -> None:

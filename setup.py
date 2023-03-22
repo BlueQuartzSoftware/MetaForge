@@ -1,15 +1,20 @@
 import os
 from setuptools import setup, find_packages
+from pathlib import Path
 
-dirname = os.path.dirname(__file__)
-readme_filename = os.path.join(dirname, 'README.md')
+parent_path = Path(__file__).parent
 
-with open(readme_filename, 'r') as file:
+readme_filepath = parent_path / 'README.md'
+with open(str(readme_filepath), 'r') as file:
     long_description = file.read()
+
+version_filepath = parent_path / 'metaforge' / 'VERSION'
+with open(str(version_filepath)) as version_file:
+    version = version_file.read().strip()
 
 setup(
   name='metaforge',
-  version='1.0.0-rc13',
+  version=version,
   author='BlueQuartz Software, LLC',
   author_email='info@bluequartz.net',
   description='MetaForge is a Python package for extracting metadata from files using templates, and uploading that metadata to HyperThought',
@@ -28,6 +33,7 @@ setup(
             'metaforge = metaforge.__main__:main',
         ]
     },
+  package_data={"metaforge": ["parsers/parsers.yaml", "VERSION"]},
   python_requires='>=3.8',
   include_package_data=True,
   zip_safe=False

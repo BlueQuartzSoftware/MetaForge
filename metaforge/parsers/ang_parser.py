@@ -4,9 +4,8 @@ from typing import Any, Dict, Final, Generator, List, Optional, Type
 from pathlib import Path
 from uuid import UUID
 
-from parsers.metaforgeparser import MetaForgeParser
-
-from _utils import file_line_generator
+from metaforge.parsers.metaforgeparser import MetaForgeParser
+from metaforge.utilities._utils import file_line_generator
 
 __all__ = ['HKLFamily', 'AngPhase', 'AngHeader', 'parse_header', 'parse_header_as_dict']
 

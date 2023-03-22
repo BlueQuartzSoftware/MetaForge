@@ -6,10 +6,8 @@ from typing import Any, Callable, Dict, Final, Generator, List, Tuple
 from pathlib import Path
 from uuid import UUID
 
-from parsers.metaforgeparser import MetaForgeParser
-
-
-from _utils import file_line_generator
+from metaforge.parsers.metaforgeparser import MetaForgeParser
+from metaforge.utilities._utils import file_line_generator
 
 __all__ = ['CtfPhase', 'CtfHeader', 'parse_header', 'parse_header_as_dict']
 

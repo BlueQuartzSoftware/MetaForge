@@ -5,7 +5,7 @@ from uuid import UUID
 import os
 import json
 
-from parsers.metaforgeparser import MetaForgeParser
+from metaforge.parsers.metaforgeparser import MetaForgeParser
 
 class JsonParser(MetaForgeParser):
   def __init__(self) -> None:

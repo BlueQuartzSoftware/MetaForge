@@ -5,7 +5,7 @@ from typing import List
 from pathlib import Path
 from uuid import UUID
 
-from parsers.metaforgeparser import MetaForgeParser
+from metaforge.parsers.metaforgeparser import MetaForgeParser
 
 from PIL import Image
 from PIL.TiffTags import TAGS

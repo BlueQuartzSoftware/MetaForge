@@ -1,6 +1,8 @@
+{% set setup_data = load_setup_py_data(setup_file='../setup.py', from_recipe_dir=True) %}
+
 package:
   name: metaforge
-  version: 1.0.0
+  version: {{ setup_data.get('version') }}
 
 source:
   # git_rev: rc-13

@@ -6,7 +6,7 @@ import os
 import h5py
 import numpy
 
-from parsers.metaforgeparser import MetaForgeParser
+from metaforge.parsers.metaforgeparser import MetaForgeParser
 
 class H5Parser(MetaForgeParser):
   def __init__(self) -> None:
