@@ -19,6 +19,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_MISSING_MSG = "Missing from data file"
     K_FROMTEMPLATE_MSG = "Using value from template file"
     K_FROMFILE_MSG = "Using data file value"
+    K_CUSTOMENTRY_MSG = "Custom entry"
 
     # Row colors
     K_MISSING_ENTRY_COLOR = QEzTableModel.K_RED_BG_COLOR
@@ -142,7 +143,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 return self.K_FROMTEMPLATE_MSG
             else:
                 return self.K_FROMFILE_MSG
-        return None
+        return self.K_CUSTOMENTRY_MSG
     
     def _get_background_color_data(self, metadata_entry: EzMetadataEntry) -> QColor:
         if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
@@ -178,12 +179,12 @@ class QUseEzTableModel(QSortFilterProxyModel):
         metadata_entry: EzMetadataEntry = src_model.metadata_model.entry(src_index.row())
             
         if role == Qt.EditRole:
-
             if index.column() == self.K_HTNAME_COL_INDEX:
                 metadata_entry.ht_name = value
                 self.dataChanged.emit(index, index)
                 return True
             elif index.column() == self.K_HTVALUE_COL_INDEX:
+                metadata_entry.override_source_value = (value != metadata_entry.source_value)
                 metadata_entry.ht_value = value
                 self.dataChanged.emit(index, index)
                 return True
@@ -261,16 +262,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
     
     def _get_htvalue_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
-        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
-            if metadata_entry.override_source_value is True:
-                if metadata_entry.editable is True:
-                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-            elif self.metadata_file_chosen is True:
-                if metadata_entry.editable is True:
-                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-        else:
-            if metadata_entry.editable is True:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        if metadata_entry.editable is True:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def _get_htannotation_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
