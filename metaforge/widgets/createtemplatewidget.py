@@ -264,13 +264,13 @@ class CreateTemplateWidget(QWidget):
         # Create an EzMetadataModel from the metadata dictionary
         metadata_model = EzMetadataModel.create_model_from_dict(model_dict=headerDict, source_type=EzMetadataEntry.SourceType.FILE)
 
-        # Reload tree view
-        self.metadata_tree_model.clearModel()
-        self.metadata_tree_model.setupModelData(metadata_model)
-        self.ui.metadataTreeView.expandAll()
-
         # Merge the new EzMetadataModel with the existing EzMetadataModel
         self._merge_metadata_model(metadata_model=metadata_model)
+
+        # Reload tree view
+        self.metadata_tree_model.clearModel()
+        self.metadata_tree_model.setupModelData(self.metadata_model)
+        self.ui.metadataTreeView.expandAll()
 
         # Reload table view
         self.filter_metadata_table()
