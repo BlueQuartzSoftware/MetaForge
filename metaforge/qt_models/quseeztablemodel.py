@@ -184,7 +184,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 self.dataChanged.emit(index, index)
                 return True
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                metadata_entry.override_source_value = (value != metadata_entry.source_value)
+                if metadata_entry.source_type == EzMetadataEntry.SourceType.FILE:
+                    metadata_entry.override_source_value = (value != metadata_entry.source_value)
                 metadata_entry.ht_value = value
                 self.dataChanged.emit(index, index)
                 return True
