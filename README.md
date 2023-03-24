@@ -10,11 +10,16 @@ HyperThought Data/MetaData Uploading program
   conda create -n metaforge python=3.8
   conda activate metaforge
 ```
-2. Install the metaforge package from the BlueQuartz Software Anaconda channel: 
+2. Add the dependency channels to your channel list:
+```lang-console
+  conda config --add channels conda-forge
+  conda config --add channels hyperthought
+```
+3. Install the metaforge package from the BlueQuartz Software Anaconda channel: 
 ```lang-console
   conda install -c bluequartzsoftware metaforge
 ```
-3. Launch the application:
+4. Launch the application:
 ```lang-console
   metaforge
 ```
