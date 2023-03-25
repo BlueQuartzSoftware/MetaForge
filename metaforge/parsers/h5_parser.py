@@ -75,7 +75,7 @@ class H5Parser(MetaForgeParser):
       for (key, value) in data.attrs.items():
         v = self.type_dispatch(value)
         if v is not None:
-          path = f'{name}/{key}*'
+          path = f'{name}.attrs/{key}'
           self.file_dict[path] = v
 
   def visit_entry(self, name: str) -> None:
