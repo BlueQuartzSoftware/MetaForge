@@ -38,15 +38,15 @@ class XmlParser(MetaForgeParser):
       for v in data:
         self.visit_dict(f'{prefix}/{v}', data[v])
     elif isinstance(data, str):
-      self.file_dict[f'{prefix}*'] = data
+      self.file_dict[f'{prefix}'] = data
     elif isinstance(data, int):
-      self.file_dict[f'{prefix}*'] = str(data)
+      self.file_dict[f'{prefix}'] = str(data)
     elif isinstance(data, float):
-      self.file_dict[f'{prefix}*'] = str(data)
+      self.file_dict[f'{prefix}'] = str(data)
     elif isinstance(data, list):
       # Magic number of 16, don't include long lists.
       if len(data) <= 16:
-        self.file_dict[f'{prefix}*'] = str(data)
+        self.file_dict[f'{prefix}'] = str(data)
 
   def visit_entry(self, prefix: str, data: Element) -> None:
     # Do the right thing depending on the type we see, recursion for dicts.
@@ -56,9 +56,12 @@ class XmlParser(MetaForgeParser):
 
     if prefix in self.file_dict:
       return
-    self.file_dict[prefix] = data.text
+    
+    # Only add entries if the XML tag has something other that whitespace.
+    if data.text and len(data.text.strip()) > 0:
+      self.file_dict[prefix] = data.text
     if len(data.attrib) > 0:
-      self.visit_dict(prefix, data.attrib)
+      self.visit_dict(f'{prefix}.attrs', data.attrib)
 
   def parse_header_as_dict(self, filepath: Path) -> dict:
     """
