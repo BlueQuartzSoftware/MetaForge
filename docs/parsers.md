@@ -67,10 +67,11 @@ Exposing Trees in Metadata
 
 A lot of metadata uses trees to expose and group related data. This is
 represented in a directory like notation in the key name, with a recently
-established convention to use the `*` suffix to represent an attribute. This
+established convention to use the `.attrs` suffix to represent attributes. This
 results in the interface displaying a tree structure on the left, and the right
 has shows the key as "Source" and the value as "Source Value". These can then
-be mapped by templates to the desired key names.
+be mapped by templates to the desired key names. So the path `mydata` would have
+a `mydata.attrs` prefix for attributes on the `mydata` node.
 
 The existing formats expose strings as strings, map single numeric values to
 numeric values, and small arrays using the `[1, 2, 3, 4]` notation commonly
