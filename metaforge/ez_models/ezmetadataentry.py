@@ -29,3 +29,4 @@ class EzMetadataEntry:
     editable: bool = True
     required: bool = False
     enabled: bool = True
+    loaded: bool = True

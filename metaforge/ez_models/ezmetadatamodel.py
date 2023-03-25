@@ -178,26 +178,6 @@ class EzMetadataModel:
                 return i
         return -1
 
-    def to_file_tree_dict(self) -> dict:
-        tree_dict = {}
-
-        for entry in self.entries:
-            if entry.source_type is not EzMetadataEntry.SourceType.FILE:
-                continue
-
-            source_path = entry.source_path
-            source_tokens = source_path.split('/')
-            tree_obj = tree_dict
-            for i in range(len(source_tokens)):
-                token = source_tokens[i]
-                if token not in tree_obj:
-                    if i == len(source_tokens) - 1:
-                        tree_obj[token] = entry.source_value
-                    else:
-                        tree_obj[token] = {}
-                tree_obj = tree_obj[token]
-        return tree_dict
-
     def size(self) -> int:
         return len(self.entries)
 

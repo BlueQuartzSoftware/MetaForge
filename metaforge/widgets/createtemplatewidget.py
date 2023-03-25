@@ -44,13 +44,14 @@ class CreateTemplateWidget(QWidget):
         self.ui = Ui_CreateTemplateWidget()
         self.ui.setupUi(self)
         self.available_parsers_model = None
+        self.metadata_model: EzMetadataModel = EzMetadataModel()
         self.ui.dataFileSelect.clicked.connect(self.select_input_data_file)
         self.ui.clearCreateButton.clicked.connect(self.clear)
         self.setAcceptDrops(True)
         self.numCustoms = 0
 
         # Setup the blank Create Template table and tree
-        self.load_metadata_entries()
+        self.load_metadata_entries(metadata_model=self.metadata_model)
 
         notify_no_errors(self.ui.error_label)
 
@@ -71,11 +72,15 @@ class CreateTemplateWidget(QWidget):
         self.metadata_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
         self.metadata_table_model_proxy = self.init_table_model_proxy(self.metadata_table_model)
         self.ui.metadata_table_view.setModel(self.metadata_table_model_proxy)
+        # centered_box_proxy = CenteredBoxProxy()
+        # self.ui.metadata_table_view.setStyle(centered_box_proxy)
         self.filter_metadata_table()
         self.ui.metadata_table_view.setItemDelegateForColumn(self.metadata_table_model.K_REMOVE_COL_INDEX, self.trash_delegate)
         self.trash_delegate.pressed.connect(self.remove_table_entry)
         self.ui.metadata_table_view.setItemDelegateForColumn(self.metadata_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.checkbox_delegate)
         self.ui.metadata_table_view.setItemDelegateForColumn(self.metadata_table_model.K_EDITABLE_COL_INDEX, self.checkbox_delegate)
+        self.ui.metadata_table_view.setWordWrap(True)
+        self.ui.metadata_table_view.setRowHeight(21, 35)
         self.polish_metadata_table()
     
     def polish_metadata_table(self):
@@ -104,7 +109,8 @@ class CreateTemplateWidget(QWidget):
         self.clear_models()
     
     def clear_models(self):
-        self.load_metadata_entries()
+        self.metadata_model = EzMetadataModel()
+        self.load_metadata_entries(self.metadata_model)
 
     def add_custom_row_to_table(self):
         self.metadata_table_model.addCustomRow(self.numCustoms)
@@ -155,13 +161,13 @@ class CreateTemplateWidget(QWidget):
     
     def _load_template_v1(self, template_json: dict):
         model: TemplateModel_V1 = TemplateModel_V1.from_dict(template_json)
-        data_file_path, metadata_model = model.extract_data()
-        self.load_template_data(data_file_path, None, metadata_model)
+        data_file_path, self.metadata_model = model.extract_data()
+        self.load_template_data(data_file_path, None, self.metadata_model)
 
     def _load_template(self, template_json: dict):
         template_model: TemplateModel = TemplateModel.from_dict(template_json)
-        data_file_path, parser_uuid, metadata_model = template_model.extract_data()
-        self.load_template_data(data_file_path, parser_uuid, metadata_model)
+        data_file_path, parser_uuid, self.metadata_model = template_model.extract_data()
+        self.load_template_data(data_file_path, parser_uuid, self.metadata_model)
     
     def load_template_data(self, data_file_path: Path, parser_uuid: UUID, metadata_model: EzMetadataModel):
         # Set the data file path
@@ -201,12 +207,13 @@ class CreateTemplateWidget(QWidget):
             return
         
         entry = self.metadata_table_model.metadata_model.entry(source_index.row())
-        if entry is not None and entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-            self.metadata_table_model.beginRemoveRows(QModelIndex(), source_index.row(), source_index.row())
-            self.metadata_table_model.metadata_model.remove_by_index(source_index.row())
-            self.metadata_table_model.endRemoveRows()
-        elif entry is not None and entry.source_type is EzMetadataEntry.SourceType.FILE:
-            self.metadata_tree_model.changeLeafCheck(entry)
+        if entry is not None:
+            if entry.source_type is EzMetadataEntry.SourceType.FILE and entry.loaded is True:
+                self.metadata_tree_model.changeLeafCheck(entry)
+            else:
+                self.metadata_table_model.beginRemoveRows(QModelIndex(), source_index.row(), source_index.row())
+                self.metadata_table_model.metadata_model.remove_by_index(source_index.row())
+                self.metadata_table_model.endRemoveRows()
         
         self.metadata_table_model_proxy.invalidate()
         index0 = self.metadata_table_model.index(0, 0)
@@ -231,7 +238,7 @@ class CreateTemplateWidget(QWidget):
 
     def parser_combobox_changed_slot(self, index: int):
         notify_no_errors(self.ui.error_label)
-        self.clear_models()
+        # self.clear_models()
         if not self.ui.dataFileLineEdit.text():
             self._notify_error_message(f"'{self.ui.data_file_label.text()}' is empty!")
             return
@@ -251,19 +258,48 @@ class CreateTemplateWidget(QWidget):
             self._notify_error_message(f"Selected parser '{parser.human_label()}' is not usable with file '{file_path}': File extension not accepted.")
             return False
 
-        # parse the metadata from the input data file
+        # Parse the metadata dictionary from the input data file
         headerDict = parser.parse_header_as_dict(file_path)
-
-
+        
+        # Create an EzMetadataModel from the metadata dictionary
         metadata_model = EzMetadataModel.create_model_from_dict(model_dict=headerDict, source_type=EzMetadataEntry.SourceType.FILE)
 
-        self.load_metadata_entries(metadata_model=metadata_model)
+        # Merge the new EzMetadataModel with the existing EzMetadataModel
+        self._merge_metadata_model(metadata_model=metadata_model)
 
-        self.ui.metadata_table_view.setWordWrap(True)
-        self.ui.metadata_table_view.setRowHeight(21, 35)
+        # Reload tree view
+        self.metadata_tree_model.clearModel()
+        self.metadata_tree_model.setupModelData(self.metadata_model)
+        self.ui.metadataTreeView.expandAll()
+
+        # Reload table view
+        self.filter_metadata_table()
         self.polish_metadata_table()
 
         return True
+    
+    def _merge_metadata_model(self, metadata_model: EzMetadataModel):
+        for entry in self.metadata_model.entries:
+            if entry.source_type == EzMetadataEntry.SourceType.FILE:
+                new_entry = metadata_model.entry_by_source(entry.source_path)
+                if new_entry is None:
+                    # Exists in current model but not in incoming model
+                    # Mark the entry as not loaded because it's no longer an entry from the current file
+                    entry.loaded = False
+                    entry.source_value = ""
+                else:
+                    # Exists in both the current model and the incoming model
+                    # Keep all settings the same for this entry, just replace the source value
+                    entry.loaded = True
+                    entry.source_value = new_entry.source_value
+
+        for entry in metadata_model.entries:
+            if entry.source_type == EzMetadataEntry.SourceType.FILE:
+                if self.metadata_model.entry_by_source(entry.source_path) is None:
+                    # Exists in incoming model, but not in current model
+                    self.metadata_model.entries.append(entry)
+                    self.metadata_table_model.refresh_entry(entry.source_path)
+
     
     def select_input_data_file(self, fileLink=None):
         notify_no_errors(self.ui.error_label)
@@ -279,7 +315,7 @@ class CreateTemplateWidget(QWidget):
 
             file_path = Path(file_path)
 
-            self.clear_models()
+            # self.clear_models()
 
             if self.ui.fileParserCombo.currentIndex() == -1:
                 parser_index, parser = self.available_parsers_model.find_compatible_parser(file_path, self._notify_error_message)

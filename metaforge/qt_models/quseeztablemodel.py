@@ -1,8 +1,9 @@
+from typing import List
+
 from PySide2.QtCore import QSortFilterProxyModel, Qt, QRegExp, QModelIndex
 from PySide2.QtGui import QColor, QIcon, QFont
 
-from typing import List
-
+from metaforge.qt_models.qeztablemodel import QEzTableModel
 from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
 
 class QUseEzTableModel(QSortFilterProxyModel):
@@ -18,11 +19,12 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_MISSING_MSG = "Missing from data file"
     K_FROMTEMPLATE_MSG = "Using value from template file"
     K_FROMFILE_MSG = "Using data file value"
+    K_CUSTOMENTRY_MSG = "Custom entry"
 
     # Row colors
-    K_MISSING_ENTRY_COLOR = QColor(255, 190, 194)
-    K_OVERRIDDEN_ENTRY_COLOR = QColor(253, 255, 190)
-    K_TEMPLATEFILE_ENTRY_COLOR = QColor(253, 255, 190)
+    K_MISSING_ENTRY_COLOR = QEzTableModel.K_RED_BG_COLOR
+    K_OVERRIDDEN_ENTRY_COLOR = QEzTableModel.K_YELLOW_BG_COLOR
+    K_TEMPLATEFILE_ENTRY_COLOR = QEzTableModel.K_YELLOW_BG_COLOR
 
     # These are the user facing header and the index of each column in the table.
     K_SOURCE_COL_NAME = "Source"
@@ -141,7 +143,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 return self.K_FROMTEMPLATE_MSG
             else:
                 return self.K_FROMFILE_MSG
-        return None
+        return self.K_CUSTOMENTRY_MSG
     
     def _get_background_color_data(self, metadata_entry: EzMetadataEntry) -> QColor:
         if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
@@ -177,12 +179,13 @@ class QUseEzTableModel(QSortFilterProxyModel):
         metadata_entry: EzMetadataEntry = src_model.metadata_model.entry(src_index.row())
             
         if role == Qt.EditRole:
-
             if index.column() == self.K_HTNAME_COL_INDEX:
                 metadata_entry.ht_name = value
                 self.dataChanged.emit(index, index)
                 return True
             elif index.column() == self.K_HTVALUE_COL_INDEX:
+                if metadata_entry.source_type == EzMetadataEntry.SourceType.FILE:
+                    metadata_entry.override_source_value = (value != metadata_entry.source_value)
                 metadata_entry.ht_value = value
                 self.dataChanged.emit(index, index)
                 return True
@@ -260,16 +263,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
     
     def _get_htvalue_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:
-        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
-            if metadata_entry.override_source_value is True:
-                if metadata_entry.editable is True:
-                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-            elif self.metadata_file_chosen is True:
-                if metadata_entry.editable is True:
-                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-        else:
-            if metadata_entry.editable is True:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+        if metadata_entry.editable is True:
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
     def _get_htannotation_flags(self, metadata_entry: EzMetadataEntry) -> Qt.ItemFlags:

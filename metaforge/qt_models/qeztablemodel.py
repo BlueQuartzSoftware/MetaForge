@@ -1,5 +1,5 @@
 from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex
-from PySide2.QtGui import QFont
+from PySide2.QtGui import QFont, QColor
 
 from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
 from metaforge.ez_models.ezmetadatamodel import EzMetadataModel
@@ -11,11 +11,16 @@ class QEzTableModel(QAbstractTableModel):
     in this section. This will make it easier to move columns around and rename items.
     """
 
+    # Row colors
+    K_RED_BG_COLOR = QColor(255, 190, 194)
+    K_YELLOW_BG_COLOR = QColor(253, 255, 190)
+
     # Total Number of Columns
     K_COL_COUNT = 10
 
     # These are some misc strings that are used.
     K_FROM_SOURCE = "--SOURCE--"
+    K_NOT_LOADED = "--NOT LOADED--"
     K_CUSTOM_VALUE = "--CUSTOM VALUE--"
 
     # These are the user facing header and the index of each column in the table.
@@ -73,10 +78,13 @@ class QEzTableModel(QAbstractTableModel):
             elif index.column() == self.K_HTNAME_COL_INDEX:
                 return metadata_entry.ht_name
             elif index.column() == self.K_SOURCEVAL_COL_INDEX:
-                if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
-                    return str(self.K_CUSTOM_VALUE)
+                if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+                    if metadata_entry.loaded is True:
+                        return str(metadata_entry.source_value)
+                    else:
+                        return self.K_NOT_LOADED
                 else:
-                    return str(metadata_entry.source_value)
+                    return str(self.K_CUSTOM_VALUE)
             elif index.column() == self.K_SOURCE_COL_INDEX:
                 if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
                     return self.K_CUSTOM_VALUE
