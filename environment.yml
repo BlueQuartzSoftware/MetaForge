@@ -12,4 +12,5 @@ dependencies:
   - python-dateutil
   - pyyaml
   - h5py
+  - flatten-dict=0.4.2
   - hyperthought
