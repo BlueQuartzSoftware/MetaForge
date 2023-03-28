@@ -179,21 +179,22 @@ class FeiTiffParser(MetaForgeParser):
 
     header = self.parse_tiff_tag_34681(filepath)
     if len(header) > 0:
-      flattened_header = flatten(header, reducer="path")
-      file_dict["FEI Tag #34681"] = flattened_header
+      file_dict["FEI Tag #34681"] = header
+      file_dict = flatten(file_dict, reducer="path")
 
     header = self.parse_tiff_tag_34682(filepath)
     if len(header) > 0:
-      flattened_header = flatten(header, reducer="path")
-      file_dict["FEI Tag #34682"] = flattened_header
+      file_dict["FEI Tag #34682"] = header
+      file_dict = flatten(file_dict, reducer="path")
 
     header = self.parse_tiff_tag_50431(filepath)
     if len(header) > 0:
-      flattened_header = flatten(header, reducer="path")
-      file_dict["FEI Tag #50431"] = flattened_header
+      file_dict["FEI Tag #50431"] = header
+      file_dict = flatten(file_dict, reducer="path")
 
     header = self.parse_standard_tags(filepath)
     if len(header) > 0:
       file_dict["Standard"] = header
+      file_dict = flatten(file_dict, reducer="path")
 
     return file_dict
