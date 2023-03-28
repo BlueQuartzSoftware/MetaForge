@@ -80,26 +80,18 @@ class EzMetadataModel:
     def create_model_from_dict(model_dict: dict, source_type: EzMetadataEntry.SourceType) -> EzMetadataModel:
         model = EzMetadataModel()
         if model_dict is not None:
-            model.add_model_entry(item=model_dict, parent_path='', source_type=source_type)
-        return model
-
-    def add_model_entry(self, item, parent_path: str, source_type: EzMetadataEntry.SourceType):
-        for key, value in item.items():
-            if type(value) is dict:
-                new_parent_path = parent_path + key + '/'
-                self.add_model_entry(item=value, parent_path=new_parent_path, source_type=source_type)
-            else:
-                item_path = parent_path + key
+            for key, value in model_dict.items():
                 if value is None:
                     value = ''
-                metadata_entry = EzMetadataEntry(source_path=item_path,
-                                                 source_value=value,
-                                                 source_type=source_type,
-                                                 ht_name=key,
-                                                 ht_value=value,
-                                                 ht_annotation='',
-                                                 ht_units='')
-                self.entries.append(metadata_entry)
+                metadata_entry = EzMetadataEntry(source_path=key,
+                                                    source_value=value,
+                                                    source_type=source_type,
+                                                    ht_name=key,
+                                                    ht_value=value,
+                                                    ht_annotation='',
+                                                    ht_units='')
+                model.entries.append(metadata_entry)
+        return model
 
     def update_model_values_from_dict(self, item: dict, parent_path: str = "") -> List[EzMetadataEntry]:
         visited = [False for _ in range (self.size())]

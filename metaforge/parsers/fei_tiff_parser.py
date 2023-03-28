@@ -4,6 +4,7 @@ from requests.api import head
 from typing import List
 from pathlib import Path
 from uuid import UUID
+from flatten_dict import flatten
 
 from metaforge.parsers.metaforgeparser import MetaForgeParser
 
@@ -179,17 +180,21 @@ class FeiTiffParser(MetaForgeParser):
     header = self.parse_tiff_tag_34681(filepath)
     if len(header) > 0:
       file_dict["FEI Tag #34681"] = header
+      file_dict = flatten(file_dict, reducer="path")
 
     header = self.parse_tiff_tag_34682(filepath)
     if len(header) > 0:
       file_dict["FEI Tag #34682"] = header
+      file_dict = flatten(file_dict, reducer="path")
 
     header = self.parse_tiff_tag_50431(filepath)
     if len(header) > 0:
       file_dict["FEI Tag #50431"] = header
+      file_dict = flatten(file_dict, reducer="path")
 
     header = self.parse_standard_tags(filepath)
     if len(header) > 0:
       file_dict["Standard"] = header
+      file_dict = flatten(file_dict, reducer="path")
 
     return file_dict

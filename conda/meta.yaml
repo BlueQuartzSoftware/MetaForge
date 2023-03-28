@@ -23,6 +23,7 @@ requirements:
     - Pillow>=8.2.0
     - python-dateutil
     - h5py
+    - flatten-dict==0.4.2
     - hyperthought
 
 about:

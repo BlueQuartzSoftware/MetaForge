@@ -143,7 +143,7 @@ class CtfParser(MetaForgeParser):
         internal2 = tokens[6]
         comment = tokens[7]
 
-      phase = CtfPhase(i, lattice_constants, lattice_angles, name, group, space_group, comment, internal1, internal2)
+      phase = CtfPhase(i+1, lattice_constants, lattice_angles, name, group, space_group, comment, internal1, internal2)
       phases.append(phase)
 
     return phases
@@ -156,12 +156,12 @@ class CtfParser(MetaForgeParser):
     tilt_angle = float(tokens[10])
     tilt_axis = float(tokens[12])
     entries = {
-      CTF_MAG : mag,
-      CTF_COVERAGE : coverage,
-      CTF_DEVICE : device,
-      CTF_KV : kv,
-      CTF_TILT_ANGLE : tilt_angle,
-      CTF_TILT_AXIS : tilt_axis,
+      f'SOURCE/{CTF_MAG}' : mag,
+      f'SOURCE/{CTF_COVERAGE}' : coverage,
+      f'SOURCE/{CTF_DEVICE}' : device,
+      f'SOURCE/{CTF_KV}' : kv,
+      f'SOURCE/{CTF_TILT_ANGLE}' : tilt_angle,
+      f'SOURCE/{CTF_TILT_AXIS}' : tilt_axis,
     }
     return entries
 
@@ -175,7 +175,7 @@ class CtfParser(MetaForgeParser):
       if line.startswith(CTF_CHANNEL_TEXT_FILE) or line.startswith(CTF_COLON_CHANNEL_TEXT_FILE):
         continue
       elif line.startswith(CTF_PRJ):
-        ctf_header.entries[CTF_PRJ] = line[len(CTF_PRJ) + 1:]
+        ctf_header.entries[f'SOURCE/{CTF_PRJ}'] = line[len(CTF_PRJ) + 1:]
       elif line.startswith(CTF_LONG_TEXT):
         entries = self.parse_ctf_long_text(tokens)
         ctf_header.entries.update(entries)
@@ -187,38 +187,24 @@ class CtfParser(MetaForgeParser):
         value = None
         if len(tokens) > 1:
           value = CTF_HEADER_PARSE_MAP[keyword](CTF_DELIMITER.join(tokens[1:]))
-        ctf_header.entries[keyword] = value
+        ctf_header.entries[f'SOURCE/{keyword}'] = value
       else:
-        ctf_header.unknown_entries[keyword] = CTF_DELIMITER.join(tokens[1:])
+        ctf_header.unknown_entries[f'SOURCE/{keyword}'] = CTF_DELIMITER.join(tokens[1:])
     return ctf_header
 
   def parse_header_as_dict(self, filepath: Path) -> dict:
     header = self.parse_header(filepath)
     entries = header.entries
     phases = header.phases
+        
+    for phase in phases:
+      entries[f'SOURCE/Phases/Phase {phase.index}/LaueGroup'] = str(phase.group.name)
+      entries[f'SOURCE/Phases/Phase {phase.index}/Internal1'] = phase.internal1
+      entries[f'SOURCE/Phases/Phase {phase.index}/Internal2'] = phase.internal2
+      entries[f'SOURCE/Phases/Phase {phase.index}/LatticeAngles'] = phase.lattice_angles
+      entries[f'SOURCE/Phases/Phase {phase.index}/LatticeConstants'] = phase.lattice_constants
+      entries[f'SOURCE/Phases/Phase {phase.index}/Name'] = phase.name
+      entries[f'SOURCE/Phases/Phase {phase.index}/SpaceGroup'] = phase.space_group
+      entries[f'SOURCE/Phases/Phase {phase.index}/Comment'] = phase.comment
 
-    phases_dict = self._get_phases_as_dict(phases)
-    entries["Phases"] = phases_dict
-    file_name = "SOURCE"
-    file_dict = {file_name: entries}
-
-    return file_dict
-
-  def _get_phases_as_dict(self, phases: Dict[int, CtfPhase]) -> dict:
-    phases_dict: dict = {}
-    for x in range(len(phases)):
-      phase = phases[x]
-
-      phase_dict: dict = {}
-      phase_dict['LaueGroup'] = str(phase.group.name)
-      phase_dict['Internal1'] = phase.internal1
-      phase_dict['Internal2'] = phase.internal2
-      phase_dict['LatticeAngles'] = phase.lattice_angles
-      phase_dict['LatticeConstants'] = phase.lattice_constants
-      phase_dict['Name'] = phase.name
-      phase_dict['SpaceGroup'] = phase.space_group
-      phase_dict['Comment'] = phase.comment
-      phase_num = x + 1
-      phases_dict[f"Phase {phase_num}"] = phase_dict
-
-    return phases_dict
+    return entries
