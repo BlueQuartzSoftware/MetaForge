@@ -2,6 +2,7 @@ import configparser
 from typing import List
 from pathlib import Path
 from uuid import UUID
+from flatten_dict import flatten
 
 from metaforge.parsers.metaforgeparser import MetaForgeParser
 
@@ -64,6 +65,7 @@ class IniParser(MetaForgeParser):
         pass
     finally:
       file_dict = {"SOURCE": header}
+      file_dict = flatten(file_dict, reducer="path")
 
     return file_dict
 
