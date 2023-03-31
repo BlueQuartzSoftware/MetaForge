@@ -1,8 +1,10 @@
 # MetaForge #
 
-HyperThought Data/MetaData Uploading program
+HyperThought Data/MetaData Uploading program.
 
-## How to Install ##
+Binaries are located at https://github.com/BlueQuartzSoftware/MetaForge/releases.
+
+## How to Install Using Anaconda ##
 ### Users ###
 *NOTE*: This assumes that you have Anaconda running on your system, and you are running either MacOS or 64-bit Windows.
 1. Create and activate a new python 3.8 Anaconda environment:
