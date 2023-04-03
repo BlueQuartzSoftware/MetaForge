@@ -83,10 +83,14 @@ class EzMetadataModel:
             for key, value in model_dict.items():
                 if value is None:
                     value = ''
+                ht_name = key
+                tokens: List[str] = key.split('/')
+                if len(tokens) > 0:
+                    ht_name = tokens.pop()
                 metadata_entry = EzMetadataEntry(source_path=key,
                                                     source_value=value,
                                                     source_type=source_type,
-                                                    ht_name=key,
+                                                    ht_name=ht_name,
                                                     ht_value=value,
                                                     ht_annotation='',
                                                     ht_units='')
