@@ -43,7 +43,8 @@ class CreateTemplateWidget(QWidget):
         self.style_sheet_helper: MetaForgeStyleDataHelper = MetaForgeStyleDataHelper(self)
         self.ui = Ui_CreateTemplateWidget()
         self.ui.setupUi(self)
-        self.parsers_model: QParsersModel = None
+        self.parsers_model: QSortFilterProxyModel = None
+        self.proxy_parsers_model = QSortFilterProxyModel(self)
         self.metadata_model: EzMetadataModel = EzMetadataModel()
         self.ui.dataFileSelect.clicked.connect(self.select_input_data_file)
         self.ui.clearCreateButton.clicked.connect(self.clear)
@@ -321,7 +322,8 @@ class CreateTemplateWidget(QWidget):
             file_path = Path(file_path)
 
             if self.ui.fileParserCombo.currentIndex() == -1:
-                parser_index, parser = self.parsers_model.find_compatible_parser(file_path, self._notify_error_message)
+                source_model: QParsersModel = self.parsers_model.sourceModel()
+                parser_index, parser = source_model.find_compatible_parser(file_path, self._notify_error_message)
                 if (parser is None):
                     return
             
@@ -334,7 +336,9 @@ class CreateTemplateWidget(QWidget):
     
     def set_parsers_model(self, model: QParsersModel):
         self.parsers_model = model
-        self.ui.fileParserCombo.setModel(model)
+        self.proxy_parsers_model.setSourceModel(self.parsers_model)
+        self.proxy_parsers_model.sort(0)
+        self.ui.fileParserCombo.setModel(self.proxy_parsers_model)
         self.ui.fileParserCombo.setCurrentIndex(-1)
         self.ui.fileParserCombo.currentIndexChanged.connect(self.parser_combobox_changed_slot)
     
