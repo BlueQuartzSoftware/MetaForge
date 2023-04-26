@@ -7,7 +7,7 @@ from uuid import UUID
 
 from pathlib import Path
 
-from PySide2.QtWidgets import QWidget, QFileDialog
+from PySide2.QtWidgets import QWidget, QFileDialog, QComboBox, QListView
 from PySide2.QtCore import Qt, QStandardPaths, QSortFilterProxyModel, QModelIndex, QEvent, QPersistentModelIndex
 import PySide2.QtCore
 
@@ -19,8 +19,8 @@ from metaforge.models.treemodel import TreeModel
 from metaforge.delegates.trashdelegate import TrashDelegate
 from metaforge.delegates.checkboxdelegate import CheckBoxDelegate
 from metaforge.qt_models.qcreateeztablemodel import QCreateEzTableModel
-from metaforge.utilities.metaforgestyledatahelper import MetaForgeStyleDataHelper
-from metaforge.models.available_parsers_model import AvailableParsersModel
+from metaforge.common.metaforgestyledatahelper import MetaForgeStyleDataHelper
+from metaforge.qt_models.qparsersmodel import QParsersModel
 from metaforge.widgets.utilities.widget_utilities import notify_error_message, notify_no_errors
 
 qt_version = PySide2.QtCore.__version_info__
@@ -43,7 +43,7 @@ class CreateTemplateWidget(QWidget):
         self.style_sheet_helper: MetaForgeStyleDataHelper = MetaForgeStyleDataHelper(self)
         self.ui = Ui_CreateTemplateWidget()
         self.ui.setupUi(self)
-        self.available_parsers_model = None
+        self.parsers_model: QParsersModel = None
         self.metadata_model: EzMetadataModel = EzMetadataModel()
         self.ui.dataFileSelect.clicked.connect(self.select_input_data_file)
         self.ui.clearCreateButton.clicked.connect(self.clear)
@@ -62,8 +62,6 @@ class CreateTemplateWidget(QWidget):
         self.ui.createTemplateTreeSearchBar.textChanged.connect(self.filter_tree)
 
         # Setup the Combo Box with all of the parsers that we know about
-        self.ui.fileParserCombo.currentIndexChanged.connect(self.parser_combobox_changed_slot)
-
         self.ui.dataFileLineEdit.installEventFilter(self)
 
     def setup_metadata_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
@@ -177,9 +175,9 @@ class CreateTemplateWidget(QWidget):
         self.load_metadata_entries(metadata_model=metadata_model)
 
         # Set the parser
-        parser_index, parser = self.available_parsers_model.find_parser_from_uuid(parser_uuid)
+        parser_index, parser = self.parsers_model.find_parser_from_uuid(parser_uuid)
         if parser is None:
-            parser_index, parser = self.available_parsers_model.find_compatible_parser(data_file_path, self._notify_error_message)
+            parser_index, parser = self.parsers_model.find_compatible_parser(data_file_path, self._notify_error_message)
             if (parser is None):
                 return
         
@@ -223,8 +221,8 @@ class CreateTemplateWidget(QWidget):
     def save_template(self, file_path: str):
         with open(file_path, 'w') as outfile:
             metadata_model = self.metadata_table_model.metadata_model
-            parser_model_index = self.available_parsers_model.index(self.ui.fileParserCombo.currentIndex(), 0)
-            parser: MetaForgeParser = self.available_parsers_model.data(parser_model_index, AvailableParsersModel.Parser)
+            parser_model_index = self.parsers_model.index(self.ui.fileParserCombo.currentIndex(), 0)
+            parser: MetaForgeParser = self.parsers_model.data(parser_model_index, QParsersModel.Parser)
             template_model = TemplateModel.create_model(data_file_path=self.ui.dataFileLineEdit.text(), parser_uuid=parser.uuid(), entries=metadata_model.entries)
             model_string = template_model.to_json(indent=4)
             outfile.write(model_string)
@@ -238,14 +236,21 @@ class CreateTemplateWidget(QWidget):
 
     def parser_combobox_changed_slot(self, index: int):
         notify_no_errors(self.ui.error_label)
-        # self.clear_models()
+
+        model_index = self.parsers_model.index(index, 0)
+        if not model_index.isValid():
+            self.ui.parser_path_label.clear()
+            return
+
+        parser_path = self.parsers_model.data(model_index, QParsersModel.ParserPath)
+        self.ui.parser_path_label.setText(str(parser_path))
+
         if not self.ui.dataFileLineEdit.text():
             self._notify_error_message(f"'{self.ui.data_file_label.text()}' is empty!")
             return
 
         filePath = Path(self.ui.dataFileLineEdit.text())
-        model_index = self.available_parsers_model.index(index, 0)
-        parser = self.available_parsers_model.data(model_index, AvailableParsersModel.Parser)
+        parser = self.parsers_model.data(model_index, QParsersModel.Parser)
 
         if not self.parse_data_file(filePath, parser):
             return
@@ -315,24 +320,23 @@ class CreateTemplateWidget(QWidget):
 
             file_path = Path(file_path)
 
-            # self.clear_models()
-
             if self.ui.fileParserCombo.currentIndex() == -1:
-                parser_index, parser = self.available_parsers_model.find_compatible_parser(file_path, self._notify_error_message)
+                parser_index, parser = self.parsers_model.find_compatible_parser(file_path, self._notify_error_message)
                 if (parser is None):
                     return
             
                 self.ui.fileParserCombo.setCurrentIndex(parser_index)
             else:
-                model_index = self.available_parsers_model.index(self.ui.fileParserCombo.currentIndex(), 0)
-                parser = self.available_parsers_model.data(model_index, AvailableParsersModel.Parser)
+                model_index = self.parsers_model.index(self.ui.fileParserCombo.currentIndex(), 0)
+                parser = self.parsers_model.data(model_index, QParsersModel.Parser)
                 if not self.parse_data_file(file_path, parser):
                     return
     
-    def set_parsers_model(self, model: AvailableParsersModel):
-        self.available_parsers_model = model
+    def set_parsers_model(self, model: QParsersModel):
+        self.parsers_model = model
         self.ui.fileParserCombo.setModel(model)
         self.ui.fileParserCombo.setCurrentIndex(-1)
+        self.ui.fileParserCombo.currentIndexChanged.connect(self.parser_combobox_changed_slot)
     
     def _notify_error_message(self, err_msg):
         notify_error_message(self.ui.error_label, err_msg)

@@ -242,11 +242,6 @@ class QEzTableModel(QAbstractTableModel):
         else:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
 
-    def addRow(self, dataDict, source, value):
-        pass
-        # self.beginInsertRows(self.index(self.metadata_model.enabled_count(), 0), self.metadata_model.size(), self.metadata_model.size())
-        # self.endInsertRows()
-
     def addCustomRow(self, numCustom):
         self.beginInsertRows(self.index(len(self.metadata_model.entries), 0), len(
             self.metadata_model.entries), len(self.metadata_model.entries))

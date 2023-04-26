@@ -1,6 +1,7 @@
 import os
 from setuptools import setup, find_packages
 from pathlib import Path
+from metaforge.common.constants import K_PARSER_YAML_FILE_NAME
 
 parent_path = Path(__file__).parent
 
@@ -33,7 +34,7 @@ setup(
             'metaforge = metaforge.__main__:main',
         ]
     },
-  package_data={"metaforge": ["parsers/parsers.yaml", "VERSION"]},
+  package_data={"metaforge": [f"parsers/{K_PARSER_YAML_FILE_NAME}", "VERSION"]},
   python_requires='>=3.8',
   include_package_data=True,
   zip_safe=False

@@ -26,8 +26,18 @@
         <file>resources/Images/key@2x.png</file>
         <file>resources/Images/key.png</file>
 
+        <file>resources/Images/star@2x.png</file>
+        <file>resources/Images/star.png</file>
+
         <file>resources/Images/plus@2x.png</file>
         <file>resources/Images/plus.png</file>
+
+        <file>resources/Images/gear@2x.png</file>
+        <file>resources/Images/gear.png</file>
+
+        <file>resources/Images/trash_can@2x.png</file>
+        <file>resources/Images/trash_can.png</file>
+
         <file>resources/Images/decrease-mouse-over.png</file>
         <file>resources/Images/decrease-normal.png</file>
 

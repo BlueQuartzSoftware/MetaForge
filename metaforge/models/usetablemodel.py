@@ -48,10 +48,6 @@ class TableModelU(QAbstractTableModel):
     K_REMOVE_COL_NAME = "Remove Row"
     K_REMOVE_COL_INDEX = 6
 
-
-#    K_EDITABLE_COL_NAME = "Editable"
-#    K_EDITABLE_COL_INDEX = 7
-
     def __init__(self, data, metadataList, editables, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadataList = metadataList

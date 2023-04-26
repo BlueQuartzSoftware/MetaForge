@@ -3,15 +3,17 @@ from pathlib import Path
 import yaml
 
 from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QMenu, QDialog
-from PySide2.QtCore import QStandardPaths, QSettings, Slot
+from PySide2.QtCore import QStandardPaths, QSettings, Slot, QPersistentModelIndex
 from PySide2.QtGui import QDesktopServices
 import PySide2.QtCore
 from typing import List
 
 from metaforge.widgets.aboutdialogimpl import AboutDialogImpl
-from metaforge.widgets.metaforge_preferences import MetaForgePreferencesDialog, MetaForgePreferences
-from metaforge.utilities.metaforgestyledatahelper import MetaForgeStyleDataHelper
-from metaforge.models.available_parsers_model import AvailableParsersModel
+from metaforge.widgets.metaforge_preferences import MetaForgePreferencesDialog
+from metaforge.common.metaforgestyledatahelper import MetaForgeStyleDataHelper
+from metaforge.qt_models.qparsersmodel import QParsersModel
+from metaforge.ez_models.ezparserdirectory import EzParserDirectory
+from metaforge.utilities.parser_utilities import create_parser_directory
 
 qt_version = PySide2.QtCore.__version_info__
 if qt_version[1] == 12:
@@ -38,7 +40,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.ui.tab_widget.setCurrentWidget(self.ui.CreateTemplateTab)
         self.preferences_dialog = MetaForgePreferencesDialog(self)
-        self.available_parsers_model = AvailableParsersModel(self)
+        self.parsers_model = QParsersModel(self)
         self.ui.create_template_widget.ui.saveTemplateButton.clicked.connect(self.save_template)
         self.ui.actionHelp.triggered.connect(self.display_help)
         self.ui.actionAbout.triggered.connect(self.display_about)
@@ -60,13 +62,10 @@ class MainWindow(QMainWindow):
         self.action_preferences.setMenuRole(QAction.PreferencesRole)
         self.ui.menuFile.addAction(self.action_preferences)
 
-        # Load the parsers
-        parser_file_paths = self._parser_file_paths()
-        self.available_parsers_model.load_parsers(parser_file_paths)
-
         # Set the parsers model down into the Create Template and Use Template widgets
-        self.ui.create_template_widget.set_parsers_model(self.available_parsers_model)
-        self.ui.use_template_widget.set_parsers_model(self.available_parsers_model)
+        self.ui.create_template_widget.set_parsers_model(self.parsers_model)
+        self.ui.use_template_widget.set_parsers_model(self.parsers_model)
+        self.preferences_dialog.set_parsers_model(self.parsers_model)
 
         # Read settings
         self.read_settings()
@@ -139,29 +138,7 @@ class MainWindow(QMainWindow):
         self.ui.action_clear_recent_packages.setDisabled(True)
     
     def display_preferences(self):
-        result: QDialog.DialogCode = self.preferences_dialog.exec()
-        if result == QDialog.DialogCode.Accepted:
-            parser_file_paths = self._parser_file_paths()
-
-            self.available_parsers_model.clear_parsers()
-            self.available_parsers_model.load_parsers(parser_file_paths)
-    
-    def _parser_file_paths(self) -> List[Path]:
-        prefs: MetaForgePreferences = self.preferences_dialog.preferences()
-        parser_folder_paths = []
-        if prefs.default_parser_path is not None:
-            parser_folder_paths.append(Path(prefs.default_parser_path))
-        [parser_folder_paths.append(Path(path)) for path in prefs.parser_folder_paths]
-        parser_file_paths = []
-        for parser_folder_path in parser_folder_paths:
-            parser_file_paths = parser_file_paths + self._find_parser_files(parser_folder_path)
-        return parser_file_paths
-
-    def _find_parser_files(self, parser_folder_path: Path) -> List[Path]:
-        yaml_file_path = parser_folder_path / self.preferences_dialog.K_PARSER_YAML_FILE_NAME
-        with yaml_file_path.open("r") as yml:
-            yaml_data: dict = yaml.safe_load(yml)
-            return [parser_folder_path / file_name for file_name in yaml_data[self.preferences_dialog.K_PARSER_YAML_KEY]]
+        self.preferences_dialog.exec()
 
     def display_about(self):
         aboutDialog = AboutDialogImpl(self)

@@ -3,7 +3,7 @@ from PySide2.QtCore import *
 from PySide2.QtGui import *
 from PySide2.QtWidgets import *
 
-from metaforge.utilities.metaforgestyledatahelper import MetaForgeStyleDataHelper
+from metaforge.common.metaforgestyledatahelper import MetaForgeStyleDataHelper
 
 class UseFileDelegate(QItemDelegate):
     def __init__(self, parent=None, stylehelper: MetaForgeStyleDataHelper=None):

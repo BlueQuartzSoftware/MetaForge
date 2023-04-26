@@ -5,31 +5,32 @@ from uuid import UUID
 import re
 import os
 import importlib
-from inspect import isclass
 
 from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt
 
+from metaforge.utilities.parser_utilities import load_parser_module
 from metaforge.parsers.metaforgeparser import MetaForgeParser
+from metaforge.ez_models.ezparser import EzParser
 
-class AvailableParsersModel(QAbstractListModel):
+class QParsersModel(QAbstractListModel):
   HumanLabel = Qt.DisplayRole
   Parser = Qt.UserRole + 1
+  ParserPath = Qt.UserRole + 2
 
   def __init__(self, parent=None):
     super().__init__(parent)
-    self._available_parsers: List[MetaForgeParser] = []
+    self._parsers: List[EzParser] = []
   
-  def _add_plugins(self, plugin_modules):
-    # Add the supplied plugins if they are of the correct type.
-    for mod in plugin_modules:
-      for attribute_name in dir(mod):
-        attribute = getattr(mod, attribute_name)
-        if isclass(attribute) and issubclass(attribute, MetaForgeParser) \
-           and attribute_name != 'MetaForgeParser':
-          # This adds an instance of the class to the parsers.
-          self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
-          self._available_parsers.append(attribute())
-          self.endInsertRows()
+  def _insert_parser(self, parser: EzParser, index: int):
+    self.beginInsertRows(QModelIndex(), index, index)
+    self._parsers.insert(index, parser)
+    self.endInsertRows()
+  
+  def _add_parser(self, parser: EzParser):
+    self._insert_parser(parser, len(self._parsers))
+
+  def _add_parsers(self, parsers: List[EzParser]):
+    [self._add_parser(parser) for parser in parsers]
   
   def _search_dynamic(self):
     # Look for files ending in _parser.py on the parsers directory.
@@ -39,38 +40,49 @@ class AvailableParsersModel(QAbstractListModel):
                                                   'parsers')))
     form_module = lambda fp: '.' + os.path.splitext(fp)[0]
     plugins = map(form_module, plugin_files)
-    plugin_modules = []
+    parsers = []
     for plugin in plugins:
       if not plugin.startswith('.example'):
-        plugin_modules.append(importlib.import_module(plugin, package="parsers"))
+        parsers.append(importlib.import_module(plugin, package="parsers"))
 
-    # Now check that they copntain a MetaForgeParser subclass and add them if so.
-    self._add_plugins(plugin_modules)
+    # Now check that they contain a MetaForgeParser subclass and add them if so.
+    self._add_parsers(parsers)
 
   def clear_parsers(self):
     self.beginRemoveRows(QModelIndex(), 0, self.rowCount() - 1)
-    self._available_parsers.clear()
+    self._parsers.clear()
     self.endRemoveRows()
 
   def load_parsers(self, parser_file_paths: List[Path]):
     # This method dynamically loads parsers from the plugins directory.
-    plugin_modules = []
     for path in parser_file_paths:
-      spec =importlib.util.spec_from_file_location("parsers", path)
-      mod = importlib.util.module_from_spec(spec)
-      spec.loader.exec_module(mod)
-      plugin_modules.append(mod)
-    self._add_plugins(plugin_modules)
-
+      parser: MetaForgeParser = load_parser_module(path)
+      parser = EzParser(path, parser)
+      matching_parser = next((matching_parser for matching_parser in self._parsers if matching_parser.parser.uuid() == parser.parser.uuid()), None)
+      if matching_parser is None:
+        # Parser is not loaded, so load it
+        self._add_parser(parser)
+      else:
+        # Parser is loaded already so replace it with the new one
+        self._replace_parser(matching_parser, parser)
+  
+  def _replace_parser(self, old_parser: EzParser, new_parser: EzParser):
+    index = self._parsers.index(old_parser)
+    self.beginRemoveRows(QModelIndex(), index, index)
+    self._parsers.remove(old_parser)
+    self.endRemoveRows()
+    self._insert_parser(new_parser, index)
 
   def data(self, index: QModelIndex, role: int):
-    if role == AvailableParsersModel.HumanLabel:
-      return self._available_parsers[index.row()].human_label()
-    elif role == AvailableParsersModel.Parser:
-      return self._available_parsers[index.row()]
+    if role == QParsersModel.HumanLabel:
+      return self._parsers[index.row()].parser.human_label()
+    elif role == QParsersModel.Parser:
+      return self._parsers[index.row()].parser
+    elif role == QParsersModel.ParserPath:
+      return self._parsers[index.row()].parser_path
 
   def rowCount(self, parent=None):
-    return len(self._available_parsers)
+    return len(self._parsers)
   
   def find_parser_from_uuid(self, uuid: UUID, error_callback=None) -> Tuple[int, MetaForgeParser]:
     if uuid is None:
@@ -85,7 +97,7 @@ class AvailableParsersModel(QAbstractListModel):
 
     for row in range(self.rowCount()):
       model_index = self.index(row, 0)
-      parser = self.data(model_index, AvailableParsersModel.Parser)
+      parser = self.data(model_index, QParsersModel.Parser)
       if parser.uuid() == uuid:
           return row, parser
 
@@ -106,7 +118,7 @@ class AvailableParsersModel(QAbstractListModel):
 
     for row in range(self.rowCount()):
       model_index = self.index(row, 0)
-      parser = self.data(model_index, AvailableParsersModel.Parser)
+      parser = self.data(model_index, QParsersModel.Parser)
       if parser.accepts_extension(file_path.suffix):
         return row, parser
     

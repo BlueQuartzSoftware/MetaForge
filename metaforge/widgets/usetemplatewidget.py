@@ -7,11 +7,11 @@ from pathlib import Path
 import hyperthought as ht
 
 from PySide2.QtWidgets import QMainWindow, QFileDialog, QProgressDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit
-from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent
-from PySide2.QtGui import QCursor
+from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize
+from PySide2.QtGui import QCursor, QIcon
 import PySide2.QtCore
 
-from metaforge.utilities.uploader import Uploader
+from metaforge.ht_helpers.ht_uploader import HyperThoughtUploader
 from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
 from metaforge.ez_models.ezmetadatamodel import EzMetadataModel, TemplateModel
 from metaforge.widgets.hyperthoughtdialogimpl import HyperthoughtDialogImpl
@@ -20,8 +20,8 @@ from metaforge.models.uselistmodel import ListModel
 from metaforge.delegates.trashdelegate import TrashDelegate
 from metaforge.qt_models.quseeztablemodel import QUseEzTableModel
 from metaforge.delegates.usefiledelegate import UseFileDelegate
-from metaforge.utilities.metaforgestyledatahelper import MetaForgeStyleDataHelper
-from metaforge.models.available_parsers_model import AvailableParsersModel
+from metaforge.common.metaforgestyledatahelper import MetaForgeStyleDataHelper
+from metaforge.qt_models.qparsersmodel import QParsersModel
 from metaforge.widgets.utilities.widget_utilities import notify_error_message, notify_no_errors
 from metaforge.utilities.ht_utilities import ezmodel_to_ht_metadata
 
@@ -50,7 +50,7 @@ class UseTemplateWidget(QWidget):
         self.style_sheet_helper: MetaForgeStyleDataHelper = MetaForgeStyleDataHelper(self)
         self.ui = Ui_UseTemplateWidget()
         self.ui.setupUi(self)
-        self.available_parsers_model = None
+        self.parsers_model: QParsersModel = None
         self.hyperthoughtui = HyperthoughtDialogImpl()
         self.ui.hyperthoughtTemplateSelect.clicked.connect(self.select_template)
         self.ui.otherDataFileSelect.clicked.connect(self.load_other_data_file)
@@ -59,6 +59,9 @@ class UseTemplateWidget(QWidget):
         self.setAcceptDrops(True)
 
         notify_no_errors(self.ui.error_label)
+
+        # Setup the icons
+        self.setup_icons()
 
         # Setup the blank Use Template table
         self.setup_metadata_table()
@@ -77,7 +80,7 @@ class UseTemplateWidget(QWidget):
 
         self.fileType = ""
         self.folderuuid = ""
-        self.uploader = Uploader()
+        self.uploader = HyperThoughtUploader()
         self.mThread = QThread()
         self.uploader.moveToThread(self.mThread)
         self.mThread.start()
@@ -85,6 +88,13 @@ class UseTemplateWidget(QWidget):
         self.createUpload.connect(self.uploader.performUpload)
         self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
         self.ui.otherDataFileLineEdit.installEventFilter(self)
+    
+    def setup_icons(self):
+        icon = QIcon()
+        icon.addFile(u":/resources/Images/trash_can.png", QSize(), QIcon.Normal, QIcon.Off)
+        # icon.addFile(u":/resources/Images/trash_can@2x.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.ui.clearUploadFilesBtn.setIcon(icon)
+        self.ui.removeUseTableRowButton.setIcon(icon)
 
     def setup_metadata_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
         self.usetrashDelegate = TrashDelegate(stylehelper=self.style_sheet_helper)
@@ -223,9 +233,6 @@ class UseTemplateWidget(QWidget):
         if source_index.isValid():
             entry = self.use_ez_table_model.metadata_model.entry(source_index.row())
             if entry is not None:
-                # if entry.source_type is EzMetadataEntry.SourceType.FILE and entry.loaded is True:
-                #     entry.enabled = False
-                # else:
                 self.use_ez_table_model.beginRemoveRows(QModelIndex(), source_index.row(), source_index.row())
                 self.use_ez_table_model.metadata_model.remove_by_index(source_index.row())
                 self.use_ez_table_model.endRemoveRows()
@@ -235,9 +242,6 @@ class UseTemplateWidget(QWidget):
                 source_row = (index.model().mapToSource(index)).row()
                 entry = self.use_ez_table_model.metadata_model.entry(source_row)
                 if entry is not None:
-                    # if entry.source_type is EzMetadataEntry.SourceType.FILE and entry.loaded is True:
-                    #     entry.enabled = False
-                    # else:
                     self.use_ez_table_model.beginRemoveRows(QModelIndex(), source_row, source_row)
                     self.use_ez_table_model.metadata_model.remove_by_index(source_row)
                     self.use_ez_table_model.endRemoveRows()
@@ -409,7 +413,7 @@ class UseTemplateWidget(QWidget):
         templateFilePath = Path(templateFilePath)
         
         # Load the dictionary from the newly inserted datafile
-        parser_index, parser = self.available_parsers_model.find_compatible_parser(file_path, self._notify_error_message)
+        parser_index, parser = self.parsers_model.find_compatible_parser(file_path, self._notify_error_message)
         if (parser is None):
             self._notify_error_message(f"No parser available for selected file '{file_path}'.")
         headerDict = parser.parse_header_as_dict(file_path)
@@ -482,8 +486,8 @@ class UseTemplateWidget(QWidget):
                 self.ui.hyperThoughtServer.setText(htUrl)
                 self.ui.hyperThoughtProject.setText(self.chosen_ht_workspace["name"])
     
-    def set_parsers_model(self, model: AvailableParsersModel):
-        self.available_parsers_model = model
+    def set_parsers_model(self, model: QParsersModel):
+        self.parsers_model = model
     
     def _notify_error_message(self, err_msg):
         notify_error_message(self.ui.error_label, err_msg)

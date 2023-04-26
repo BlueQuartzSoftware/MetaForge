@@ -10,11 +10,6 @@ from uuid import UUID
 
 from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
 
-# K_TEMPLATE_VERSION_KEY = 'template_version'
-# K_DATA_FILE_KEY = 'data_file_path'
-# K_PARSER_UUID_KEY = 'parser_uuid'
-# K_MODEL_ENTRIES_KEY = 'entries'
-
 @dataclass_json
 @dataclass
 class TemplateModel_V1:

@@ -141,30 +141,6 @@ class TreeModel(QAbstractItemModel):
         item_path = self._get_item_path(item)
         self.checkChanged.emit(item_path)
 
-    # def _sync_check_states(self, item: TreeItem):
-    #     if item is not None:
-    #         child_items = item.childItems
-    #         if len(child_items) == 0:
-    #             return
-
-    #         all_checked = True
-    #         all_unchecked = True
-    #         for child_item in child_items:
-    #             self._sync_check_states(child_item)
-    #             if child_item.check_state is Qt.Checked:
-    #                 all_unchecked = False
-    #             elif child_item.check_state is Qt.Unchecked:
-    #                 all_checked = False
-    #         if all_checked is True:
-    #             item.check_state = Qt.Checked
-    #         elif all_unchecked is True:
-    #             item.check_state = Qt.Unchecked
-    #         else:
-    #             item.check_state = Qt.PartiallyChecked
-
-    #         index = self.get_index_from_item(item)
-    #         self.dataChanged.emit(index, index)
-
     def _get_item_path(self, item: TreeItem) -> str:
         path_list = []
         path = "/"
