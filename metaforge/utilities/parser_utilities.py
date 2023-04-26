@@ -22,7 +22,7 @@ def create_parser_directory(parser_folder_path: Path) -> EzParserDirectory:
         return EzParserDirectory(parser_folder_path, [parser_folder_path / file_name for file_name in yaml_data[K_PARSER_YAML_KEY]])
 
 def generate_skeleton_parser_yaml_file() -> str:
-    return f"---\n{K_PARSER_YAML_KEY}:\n  # - example_parser.py\n  # - /subfolder/example_parser2.py"
+    return f"---\n# List the relative path to each parser script below.  Some examples are provided.\n{K_PARSER_YAML_KEY}:\n  # - example_parser.py\n  # - /subfolder/example_parser2.py"
 
 def load_parser_module(parser_file_path: Path):
     spec =importlib.util.spec_from_file_location("parsers", str(parser_file_path))
