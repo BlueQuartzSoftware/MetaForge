@@ -57,14 +57,18 @@ class QParsersModel(QAbstractListModel):
     # This method dynamically loads parsers from the plugins directory.
     for path in parser_file_paths:
       parser: MetaForgeParser = load_parser_module(path)
-      parser = EzParser(path, parser)
-      matching_parser = next((matching_parser for matching_parser in self._parsers if matching_parser.parser.uuid() == parser.parser.uuid()), None)
-      if matching_parser is None:
+      new_ez_parser = EzParser(path, parser)
+      matching_ez_parser: EzParser = None
+      for current_ez_parser in self._parsers:
+        if current_ez_parser.parser.uuid() == new_ez_parser.parser.uuid():
+          matching_ez_parser = current_ez_parser
+
+      if matching_ez_parser is None:
         # Parser is not loaded, so load it
-        self._add_parser(parser)
+        self._add_parser(new_ez_parser)
       else:
         # Parser is loaded already so replace it with the new one
-        self._replace_parser(matching_parser, parser)
+        self._replace_parser(matching_ez_parser, new_ez_parser)
   
   def _replace_parser(self, old_parser: EzParser, new_parser: EzParser):
     index = self._parsers.index(old_parser)
