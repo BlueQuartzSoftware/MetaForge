@@ -38,7 +38,7 @@
         </font>
        </property>
        <property name="text">
-        <string>Parser Locations</string>
+        <string>Parsers</string>
        </property>
       </widget>
      </item>

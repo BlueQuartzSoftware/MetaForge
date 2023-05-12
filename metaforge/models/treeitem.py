@@ -2,13 +2,13 @@ from __future__ import annotations
 from typing import List
 from PySide2.QtCore import Qt
 
-from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
+from metaforge.models.metadataentry import MetadataEntry
 
 class TreeItem(object):
-    def __init__(self, display_name: str, metadata_entry: EzMetadataEntry = None, parent=None):
+    def __init__(self, display_name: str, metadata_entry: MetadataEntry = None, parent=None):
         self.parentItem = parent
         self.display_name: str = display_name
-        self.metadata_entry: EzMetadataEntry = metadata_entry
+        self.metadata_entry: MetadataEntry = metadata_entry
         self.childItems: List[TreeItem] = []
 
     def checked(self):

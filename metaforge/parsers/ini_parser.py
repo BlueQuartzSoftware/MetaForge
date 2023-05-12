@@ -11,7 +11,7 @@ from PIL.TiffTags import TAGS
 
 class IniParser(MetaForgeParser):
   def __init__(self) -> None:
-    self.ext_list: list = ('.ini', '.config', '.txt', '.hdr')
+    self.ext_list: list = ['.ini', '.config', '.txt', '.hdr']
 
   def human_label(self) -> str:
     return "Ini Parser"

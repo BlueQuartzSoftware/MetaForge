@@ -2,18 +2,16 @@
 import shutil
 from typing import List
 import json
-from datetime import datetime
 from pathlib import Path
 import hyperthought as ht
 
-from PySide2.QtWidgets import QMainWindow, QFileDialog, QProgressDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit
-from PySide2.QtCore import QFile, QDir, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize
+from PySide2.QtWidgets import QMainWindow, QFileDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit
+from PySide2.QtCore import QFile, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize
 from PySide2.QtGui import QCursor, QIcon
 import PySide2.QtCore
 
 from metaforge.ht_helpers.ht_uploader import HyperThoughtUploader
-from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
-from metaforge.ez_models.ezmetadatamodel import EzMetadataModel, TemplateModel
+from metaforge.models.metadatamodel import MetadataModel
 from metaforge.widgets.hyperthoughtdialogimpl import HyperthoughtDialogImpl
 from metaforge.qt_models.qeztablemodel import QEzTableModel
 from metaforge.models.uselistmodel import ListModel
@@ -21,7 +19,7 @@ from metaforge.delegates.trashdelegate import TrashDelegate
 from metaforge.qt_models.quseeztablemodel import QUseEzTableModel
 from metaforge.delegates.usefiledelegate import UseFileDelegate
 from metaforge.common.metaforgestyledatahelper import MetaForgeStyleDataHelper
-from metaforge.qt_models.qparsersmodel import QParsersModel
+from metaforge.models.parsermodel import ParserModel
 from metaforge.widgets.utilities.widget_utilities import notify_error_message, notify_no_errors
 from metaforge.utilities.ht_utilities import ezmodel_to_ht_metadata
 
@@ -50,7 +48,7 @@ class UseTemplateWidget(QWidget):
         self.style_sheet_helper: MetaForgeStyleDataHelper = MetaForgeStyleDataHelper(self)
         self.ui = Ui_UseTemplateWidget()
         self.ui.setupUi(self)
-        self.parsers_model: QParsersModel = None
+        self.parsers_model: ParserModel = None
         self.hyperthoughtui = HyperthoughtDialogImpl()
         self.ui.hyperthoughtTemplateSelect.clicked.connect(self.select_template)
         self.ui.otherDataFileSelect.clicked.connect(self.load_other_data_file)
@@ -96,7 +94,7 @@ class UseTemplateWidget(QWidget):
         self.ui.clearUploadFilesBtn.setIcon(icon)
         self.ui.removeUseTableRowButton.setIcon(icon)
 
-    def setup_metadata_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
+    def setup_metadata_table(self, metadata_model: MetadataModel = MetadataModel()):
         self.usetrashDelegate = TrashDelegate(stylehelper=self.style_sheet_helper)
         self.use_ez_table_model = QEzTableModel(metadata_model, parent=self)
         self.use_ez_table_model_proxy = self.init_table_model_proxy(self.use_ez_table_model)
@@ -263,7 +261,7 @@ class UseTemplateWidget(QWidget):
         with model_input_path.open('r') as infile:
             model_dict = json.load(infile)
 
-            metadata_model = EzMetadataModel.from_dict(model_dict[self.K_MODEL_KEY_NAME])
+            metadata_model = MetadataModel.from_dict(model_dict[self.K_MODEL_KEY_NAME])
             self.setup_metadata_table(metadata_model=metadata_model)
 
             # Load file list
@@ -373,8 +371,8 @@ class UseTemplateWidget(QWidget):
         if templateFilePath == "":
             return False
 
-        # Load the EzMetadataModel from the json file (Template file)
-        metadata_model = EzMetadataModel.from_json_file(templateFilePath)
+        # Load the MetadataModel from the json file (Template file)
+        metadata_model = MetadataModel.from_json_file(templateFilePath)
         self.setup_metadata_table(metadata_model)
         self.currentTemplate = Path(templateFilePath).name
         self.update_metadata_table_model()
@@ -413,9 +411,9 @@ class UseTemplateWidget(QWidget):
         templateFilePath = Path(templateFilePath)
         
         # Load the dictionary from the newly inserted datafile
-        parser_index, parser = self.parsers_model.find_compatible_parser(file_path, self._notify_error_message)
-        if (parser is None):
-            self._notify_error_message(f"No parser available for selected file '{file_path}'.")
+        parser, err_msg = self.parsers_model.find_parser_from_data_path(file_path)
+        if parser is None:
+            self._notify_error_message(err_msg)
         headerDict = parser.parse_header_as_dict(file_path)
 
         self.use_ez_table_model_proxy.missing_entries = self.use_ez_table_model.metadata_model.update_model_values_from_dict(headerDict)
@@ -486,8 +484,8 @@ class UseTemplateWidget(QWidget):
                 self.ui.hyperThoughtServer.setText(htUrl)
                 self.ui.hyperThoughtProject.setText(self.chosen_ht_workspace["name"])
     
-    def set_parsers_model(self, model: QParsersModel):
-        self.parsers_model = model
+    def set_parsers_model(self, parsers_model: ParserModel):
+        self.parsers_model = parsers_model
     
     def _notify_error_message(self, err_msg):
         notify_error_message(self.ui.error_label, err_msg)

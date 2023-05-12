@@ -3,14 +3,14 @@
 ################################################################################
 ## Form generated from reading UI file 'metaforge_preferences.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 5.15.8
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide2.QtCore import *  # type: ignore
+from PySide2.QtGui import *  # type: ignore
+from PySide2.QtWidgets import *  # type: ignore
 
 from  . import resources_rc
 
@@ -95,7 +95,7 @@ class Ui_MetaForgePreferences(object):
 
     def retranslateUi(self, MetaForgePreferences):
         MetaForgePreferences.setWindowTitle(QCoreApplication.translate("MetaForgePreferences", u"Preferences", None))
-        self.parser_directories_label.setText(QCoreApplication.translate("MetaForgePreferences", u"Parser Locations", None))
+        self.parser_directories_label.setText(QCoreApplication.translate("MetaForgePreferences", u"Parsers", None))
 #if QT_CONFIG(tooltip)
         self.removeBtn.setToolTip(QCoreApplication.translate("MetaForgePreferences", u"Use this button to remove non-existant arrays out of the \"Selected Data Arrays\" column", None))
 #endif // QT_CONFIG(tooltip)

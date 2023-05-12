@@ -1,8 +1,8 @@
 from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex
 from PySide2.QtGui import QFont, QColor
 
-from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
-from metaforge.ez_models.ezmetadatamodel import EzMetadataModel
+from metaforge.models.metadataentry import MetadataEntry
+from metaforge.models.metadatamodel import MetadataModel
 
 
 class QEzTableModel(QAbstractTableModel):
@@ -54,7 +54,7 @@ class QEzTableModel(QAbstractTableModel):
     K_REMOVE_COL_NAME = "Remove"
     K_REMOVE_COL_INDEX = 9
 
-    def __init__(self, metadata_model: EzMetadataModel, parent=None):
+    def __init__(self, metadata_model: MetadataModel, parent=None):
         QAbstractTableModel.__init__(self, parent)
         self.metadata_model = metadata_model
 
@@ -70,7 +70,7 @@ class QEzTableModel(QAbstractTableModel):
         if not index.isValid():
             return None
 
-        metadata_entry: EzMetadataEntry = self.metadata_model.entry(index.row())
+        metadata_entry: MetadataEntry = self.metadata_model.entry(index.row())
 
         if role == Qt.DisplayRole or role == Qt.EditRole or role == Qt.ToolTipRole:
             if index.column() == self.K_SORT_COL_INDEX:
@@ -78,7 +78,7 @@ class QEzTableModel(QAbstractTableModel):
             elif index.column() == self.K_HTNAME_COL_INDEX:
                 return metadata_entry.ht_name
             elif index.column() == self.K_SOURCEVAL_COL_INDEX:
-                if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+                if metadata_entry.source_type is MetadataEntry.SourceType.FILE:
                     if metadata_entry.loaded is True:
                         return str(metadata_entry.source_value)
                     else:
@@ -86,12 +86,12 @@ class QEzTableModel(QAbstractTableModel):
                 else:
                     return str(self.K_CUSTOM_VALUE)
             elif index.column() == self.K_SOURCE_COL_INDEX:
-                if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                if metadata_entry.source_type is MetadataEntry.SourceType.CUSTOM:
                     return self.K_CUSTOM_VALUE
                 else:
                     return metadata_entry.source_path
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+                if metadata_entry.source_type is MetadataEntry.SourceType.CUSTOM:
                     return str(metadata_entry.ht_value)
                 else:
                     if metadata_entry.override_source_value is True:
@@ -109,7 +109,7 @@ class QEzTableModel(QAbstractTableModel):
                 else:
                     return Qt.Unchecked
             elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
-                if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+                if metadata_entry.source_type is MetadataEntry.SourceType.FILE:
                     if metadata_entry.override_source_value is True:
                         return Qt.Checked
                     else:
@@ -131,7 +131,7 @@ class QEzTableModel(QAbstractTableModel):
         if self.metadata_model is None:
             return False
         
-        metadata_entry: EzMetadataEntry = self.metadata_model.entry(index.row())
+        metadata_entry: MetadataEntry = self.metadata_model.entry(index.row())
             
         if role == Qt.EditRole:
             if index.column() == self.K_SORT_COL_INDEX:
@@ -142,7 +142,7 @@ class QEzTableModel(QAbstractTableModel):
                 self.dataChanged.emit(index, index)
                 return True
             elif index.column() == self.K_HTVALUE_COL_INDEX:
-                if metadata_entry.source_type == EzMetadataEntry.SourceType.CUSTOM or metadata_entry.override_source_value is True:
+                if metadata_entry.source_type == MetadataEntry.SourceType.CUSTOM or metadata_entry.override_source_value is True:
                     metadata_entry.ht_value = value
                     self.dataChanged.emit(index, index)
                     return True
@@ -206,7 +206,7 @@ class QEzTableModel(QAbstractTableModel):
         if not index.isValid():
             return Qt.NoItemFlags
 
-        metadata_entry: EzMetadataEntry = self.metadata_model.entry(index.row())
+        metadata_entry: MetadataEntry = self.metadata_model.entry(index.row())
 
         if index.column() == self.K_SORT_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
@@ -217,7 +217,7 @@ class QEzTableModel(QAbstractTableModel):
         elif index.column() == self.K_HTNAME_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         elif index.column() == self.K_HTVALUE_COL_INDEX:
-            if metadata_entry.source_type == EzMetadataEntry.SourceType.CUSTOM:
+            if metadata_entry.source_type == MetadataEntry.SourceType.CUSTOM:
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
             else:
                 if metadata_entry.override_source_value is True:
@@ -229,9 +229,9 @@ class QEzTableModel(QAbstractTableModel):
         elif index.column() == self.K_HTUNITS_COL_INDEX:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
         elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
-            if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE:
+            if metadata_entry.source_type is MetadataEntry.SourceType.FILE:
                 return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable
-            elif metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM:
+            elif metadata_entry.source_type is MetadataEntry.SourceType.CUSTOM:
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable
             else:
                 return Qt.ItemIsEnabled | Qt.ItemIsSelectable
@@ -245,8 +245,8 @@ class QEzTableModel(QAbstractTableModel):
     def addCustomRow(self, numCustom):
         self.beginInsertRows(self.index(len(self.metadata_model.entries), 0), len(
             self.metadata_model.entries), len(self.metadata_model.entries))
-        custom = EzMetadataEntry()
-        custom.source_type =  EzMetadataEntry.SourceType.CUSTOM
+        custom = MetadataEntry()
+        custom.source_type =  MetadataEntry.SourceType.CUSTOM
         custom.source_path  = ""
         custom.source_value  = ""
         custom.ht_name  = "Custom HT Name"
@@ -263,7 +263,7 @@ class QEzTableModel(QAbstractTableModel):
         self.endInsertRows()
     
     def refresh_entry(self, source):
-        metadata_entry: EzMetadataEntry = self.metadata_model.entry_by_source(source)
+        metadata_entry: MetadataEntry = self.metadata_model.entry_by_source(source)
         if metadata_entry is not None:
             row = self.metadata_model.index_from_source(source)
             left_index = self.index(row, 0)

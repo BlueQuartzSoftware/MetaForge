@@ -1,9 +1,8 @@
 # This Python file uses the following encoding: utf-8
 from pathlib import Path
-import yaml
 
-from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QMenu, QDialog
-from PySide2.QtCore import QStandardPaths, QSettings, Slot, QPersistentModelIndex
+from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QMenu
+from PySide2.QtCore import QStandardPaths, QSettings, Slot
 from PySide2.QtGui import QDesktopServices
 import PySide2.QtCore
 from typing import List
@@ -11,9 +10,9 @@ from typing import List
 from metaforge.widgets.aboutdialogimpl import AboutDialogImpl
 from metaforge.widgets.metaforge_preferences import MetaForgePreferencesDialog
 from metaforge.common.metaforgestyledatahelper import MetaForgeStyleDataHelper
-from metaforge.qt_models.qparsersmodel import QParsersModel
-from metaforge.ez_models.ezparserdirectory import EzParserDirectory
-from metaforge.utilities.parser_utilities import create_parser_directory
+from metaforge.qt_models.qparsercomboboxmodel import QParserComboBoxModel
+from metaforge.qt_models.qparsertablemodel import QParserTableModel
+from metaforge.models.parsermodel import ParserModel
 
 qt_version = PySide2.QtCore.__version_info__
 if qt_version[1] == 12:
@@ -31,6 +30,7 @@ class MainWindow(QMainWindow):
     K_SETTINGS_WINDOW_STATE_KEY = "window_state"
     K_SETTINGS_RECENT_TEMPLATES_KEY = "recent_templates"
     K_SETTINGS_RECENT_PACKAGES_KEY = "recent_packages"
+    K_SETTINGS_PARSER_MODEL_KEY = "parser_model"
 
     def __init__(self, app: QApplication):
         super(MainWindow, self).__init__()
@@ -40,7 +40,6 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.ui.tab_widget.setCurrentWidget(self.ui.CreateTemplateTab)
         self.preferences_dialog = MetaForgePreferencesDialog(self)
-        self.parsers_model = QParsersModel(self)
         self.ui.create_template_widget.ui.saveTemplateButton.clicked.connect(self.save_template)
         self.ui.actionHelp.triggered.connect(self.display_help)
         self.ui.actionAbout.triggered.connect(self.display_about)
@@ -62,13 +61,17 @@ class MainWindow(QMainWindow):
         self.action_preferences.setMenuRole(QAction.PreferencesRole)
         self.ui.menuFile.addAction(self.action_preferences)
 
-        # Set the parsers model down into the Create Template and Use Template widgets
-        self.ui.create_template_widget.set_parsers_model(self.parsers_model)
-        self.ui.use_template_widget.set_parsers_model(self.parsers_model)
-        self.preferences_dialog.set_parsers_model(self.parsers_model)
-
         # Read settings
         self.read_settings()
+
+        # Create the ez parser model and the qt parser models, and set them into the widgets
+        self.qparsers_cb_model = QParserComboBoxModel(self.ez_parser_model, self.ui.create_template_widget)
+        self.qparser_table_model = QParserTableModel(self.ez_parser_model, self.preferences_dialog)
+        self.qparser_table_model.model_about_to_change.connect(self.qparsers_cb_model.modelAboutToBeReset)
+        self.qparser_table_model.model_changed.connect(self.qparsers_cb_model.modelReset)
+        self.ui.create_template_widget.set_parsers_model(self.qparsers_cb_model)
+        self.ui.use_template_widget.set_parsers_model(self.ez_parser_model)
+        self.preferences_dialog.set_parsers_model(self.qparser_table_model)
     
     def read_settings(self):
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
@@ -87,6 +90,11 @@ class MainWindow(QMainWindow):
                 action = QAction(file_path)
                 action.triggered.connect(lambda triggered=False, pkg_file_path=Path(file_path): self.ui.use_template_widget.open_package(pkg_file_path))
                 self.add_recent_action(self.ui.menu_recent_packages, self.recent_package_list, self.action_recent_packages_separator, self.ui.action_clear_recent_packages, action)
+        
+        parser_dir_model_json = settings.value(self.K_SETTINGS_PARSER_MODEL_KEY, defaultValue="", type=str)
+        self.ez_parser_model = ParserModel()
+        if parser_dir_model_json != "":
+            self.ez_parser_model: ParserModel = ParserModel.from_json(parser_dir_model_json)
 
     def read_window_settings(self, settings):
         self.restoreGeometry(settings.value(self.K_SETTINGS_GEOMETRY_KEY))
@@ -102,6 +110,9 @@ class MainWindow(QMainWindow):
 
         recent_package_list = [action.text() for action in self.recent_package_list]
         settings.setValue(self.K_SETTINGS_RECENT_PACKAGES_KEY, recent_package_list)
+
+        model_json = self.ez_parser_model.to_json()
+        settings.setValue(self.K_SETTINGS_PARSER_MODEL_KEY, model_json)
 
         self.ui.create_template_widget.close()
         self.ui.use_template_widget.close()

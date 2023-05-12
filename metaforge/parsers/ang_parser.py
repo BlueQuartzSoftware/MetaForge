@@ -110,7 +110,7 @@ class AngHeader:
 class AngParser(MetaForgeParser):
 
   def __init__(self) -> None:
-    self.ext_list: list = ('.ang')
+    self.ext_list: list = ['.ang']
   
 
   def human_label(self) -> str:

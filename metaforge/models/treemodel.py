@@ -5,20 +5,20 @@ from PySide2.QtCore import QAbstractItemModel, QFile, QIODevice, QItemSelectionM
 from PySide2.QtWidgets import QApplication, QMainWindow
 from metaforge.models.treeitem import TreeItem
 
-from metaforge.ez_models.ezmetadatamodel import EzMetadataModel
-from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
+from metaforge.models.metadatamodel import MetadataModel
+from metaforge.models.metadataentry import MetadataEntry
 
 
 class TreeModel(QAbstractItemModel):
     checkChanged = Signal(str)
 
-    def __init__(self, header, metadata_model: EzMetadataModel, parent=None):
+    def __init__(self, header, metadata_model: MetadataModel, parent=None):
         super(TreeModel, self).__init__(parent)
 
         self.rootItem = TreeItem(display_name=header)
         self.setupModelData(metadata_model)
 
-    def changeLeafCheck(self, entry: EzMetadataEntry):
+    def changeLeafCheck(self, entry: MetadataEntry):
         index = self._get_index_from_entry(entry)
         if index.isValid():
             self.setData(index, 0, Qt.CheckStateRole)
@@ -152,8 +152,8 @@ class TreeModel(QAbstractItemModel):
         path = path.join(path_list)
         return path
     
-    def _get_item_from_entry(self, entry: EzMetadataEntry) -> TreeItem:
-        def recurse(entry: EzMetadataEntry, item: TreeItem):
+    def _get_item_from_entry(self, entry: MetadataEntry) -> TreeItem:
+        def recurse(entry: MetadataEntry, item: TreeItem):
             if item.metadata_entry == entry:
                 return item
 
@@ -166,7 +166,7 @@ class TreeModel(QAbstractItemModel):
 
         return recurse(entry, self.rootItem)
     
-    def _get_index_from_entry(self, entry: EzMetadataEntry) -> QModelIndex:
+    def _get_index_from_entry(self, entry: MetadataEntry) -> QModelIndex:
         tree_item = self._get_item_from_entry(entry)
         return self.get_index_from_item(tree_item)
 
@@ -183,9 +183,9 @@ class TreeModel(QAbstractItemModel):
     def clearModel(self):
         self.removeRows(0, self.rowCount())
 
-    def setupModelData(self, metadata_model: EzMetadataModel):
+    def setupModelData(self, metadata_model: MetadataModel):
         for entry in metadata_model.entries:
-            if entry.source_type is not EzMetadataEntry.SourceType.FILE or entry.loaded is False:
+            if entry.source_type is not MetadataEntry.SourceType.FILE or entry.loaded is False:
                 continue
 
             source_path = entry.source_path

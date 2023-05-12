@@ -1,26 +1,25 @@
 # This Python file uses the following encoding: utf-8
-from importlib.metadata import metadata
-from pyexpat import model
 from typing import List
 import json
 from uuid import UUID
 
 from pathlib import Path
 
-from PySide2.QtWidgets import QWidget, QFileDialog, QComboBox, QListView
+from PySide2.QtWidgets import QWidget, QFileDialog
 from PySide2.QtCore import Qt, QStandardPaths, QSortFilterProxyModel, QModelIndex, QEvent, QPersistentModelIndex
 import PySide2.QtCore
 
 from metaforge.parsers.metaforgeparser import MetaForgeParser
-from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
-from metaforge.ez_models.ezmetadatamodel import EzMetadataModel, TemplateModel_V1, TemplateModel
+from metaforge.models.metadataentry import MetadataEntry
+from metaforge.models.metadatamodel import MetadataModel, TemplateModel_V1, TemplateModel
 from metaforge.qt_models.qeztablemodel import QEzTableModel
 from metaforge.models.treemodel import TreeModel
 from metaforge.delegates.trashdelegate import TrashDelegate
 from metaforge.delegates.checkboxdelegate import CheckBoxDelegate
 from metaforge.qt_models.qcreateeztablemodel import QCreateEzTableModel
 from metaforge.common.metaforgestyledatahelper import MetaForgeStyleDataHelper
-from metaforge.qt_models.qparsersmodel import QParsersModel
+from metaforge.qt_models.qparsercomboboxmodel import QParserComboBoxModel
+from metaforge.qt_models.qproxyparsercomboboxmodel import QProxyParserComboBoxModel
 from metaforge.widgets.utilities.widget_utilities import notify_error_message, notify_no_errors
 
 qt_version = PySide2.QtCore.__version_info__
@@ -43,13 +42,14 @@ class CreateTemplateWidget(QWidget):
         self.style_sheet_helper: MetaForgeStyleDataHelper = MetaForgeStyleDataHelper(self)
         self.ui = Ui_CreateTemplateWidget()
         self.ui.setupUi(self)
-        self.parsers_model: QSortFilterProxyModel = None
-        self.proxy_parsers_model = QSortFilterProxyModel(self)
-        self.metadata_model: EzMetadataModel = EzMetadataModel()
+        self.qparsers_cb_model: QParserComboBoxModel = None
+        self.proxy_parsers_model = QProxyParserComboBoxModel(self)
+        self.metadata_model: MetadataModel = MetadataModel()
         self.ui.dataFileSelect.clicked.connect(self.select_input_data_file)
         self.ui.clearCreateButton.clicked.connect(self.clear)
         self.setAcceptDrops(True)
         self.numCustoms = 0
+        self.cb_saved_parser_path = None
 
         # Setup the blank Create Template table and tree
         self.load_metadata_entries(metadata_model=self.metadata_model)
@@ -65,7 +65,7 @@ class CreateTemplateWidget(QWidget):
         # Setup the Combo Box with all of the parsers that we know about
         self.ui.dataFileLineEdit.installEventFilter(self)
 
-    def setup_metadata_table(self, metadata_model: EzMetadataModel = EzMetadataModel()):
+    def setup_metadata_table(self, metadata_model: MetadataModel = MetadataModel()):
         self.trash_delegate = TrashDelegate(stylehelper=self.style_sheet_helper)
         self.checkbox_delegate = CheckBoxDelegate()
         self.metadata_table_model = QEzTableModel(metadata_model=metadata_model, parent=self)
@@ -88,7 +88,7 @@ class CreateTemplateWidget(QWidget):
         self.ui.metadata_table_view.setColumnWidth(self.metadata_table_model.K_OVERRIDESOURCEVALUE_COL_INDEX, self.width() * .125)
         self.ui.metadata_table_view.horizontalHeader().setStretchLastSection(True)
 
-    def setup_metadata_tree(self, metadata_model: EzMetadataModel = EzMetadataModel()):
+    def setup_metadata_tree(self, metadata_model: MetadataModel = MetadataModel()):
         headers = [self.K_CREATE_TREE_HEADER]
         self.metadata_tree_model = TreeModel(headers, metadata_model, self)
         self.tree_search_filter_model = QSortFilterProxyModel(self)
@@ -108,7 +108,7 @@ class CreateTemplateWidget(QWidget):
         self.clear_models()
     
     def clear_models(self):
-        self.metadata_model = EzMetadataModel()
+        self.metadata_model = MetadataModel()
         self.load_metadata_entries(self.metadata_model)
 
     def add_custom_row_to_table(self):
@@ -168,7 +168,7 @@ class CreateTemplateWidget(QWidget):
         data_file_path, parser_uuid, self.metadata_model = template_model.extract_data()
         self.load_template_data(data_file_path, parser_uuid, self.metadata_model)
     
-    def load_template_data(self, data_file_path: Path, parser_uuid: UUID, metadata_model: EzMetadataModel):
+    def load_template_data(self, data_file_path: Path, parser_uuid: UUID, metadata_model: MetadataModel):
         # Set the data file path
         self.ui.dataFileLineEdit.setText(str(data_file_path))
 
@@ -176,17 +176,19 @@ class CreateTemplateWidget(QWidget):
         self.load_metadata_entries(metadata_model=metadata_model)
 
         # Set the parser
-        parser_index, parser = self.parsers_model.find_parser_from_uuid(parser_uuid)
+        parser, err_msg = self.qparsers_cb_model.find_parser_from_uuid(parser_uuid)
         if parser is None:
-            parser_index, parser = self.parsers_model.find_compatible_parser(data_file_path, self._notify_error_message)
+            parser, err_msg = self.qparsers_cb_model.find_parser_from_data_path(data_file_path)
             if (parser is None):
+                self._notify_error_message(err_msg)
                 return
         
+        parser_index = self.qparsers_cb_model.index_from_parser(parser)
         self.ui.fileParserCombo.blockSignals(True)
         self.ui.fileParserCombo.setCurrentIndex(parser_index)
         self.ui.fileParserCombo.blockSignals(False)
     
-    def load_metadata_entries(self, metadata_model: EzMetadataModel = EzMetadataModel()):        
+    def load_metadata_entries(self, metadata_model: MetadataModel = MetadataModel()):        
         # Setup the Create Template table
         self.setup_metadata_table(metadata_model=metadata_model)
 
@@ -207,7 +209,7 @@ class CreateTemplateWidget(QWidget):
         
         entry = self.metadata_table_model.metadata_model.entry(source_index.row())
         if entry is not None:
-            if entry.source_type is EzMetadataEntry.SourceType.FILE and entry.loaded is True:
+            if entry.source_type is MetadataEntry.SourceType.FILE and entry.loaded is True:
                 self.metadata_tree_model.changeLeafCheck(entry)
             else:
                 self.metadata_table_model.beginRemoveRows(QModelIndex(), source_index.row(), source_index.row())
@@ -222,8 +224,9 @@ class CreateTemplateWidget(QWidget):
     def save_template(self, file_path: str):
         with open(file_path, 'w') as outfile:
             metadata_model = self.metadata_table_model.metadata_model
-            parser_model_index = self.parsers_model.index(self.ui.fileParserCombo.currentIndex(), 0)
-            parser: MetaForgeParser = self.parsers_model.data(parser_model_index, QParsersModel.Parser)
+            proxy_model_index = self.proxy_parsers_model.index(self.ui.fileParserCombo.currentIndex(), 0)
+            parser_model_index = self.proxy_parsers_model.mapToSource(proxy_model_index)
+            parser: MetaForgeParser = self.qparsers_cb_model.data(parser_model_index, QParserComboBoxModel.Parser)
             template_model = TemplateModel.create_model(data_file_path=self.ui.dataFileLineEdit.text(), parser_uuid=parser.uuid(), entries=metadata_model.entries)
             model_string = template_model.to_json(indent=4)
             outfile.write(model_string)
@@ -238,12 +241,13 @@ class CreateTemplateWidget(QWidget):
     def parser_combobox_changed_slot(self, index: int):
         notify_no_errors(self.ui.error_label)
 
-        model_index = self.parsers_model.index(index, 0)
+        proxy_model_index = self.proxy_parsers_model.index(index, 0)
+        model_index = self.proxy_parsers_model.mapToSource(proxy_model_index)
         if not model_index.isValid():
             self.ui.parser_path_label.clear()
             return
 
-        parser_path = self.parsers_model.data(model_index, QParsersModel.ParserPath)
+        parser_path = self.qparsers_cb_model.data(model_index, QParserComboBoxModel.ParserPath)
         self.ui.parser_path_label.setText(str(parser_path))
 
         if not self.ui.dataFileLineEdit.text():
@@ -251,7 +255,7 @@ class CreateTemplateWidget(QWidget):
             return
 
         filePath = Path(self.ui.dataFileLineEdit.text())
-        parser = self.parsers_model.data(model_index, QParsersModel.Parser)
+        parser = self.qparsers_cb_model.data(model_index, QParserComboBoxModel.Parser)
 
         if not self.parse_data_file(filePath, parser):
             return
@@ -267,10 +271,10 @@ class CreateTemplateWidget(QWidget):
         # Parse the metadata dictionary from the input data file
         headerDict = parser.parse_header_as_dict(file_path)
         
-        # Create an EzMetadataModel from the metadata dictionary
-        metadata_model = EzMetadataModel.create_model_from_dict(model_dict=headerDict, source_type=EzMetadataEntry.SourceType.FILE)
+        # Create an MetadataModel from the metadata dictionary
+        metadata_model = MetadataModel.create_model_from_dict(model_dict=headerDict, source_type=MetadataEntry.SourceType.FILE)
 
-        # Merge the new EzMetadataModel with the existing EzMetadataModel
+        # Merge the new MetadataModel with the existing MetadataModel
         self._merge_metadata_model(metadata_model=metadata_model)
 
         # Reload tree view
@@ -284,9 +288,9 @@ class CreateTemplateWidget(QWidget):
 
         return True
     
-    def _merge_metadata_model(self, metadata_model: EzMetadataModel):
+    def _merge_metadata_model(self, metadata_model: MetadataModel):
         for entry in self.metadata_model.entries:
-            if entry.source_type == EzMetadataEntry.SourceType.FILE:
+            if entry.source_type == MetadataEntry.SourceType.FILE:
                 new_entry = metadata_model.entry_by_source(entry.source_path)
                 if new_entry is None:
                     # Exists in current model but not in incoming model
@@ -300,7 +304,7 @@ class CreateTemplateWidget(QWidget):
                     entry.source_value = new_entry.source_value
 
         for entry in metadata_model.entries:
-            if entry.source_type == EzMetadataEntry.SourceType.FILE:
+            if entry.source_type == MetadataEntry.SourceType.FILE:
                 if self.metadata_model.entry_by_source(entry.source_path) is None:
                     # Exists in incoming model, but not in current model
                     self.metadata_model.entries.append(entry)
@@ -322,25 +326,52 @@ class CreateTemplateWidget(QWidget):
             file_path = Path(file_path)
 
             if self.ui.fileParserCombo.currentIndex() == -1:
-                source_model: QParsersModel = self.parsers_model.sourceModel()
-                parser_index, parser = source_model.find_compatible_parser(file_path, self._notify_error_message)
-                if (parser is None):
+                parser, err_msg = self.qparsers_cb_model.find_parser_from_data_path(file_path)
+                if parser is None:
+                    self._notify_error_message(err_msg)
                     return
             
+                parser_index = self.qparsers_cb_model.index_from_parser(parser)
                 self.ui.fileParserCombo.setCurrentIndex(parser_index)
             else:
-                model_index = self.parsers_model.index(self.ui.fileParserCombo.currentIndex(), 0)
-                parser = self.parsers_model.data(model_index, QParsersModel.Parser)
+                proxy_model_index = self.proxy_parsers_model.index(self.ui.fileParserCombo.currentIndex(), 0)
+                model_index = self.proxy_parsers_model.mapToSource(proxy_model_index)
+                parser = self.qparsers_cb_model.data(model_index, QParserComboBoxModel.Parser)
                 if not self.parse_data_file(file_path, parser):
                     return
     
-    def set_parsers_model(self, model: QParsersModel):
-        self.parsers_model = model
-        self.proxy_parsers_model.setSourceModel(self.parsers_model)
+    def set_parsers_model(self, qparsers_cb_model: QParserComboBoxModel):
+        self.qparsers_cb_model = qparsers_cb_model
+        self.proxy_parsers_model.setSourceModel(self.qparsers_cb_model)
         self.proxy_parsers_model.sort(0)
         self.ui.fileParserCombo.setModel(self.proxy_parsers_model)
         self.ui.fileParserCombo.setCurrentIndex(-1)
         self.ui.fileParserCombo.currentIndexChanged.connect(self.parser_combobox_changed_slot)
+        qparsers_cb_model.modelAboutToBeReset.connect(self._save_combo_box)
+        qparsers_cb_model.modelReset.connect(self._update_combo_box)
     
+    def _save_combo_box(self):
+        idx = self.ui.fileParserCombo.currentIndex()
+        if idx > 0:
+            proxy_index = self.proxy_parsers_model.index(idx, 0)
+            source_index = self.proxy_parsers_model.mapToSource(proxy_index)
+            self.cb_saved_parser_path = self.qparsers_cb_model.data(source_index, QParserComboBoxModel.ParserPath)
+    
+    def _update_combo_box(self):
+        self.proxy_parsers_model.invalidateFilter()
+
+        if self.cb_saved_parser_path is None:
+            self.ui.fileParserCombo.setCurrentIndex(-1)
+            return
+        
+        idx = self.qparsers_cb_model.index_from_parser_path(self.cb_saved_parser_path)
+        if idx < 0:
+            self.ui.fileParserCombo.setCurrentIndex(idx)
+        else:
+            source_index = self.qparsers_cb_model.index(idx, 0)
+            proxy_index = self.proxy_parsers_model.mapFromSource(source_index)
+            self.ui.fileParserCombo.setCurrentIndex(proxy_index.row())
+        self.cb_saved_parser_path = None
+
     def _notify_error_message(self, err_msg):
         notify_error_message(self.ui.error_label, err_msg)

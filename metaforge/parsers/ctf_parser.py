@@ -95,7 +95,7 @@ class CtfHeader:
 class CtfParser(MetaForgeParser):
 
   def __init__(self) -> None:
-    self.ext_list: list = ('.ctf')
+    self.ext_list: list = ['.ctf']
 
 
   def human_label(self) -> str:

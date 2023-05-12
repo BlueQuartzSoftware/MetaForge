@@ -1,11 +1,9 @@
-def path_encoder(cls):
-    '''
-    This encoder returns a string representation of a given pathlib.Path value
-    '''
-    return str(cls)
+from pathlib import Path
 
-def listofpaths_encoder(cls):
+from metaforge.parsers.metaforgeparser import MetaForgeParser
+
+def path_encoder(path: Path):
     '''
     This encoder returns a string representation of a given pathlib.Path value
     '''
-    return [path_encoder(path) for path in cls]
+    return str(path)

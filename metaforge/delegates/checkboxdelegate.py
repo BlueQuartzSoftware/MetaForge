@@ -1,8 +1,10 @@
 # This Python file uses the following encoding: utf-8
 from PySide2.QtCore import *
-from PySide2.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
+from PySide2.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem, QUndoStack
 import PySide2.QtCore
 from PySide2.QtCore import Qt, QEvent
+
+from metaforge.undo_stack_commands.toggle_parser_command import ToggleParserCommand
 
 qt_version = PySide2.QtCore.__version_info__
 
@@ -13,8 +15,9 @@ elif qt_version[1] == 15:
 
 
 class CheckBoxDelegate(QStyledItemDelegate):
-    def __init__(self, parent=None):
+    def __init__(self, undo_stack: QUndoStack=None, parent=None):
         QStyledItemDelegate.__init__(self, parent)
+        self.undo_stack: QUndoStack = undo_stack
 
     def paint(self, painter, option, index):
         opt = option
@@ -68,6 +71,10 @@ class CheckBoxDelegate(QStyledItemDelegate):
         else:
             value = Qt.Checked
 
-        return model.setData(index, value, Qt.CheckStateRole)
+        if self.undo_stack is not None:
+            self.undo_stack.push(ToggleParserCommand(model, index, value))
+            return True
+        else:
+            return model.setData(index, value, Qt.CheckStateRole)
 
 
