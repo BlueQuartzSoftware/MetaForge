@@ -91,6 +91,8 @@ class QParserTableModel(QAbstractTableModel):
                 return parser.version()
             elif index.column() == self.K_PARSER_MESSAGES_COL_INDEX:
                 return self._ez_parser_model.message(index.row())
+        elif role == Qt.BackgroundRole and parser is None:
+            return self.K_RED_BG_COLOR
         elif role == Qt.DecorationRole and self._ez_parser_model.is_default(index.row()) and index.column() == self.K_PARSER_NAME_COL_INDEX:
             return QIcon(QPixmap(':/resources/Images/star@2x.png'))
         elif role == Qt.CheckStateRole and index.column() == self.K_ENABLED_COL_INDEX:
