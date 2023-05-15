@@ -15,7 +15,7 @@ class FeiTiffParser(MetaForgeParser):
   K_FEI_TAGS = [34681, 34682, 50431]
 
   def __init__(self) -> None:
-    self.ext_list: list = ('.tif', '.tiff')
+    self.ext_list: list = ['.tif', '.tiff']
 
   def human_label(self) -> str:
     return "FEI Tiff Parser"

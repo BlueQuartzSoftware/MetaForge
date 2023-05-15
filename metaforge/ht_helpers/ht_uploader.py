@@ -5,7 +5,7 @@ import hyperthought as ht
 import os
 
 
-class Uploader(QObject):
+class HyperThoughtUploader(QObject):
     notify_file_progress = Signal(int)
     notify_file_progress_text = Signal(str)
     notify_list_progress = Signal(int)
@@ -13,7 +13,7 @@ class Uploader(QObject):
     all_uploads_done = Signal()
 
     def __init__(self, parent=None):
-        super(Uploader, self).__init__(parent)
+        super(HyperThoughtUploader, self).__init__(parent)
         self.interrupt = False
         self.total_bytes = 0.0
         self.bytes_uploaded = 0.0

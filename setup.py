@@ -33,7 +33,7 @@ setup(
             'metaforge = metaforge.__main__:main',
         ]
     },
-  package_data={"metaforge": ["parsers/parsers.yaml", "VERSION"]},
+  package_data={"metaforge": ["VERSION"]},
   python_requires='>=3.8',
   include_package_data=True,
   zip_safe=False

@@ -6,7 +6,7 @@ from metaforge.parsers.metaforgeparser import MetaForgeParser
 
 class ExampleParser(MetaForgeParser):
   def __init__(self) -> None:
-    self.ext_list: list = ()
+    self.ext_list: list = []
 
   def human_label(self) -> str:
     return "WHAT YOUR PARSER SHOWS TO THE GUI AS."

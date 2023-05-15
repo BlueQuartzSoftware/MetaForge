@@ -10,7 +10,7 @@ from metaforge.parsers.metaforgeparser import MetaForgeParser
 
 class H5Parser(MetaForgeParser):
   def __init__(self) -> None:
-    self.ext_list: list = ('.h5', '.oh5', '.emd')
+    self.ext_list: list = ['.h5', '.oh5', '.emd']
     self.count: int = 0
     self.file_dict: object = {}
 

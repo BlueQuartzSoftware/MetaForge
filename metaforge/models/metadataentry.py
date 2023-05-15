@@ -8,7 +8,7 @@ from typing import List
 
 @dataclass_json
 @dataclass
-class EzMetadataEntry:
+class MetadataEntry:
     unique_id: int = 0
     parent: int = -1
     children: List[int] = field(default_factory=list)
@@ -24,7 +24,7 @@ class EzMetadataEntry:
     ht_value: str = ""
     ht_annotation: str = ""
     ht_units: str = ""
-    source_type: EzMetadataEntry.SourceType = SourceType.FILE
+    source_type: MetadataEntry.SourceType = SourceType.FILE
     override_source_value: bool = False
     editable: bool = True
     required: bool = False

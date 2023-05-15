@@ -1,7 +1,7 @@
 from PySide2.QtCore import QSortFilterProxyModel, Qt
 from PySide2.QtGui import QColor
 
-from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
+from metaforge.models.metadataentry import MetadataEntry
 from metaforge.qt_models.qeztablemodel import QEzTableModel
 
 class QCreateEzTableModel(QSortFilterProxyModel):
@@ -25,7 +25,7 @@ class QCreateEzTableModel(QSortFilterProxyModel):
                 return index.row() + 1
         if role == Qt.BackgroundRole:
             src_index = self.mapToSource(index)
-            metadata_entry: EzMetadataEntry = src_model.metadata_model.entry(src_index.row())
+            metadata_entry: MetadataEntry = src_model.metadata_model.entry(src_index.row())
             return self._get_background_color_data(metadata_entry)
 
         return super().data(index, role)
@@ -35,23 +35,23 @@ class QCreateEzTableModel(QSortFilterProxyModel):
             return False
 
         metadata_model = self.sourceModel().metadata_model
-        metadata_entry: EzMetadataEntry = metadata_model.entry(source_row)
+        metadata_entry: MetadataEntry = metadata_model.entry(source_row)
 
         regex = self.filterRegExp()
         match = regex.exactMatch(metadata_entry.ht_name)
 
         # Custom data use case
-        if metadata_entry.source_type is EzMetadataEntry.SourceType.CUSTOM and match:
+        if metadata_entry.source_type is MetadataEntry.SourceType.CUSTOM and match:
             return True
 
         # All other use cases
-        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE and match:
+        if metadata_entry.source_type is MetadataEntry.SourceType.FILE and match:
             return metadata_entry.enabled
         else:
             return False
     
-    def _get_background_color_data(self, metadata_entry: EzMetadataEntry) -> QColor:
-        if metadata_entry.source_type is EzMetadataEntry.SourceType.FILE and metadata_entry.loaded is False:
+    def _get_background_color_data(self, metadata_entry: MetadataEntry) -> QColor:
+        if metadata_entry.source_type is MetadataEntry.SourceType.FILE and metadata_entry.loaded is False:
             return self.K_NOT_LOADED_BG_COLOR
 
         return None

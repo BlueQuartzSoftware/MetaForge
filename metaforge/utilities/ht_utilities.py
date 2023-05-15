@@ -1,8 +1,8 @@
 from typing import List
 from hyperthought.metadata import MetadataItem
 
-from metaforge.ez_models.ezmetadatamodel import EzMetadataModel
-from metaforge.ez_models.ezmetadataentry import EzMetadataEntry
+from metaforge.models.metadatamodel import MetadataModel
+from metaforge.models.metadataentry import MetadataEntry
 
 def dict_to_ht_metadata(metadata_dict) -> List[MetadataItem]:
     """
@@ -62,8 +62,8 @@ def dict_to_ht_metadata(metadata_dict) -> List[MetadataItem]:
     return ht_metadata_items
 
 
-def ezmodel_to_ht_metadata(model: EzMetadataModel,
-                           missing_entries: List[EzMetadataEntry],
+def ezmodel_to_ht_metadata(model: MetadataModel,
+                           missing_entries: List[MetadataEntry],
                            metadata_file_chosen: bool) -> List[MetadataItem]:
     """
 
@@ -73,7 +73,7 @@ def ezmodel_to_ht_metadata(model: EzMetadataModel,
     entries = model.entries
     for e in entries:
         if e.enabled:
-            if e.source_type is EzMetadataEntry.SourceType.FILE:
+            if e.source_type is MetadataEntry.SourceType.FILE:
                 if e.override_source_value is True:
                     ht_metadata_item = _create_ht_metadata_item(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
                     ht_metadata_items.append(ht_metadata_item)
@@ -83,7 +83,7 @@ def ezmodel_to_ht_metadata(model: EzMetadataModel,
                     else:
                         ht_metadata_item = _create_ht_metadata_item(e.ht_name, e.source_value, e.ht_units, e.ht_annotation)
                     ht_metadata_items.append(ht_metadata_item)
-            elif e.source_type is EzMetadataEntry.SourceType.CUSTOM:
+            elif e.source_type is MetadataEntry.SourceType.CUSTOM:
                 ht_metadata_item = _create_ht_metadata_item(e.ht_name, e.ht_value, e.ht_units, e.ht_annotation)
                 ht_metadata_items.append(ht_metadata_item)
     return ht_metadata_items

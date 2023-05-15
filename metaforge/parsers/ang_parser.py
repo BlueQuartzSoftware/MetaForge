@@ -5,7 +5,7 @@ from pathlib import Path
 from uuid import UUID
 
 from metaforge.parsers.metaforgeparser import MetaForgeParser
-from metaforge.utilities._utils import file_line_generator
+from metaforge.utilities.path_utilities import file_line_generator
 
 __all__ = ['HKLFamily', 'AngPhase', 'AngHeader', 'parse_header', 'parse_header_as_dict']
 
@@ -110,7 +110,7 @@ class AngHeader:
 class AngParser(MetaForgeParser):
 
   def __init__(self) -> None:
-    self.ext_list: list = ('.ang')
+    self.ext_list: list = ['.ang']
   
 
   def human_label(self) -> str:

@@ -10,7 +10,7 @@ from metaforge.parsers.metaforgeparser import MetaForgeParser
 
 class XmlParser(MetaForgeParser):
   def __init__(self) -> None:
-    self.ext_list: list = ('.xml')
+    self.ext_list: list = ['.xml']
     self.count: int = 0
     self.file_dict: object = {}
     self.json_data: object = {}

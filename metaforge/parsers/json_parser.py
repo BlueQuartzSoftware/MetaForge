@@ -9,7 +9,7 @@ from metaforge.parsers.metaforgeparser import MetaForgeParser
 
 class JsonParser(MetaForgeParser):
   def __init__(self) -> None:
-    self.ext_list: list = ('.json')
+    self.ext_list: list = ['.json']
     self.file_dict: object = {}
 
   def human_label(self) -> str:

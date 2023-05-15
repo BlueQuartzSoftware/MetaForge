@@ -1,154 +1,104 @@
 from pathlib import Path
-import yaml
-from metaforge.widgets.utilities.widget_utilities import notify_no_errors, notify_error_message
 from typing import List
-from dataclasses import dataclass
-from dataclasses_json import dataclass_json
 
-from PySide2.QtWidgets import QDialog, QDialogButtonBox, QListWidgetItem, QFileDialog, QApplication
+from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QHeaderView, QUndoStack
 import PySide2.QtCore
-from PySide2.QtCore import QSettings
+from PySide2.QtCore import QModelIndex, QItemSelection, QSortFilterProxyModel, Qt
 
-from metaforge.utilities.definitions import METAFORGE_PKG_ROOT
+from metaforge.undo_stack_commands.load_parsers_command import LoadParsersCommand
+from metaforge.undo_stack_commands.remove_parsers_command import RemoveParsersCommand
+from metaforge.qt_models.qparsertablemodel import QParserTableModel
+from metaforge.delegates.checkboxdelegate import CheckBoxDelegate
+from metaforge.widgets.utilities.widget_utilities import notify_no_errors
 
 qt_version = PySide2.QtCore.__version_info__
 if qt_version[1] == 12:
     from metaforge.widgets.generated_5_12.ui_metaforge_preferences import Ui_MetaForgePreferences
+    from metaforge.widgets.generated_5_12.ui_metaforge_preferences import Ui_MetaForgePreferences
 elif qt_version[1] == 15:
     from metaforge.widgets.generated_5_15.ui_metaforge_preferences import Ui_MetaForgePreferences
 
-@dataclass
-@dataclass_json
-class MetaForgePreferences():
-    def __init__(self, default_parser_path, parser_folder_paths):
-        self.default_parser_path: str = default_parser_path
-        self.parser_folder_paths: List[str] = parser_folder_paths
-
 class MetaForgePreferencesDialog(QDialog):
-    K_SETTINGS_USE_DEFAULT_PARSER_LOCATION_KEY = "use_default_parser_location"
-    K_SETTINGS_PARSER_PATHS_KEY = "parser_paths"
-    K_PARSER_YAML_FILE_NAME = "parsers.yaml"
-    K_PARSER_YAML_KEY = "metaforge-parsers"
     K_NO_ERRORS_STR = "No errors."
 
     def __init__(self, parent=None):
         super(MetaForgePreferencesDialog, self).__init__(parent)
         self.ui = Ui_MetaForgePreferences()
         self.ui.setupUi(self)
-        self.current_directory = ''
-
-        self._set_default_parser_location()
-        self._read_settings()
+        self.current_directory = Path("")
+        self.qparser_table_model: QParserTableModel = None
+        self.qproxy_parser_table_model: QSortFilterProxyModel = QSortFilterProxyModel(self)
+        self.undo_stack: QUndoStack = QUndoStack(self)
+        
+        self.checkbox_delegate = CheckBoxDelegate(self.undo_stack)
+        self.ui.parser_directories_table.setItemDelegateForColumn(QParserTableModel.K_ENABLED_COL_INDEX, self.checkbox_delegate)
 
         self.ui.addBtn.pressed.connect(self._add_files)
         self.ui.removeBtn.pressed.connect(self._remove_selected_files)
-        self.ui.include_default_parser_location.stateChanged.connect(self._toggle_default_parser_location)
+        self.ui.searchLineEdit.textChanged.connect(self.qproxy_parser_table_model.setFilterFixedString)
+
+        self.ui.parser_directories_table.setSortingEnabled(True)
+        self.qproxy_parser_table_model.setFilterKeyColumn(QParserTableModel.K_PARSER_NAME_COL_INDEX)
+        self.qproxy_parser_table_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
 
         self.ui.buttonBox.button(QDialogButtonBox.Ok).pressed.connect(self.accept)
         self.ui.buttonBox.button(QDialogButtonBox.Cancel).pressed.connect(self.reject)
 
         notify_no_errors(self.ui.error_string)
     
-    def _set_default_parser_location(self):
-        default_location = METAFORGE_PKG_ROOT / 'parsers'
-        self.ui.include_default_parser_location.setText(str(default_location))
-    
-    def _toggle_default_parser_location(self, state: PySide2.QtCore.Qt.CheckState):
-        if state == PySide2.QtCore.Qt.CheckState.Checked:
-            self.staged_prefs.default_parser_path = self.ui.include_default_parser_location.text()
-        else:
-            self.staged_prefs.default_parser_path = None
-    
-    def _read_settings(self):
-        settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
-        parser_folder_paths: List[str] = []
-        use_default_location = settings.value(self.K_SETTINGS_USE_DEFAULT_PARSER_LOCATION_KEY, defaultValue=True, type=bool)
-        self.ui.include_default_parser_location.setChecked(use_default_location)
-        default_parser_path = None
-        if use_default_location:
-            default_parser_path = self.ui.include_default_parser_location.text()
-
-        parser_folder_size = settings.beginReadArray(self.K_SETTINGS_PARSER_PATHS_KEY)
-        for i in range(parser_folder_size):
-            settings.setArrayIndex(i)
-            parser_path = settings.value(f'{i}')
-            parser_folder_paths.append(parser_path)
-        settings.endArray()
-
-        self.ui.parser_locations_list.addItems(parser_folder_paths)
-        self.prefs = MetaForgePreferences(default_parser_path, parser_folder_paths)
-        self.staged_prefs = MetaForgePreferences(default_parser_path, parser_folder_paths)
-    
-    def closeEvent(self, event):
-        settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
-        settings.setValue(self.K_SETTINGS_USE_DEFAULT_PARSER_LOCATION_KEY, self.ui.include_default_parser_location.isChecked())
-
-        parser_folder_paths = self.prefs.parser_folder_paths
-        settings.beginWriteArray(self.K_SETTINGS_PARSER_PATHS_KEY)
-        for i in range(len(parser_folder_paths)):
-            parser_path = parser_folder_paths[i]
-            settings.setArrayIndex(i)
-            settings.setValue(f'{i}', parser_path)
-        settings.endArray()
-
-        super().closeEvent(event)
-    
-    def exec(self) -> int:
-        self.ui.parser_locations_list.clear()
-        [self.ui.parser_locations_list.addItem(path) for path in self.prefs.parser_folder_paths]
-
-        return super().exec_()
+    def _handle_parser_directories_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
+        proxy_indexes: List[QModelIndex] = self.ui.parser_directories_table.selectionModel().selectedRows()
+        for proxy_index in proxy_indexes:
+            is_default = self.qproxy_parser_table_model.data(proxy_index, QParserTableModel.Default)
+            if is_default:
+                self.ui.removeBtn.setDisabled(True)
+                return
+        
+        self.ui.removeBtn.setEnabled(True)
     
     def _add_files(self):
-        dir_path = QFileDialog.getExistingDirectory(self, 'Open Directory', self.current_directory)
-        if dir_path != "":
-            self.current_directory = dir_path
-            self.ui.parser_locations_list.addItem(dir_path)
-            self.staged_prefs.parser_folder_paths.append(dir_path)
-
-            self.validate()
+        result = QFileDialog.getOpenFileNames(self, 'Open Parser File(s)', str(self.current_directory), "MetaForge Parsers (*.py)")
+        file_paths = result[0]
+        if len(file_paths) > 0:
+            self.current_directory = Path(file_paths[0]).parent
+            file_paths = [Path(file_path) for file_path in file_paths]
+            load_parsers_command = LoadParsersCommand(self.qparser_table_model, file_paths)
+            self.undo_stack.push(load_parsers_command)
 
     def _remove_selected_files(self):
-        selected_items: List[QListWidgetItem] = self.ui.parser_locations_list.selectedItems()
-        for item in selected_items:
-            self.ui.parser_locations_list.takeItem(self.ui.parser_locations_list.row(item))
-            self.staged_prefs.parser_folder_paths.remove(item.text())
-        
-        self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(self.validate())
-    
-    def preferences(self) -> MetaForgePreferences:
-        return self.prefs
-    
-    def validate(self) -> bool:
-        for parser_folder_path in self.staged_prefs.parser_folder_paths:
-            parser_folder_path = Path(parser_folder_path)
-            yaml_file_path = parser_folder_path / self.K_PARSER_YAML_FILE_NAME
-            if not yaml_file_path.exists():
-                notify_error_message(self.ui.error_string, f'Yaml file not found at path \"{str(yaml_file_path)}\"!')
-                self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-                return False
-
-            with yaml_file_path.open("r") as yml:
-                try:
-                    yaml_data: dict = yaml.safe_load(yml)
-                except yaml.YAMLError as exc:
-                    notify_error_message(self.ui.error_string, f'Unable to read yaml file \"{str(yaml_file_path)}\" - {exc}')
-                    self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-                    return False
-                
-                if self.K_PARSER_YAML_KEY not in yaml_data:
-                    notify_error_message(self.ui.error_string, f'No key named \"{self.K_PARSER_YAML_KEY}\" in yaml file \"{str(yaml_file_path)}\"!')
-                    self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(False)
-                    return False
+        selected_rows: List[QModelIndex] = self.ui.parser_directories_table.selectionModel().selectedRows()
+        selected_rows = [index.row() for index in selected_rows]
+        remove_parsers_command = RemoveParsersCommand(self.qparser_table_model, selected_rows)
+        self.undo_stack.push(remove_parsers_command)
         
         notify_no_errors(self.ui.error_string)
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
-        return True
+
+    def _setup_parser_directories_table(self):
+        self.ui.parser_directories_table.horizontalHeader().setSectionResizeMode(QParserTableModel.K_ENABLED_COL_INDEX, QHeaderView.ResizeToContents)
+        self.ui.parser_directories_table.horizontalHeader().setSectionResizeMode(QParserTableModel.K_PARSER_NAME_COL_INDEX, QHeaderView.ResizeToContents)
+        self.ui.parser_directories_table.horizontalHeader().setSectionResizeMode(QParserTableModel.K_PARSER_LOCATION_COL_INDEX, QHeaderView.Stretch)
+        self.ui.parser_directories_table.horizontalHeader().setSectionResizeMode(QParserTableModel.K_PARSER_SUPPORTED_EXTS_COL_INDEX, QHeaderView.ResizeToContents)
+        self.ui.parser_directories_table.horizontalHeader().setSectionResizeMode(QParserTableModel.K_PARSER_VERSION_COL_INDEX, QHeaderView.ResizeToContents)
+        self.ui.parser_directories_table.horizontalHeader().setSectionResizeMode(QParserTableModel.K_PARSER_MESSAGES_COL_INDEX, QHeaderView.Stretch)
+        self.ui.parser_directories_table.verticalHeader().setSectionResizeMode(QHeaderView.ResizeToContents)
+        self.ui.parser_directories_table.setWordWrap(True)
+    
+    def set_parsers_model(self, model: QParserTableModel):
+        self.qparser_table_model = model
+        self.qproxy_parser_table_model.setSourceModel(model)
+        self.ui.parser_directories_table.setModel(self.qproxy_parser_table_model)
+        self.ui.parser_directories_table.selectionModel().selectionChanged.connect(self._handle_parser_directories_selection_changed)
+        self._setup_parser_directories_table()
 
     def accept(self):
-        self.prefs = self.staged_prefs
+        self.undo_stack.clear()
+        self.qparser_table_model.update_watched_parsers()
+        self.qparser_table_model.model_about_to_change.emit()
+        self.qparser_table_model.model_changed.emit()
         super().accept()
 
     def reject(self):
-        self.staged_prefs = self.prefs
+        while self.undo_stack.canUndo():
+            self.undo_stack.undo()
         super().reject()
