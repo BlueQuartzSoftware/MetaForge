@@ -3,7 +3,7 @@ from typing import List
 
 from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QHeaderView, QUndoStack
 import PySide2.QtCore
-from PySide2.QtCore import QModelIndex, QItemSelection
+from PySide2.QtCore import QModelIndex, QItemSelection, QSortFilterProxyModel, Qt
 
 from metaforge.undo_stack_commands.load_parsers_command import LoadParsersCommand
 from metaforge.undo_stack_commands.remove_parsers_command import RemoveParsersCommand
@@ -27,6 +27,7 @@ class MetaForgePreferencesDialog(QDialog):
         self.ui.setupUi(self)
         self.current_directory = Path("")
         self.qparser_table_model: QParserTableModel = None
+        self.qproxy_parser_table_model: QSortFilterProxyModel = QSortFilterProxyModel(self)
         self.undo_stack: QUndoStack = QUndoStack(self)
         
         self.checkbox_delegate = CheckBoxDelegate(self.undo_stack)
@@ -34,6 +35,11 @@ class MetaForgePreferencesDialog(QDialog):
 
         self.ui.addBtn.pressed.connect(self._add_files)
         self.ui.removeBtn.pressed.connect(self._remove_selected_files)
+        self.ui.searchLineEdit.textChanged.connect(self.qproxy_parser_table_model.setFilterFixedString)
+
+        self.ui.parser_directories_table.setSortingEnabled(True)
+        self.qproxy_parser_table_model.setFilterKeyColumn(QParserTableModel.K_PARSER_NAME_COL_INDEX)
+        self.qproxy_parser_table_model.setFilterCaseSensitivity(Qt.CaseInsensitive)
 
         self.ui.buttonBox.button(QDialogButtonBox.Ok).pressed.connect(self.accept)
         self.ui.buttonBox.button(QDialogButtonBox.Cancel).pressed.connect(self.reject)
@@ -41,9 +47,9 @@ class MetaForgePreferencesDialog(QDialog):
         notify_no_errors(self.ui.error_string)
     
     def _handle_parser_directories_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
-        model_indexes: List[QModelIndex] = self.ui.parser_directories_table.selectionModel().selectedRows()
-        for model_index in model_indexes:
-            is_default = self.qparser_table_model.data(model_index, QParserTableModel.Default)
+        proxy_indexes: List[QModelIndex] = self.ui.parser_directories_table.selectionModel().selectedRows()
+        for proxy_index in proxy_indexes:
+            is_default = self.qproxy_parser_table_model.data(proxy_index, QParserTableModel.Default)
             if is_default:
                 self.ui.removeBtn.setDisabled(True)
                 return
@@ -80,7 +86,8 @@ class MetaForgePreferencesDialog(QDialog):
     
     def set_parsers_model(self, model: QParserTableModel):
         self.qparser_table_model = model
-        self.ui.parser_directories_table.setModel(self.qparser_table_model)
+        self.qproxy_parser_table_model.setSourceModel(model)
+        self.ui.parser_directories_table.setModel(self.qproxy_parser_table_model)
         self.ui.parser_directories_table.selectionModel().selectionChanged.connect(self._handle_parser_directories_selection_changed)
         self._setup_parser_directories_table()
 

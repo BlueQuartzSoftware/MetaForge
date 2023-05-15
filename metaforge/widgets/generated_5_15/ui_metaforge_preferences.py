@@ -26,16 +26,6 @@ class Ui_MetaForgePreferences(object):
         self.gridLayout_2.setHorizontalSpacing(4)
         self.gridLayout_2.setVerticalSpacing(-1)
         self.gridLayout_2.setContentsMargins(-1, 0, 0, -1)
-        self.parser_directories_label = QLabel(MetaForgePreferences)
-        self.parser_directories_label.setObjectName(u"parser_directories_label")
-        font = QFont()
-        font.setPointSize(14)
-        font.setBold(True)
-        font.setWeight(75)
-        self.parser_directories_label.setFont(font)
-
-        self.gridLayout_2.addWidget(self.parser_directories_label, 0, 0, 1, 3)
-
         self.removeBtn = QPushButton(MetaForgePreferences)
         self.removeBtn.setObjectName(u"removeBtn")
         self.removeBtn.setMinimumSize(QSize(24, 24))
@@ -46,11 +36,16 @@ class Ui_MetaForgePreferences(object):
         self.removeBtn.setIconSize(QSize(24, 24))
         self.removeBtn.setFlat(True)
 
-        self.gridLayout_2.addWidget(self.removeBtn, 4, 2, 1, 1)
+        self.gridLayout_2.addWidget(self.removeBtn, 4, 3, 1, 1)
 
         self.verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
 
-        self.gridLayout_2.addItem(self.verticalSpacer, 5, 2, 1, 1)
+        self.gridLayout_2.addItem(self.verticalSpacer, 5, 3, 1, 1)
+
+        self.searchLineEdit = QLineEdit(MetaForgePreferences)
+        self.searchLineEdit.setObjectName(u"searchLineEdit")
+
+        self.gridLayout_2.addWidget(self.searchLineEdit, 1, 1, 1, 1)
 
         self.addBtn = QPushButton(MetaForgePreferences)
         self.addBtn.setObjectName(u"addBtn")
@@ -62,13 +57,29 @@ class Ui_MetaForgePreferences(object):
         self.addBtn.setIconSize(QSize(24, 24))
         self.addBtn.setFlat(True)
 
-        self.gridLayout_2.addWidget(self.addBtn, 2, 2, 2, 1)
+        self.gridLayout_2.addWidget(self.addBtn, 2, 3, 2, 1)
+
+        self.label = QLabel(MetaForgePreferences)
+        self.label.setObjectName(u"label")
+
+        self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
+
+        self.parser_directories_label = QLabel(MetaForgePreferences)
+        self.parser_directories_label.setObjectName(u"parser_directories_label")
+        font = QFont()
+        font.setPointSize(14)
+        font.setBold(True)
+        font.setWeight(75)
+        self.parser_directories_label.setFont(font)
+
+        self.gridLayout_2.addWidget(self.parser_directories_label, 0, 0, 1, 4)
 
         self.parser_directories_table = QTableView(MetaForgePreferences)
         self.parser_directories_table.setObjectName(u"parser_directories_table")
         self.parser_directories_table.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.parser_directories_table.verticalHeader().setVisible(False)
 
-        self.gridLayout_2.addWidget(self.parser_directories_table, 2, 0, 4, 2)
+        self.gridLayout_2.addWidget(self.parser_directories_table, 2, 0, 4, 3)
 
 
         self.gridLayout.addLayout(self.gridLayout_2, 0, 0, 1, 1)
@@ -95,7 +106,6 @@ class Ui_MetaForgePreferences(object):
 
     def retranslateUi(self, MetaForgePreferences):
         MetaForgePreferences.setWindowTitle(QCoreApplication.translate("MetaForgePreferences", u"Preferences", None))
-        self.parser_directories_label.setText(QCoreApplication.translate("MetaForgePreferences", u"Parsers", None))
 #if QT_CONFIG(tooltip)
         self.removeBtn.setToolTip(QCoreApplication.translate("MetaForgePreferences", u"Use this button to remove non-existant arrays out of the \"Selected Data Arrays\" column", None))
 #endif // QT_CONFIG(tooltip)
@@ -104,6 +114,8 @@ class Ui_MetaForgePreferences(object):
         self.addBtn.setToolTip(QCoreApplication.translate("MetaForgePreferences", u"Use this button to move an array up in the \"Selected Data Arrays\" column", None))
 #endif // QT_CONFIG(tooltip)
         self.addBtn.setText("")
+        self.label.setText(QCoreApplication.translate("MetaForgePreferences", u"Search", None))
+        self.parser_directories_label.setText(QCoreApplication.translate("MetaForgePreferences", u"Parsers", None))
         self.error_string.setText(QCoreApplication.translate("MetaForgePreferences", u"ERROR_STRING", None))
     # retranslateUi
 
