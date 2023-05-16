@@ -2,11 +2,9 @@ Adding Parsers
 ==============
 
 MetaForge supports the addition of new parsers at runtime, the bundled parsers
-reuse the same mechanism. The `parsers` subdirectory contains the bundled
+reuse the same mechanism. The `parsers` subdirectory contains the default bundled
 parsers using the naming convention of `format_parser.py`, e.g. `h5_parser.py`.
-The file `parsers.yaml` contains a list of the parsers in the same directory as
-the YAML file to load. More directories can be added to the search path from the
-`File->Preferences` menu.
+More parsers can be added from the `File->Preferences` menu.
 
 At a high level you should realize that the parsers using the typing extensions
 for Python. This means that the expected types are declared for input and
