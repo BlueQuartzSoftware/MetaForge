@@ -47,7 +47,7 @@ class CreateTemplateWidget(QWidget):
         self.metadata_model: MetadataModel = MetadataModel()
         self.ui.dataFileSelect.clicked.connect(self.select_input_data_file)
         self.ui.clearCreateButton.clicked.connect(self.clear)
-        self.setAcceptDrops(True)
+        # self.setAcceptDrops(True)
         self.numCustoms = 0
         self.cb_saved_parser_path = None
 

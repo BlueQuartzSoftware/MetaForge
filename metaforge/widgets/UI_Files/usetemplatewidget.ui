@@ -564,11 +564,23 @@
          <layout class="QGridLayout" name="gridLayout_6">
           <item row="1" column="0" colspan="3">
            <widget class="QTableView" name="useTemplateTableView">
+            <property name="acceptDrops">
+             <bool>true</bool>
+            </property>
             <property name="toolTip">
              <string>This table contains the metadata that will be uploaded with each file in the file list on the left.</string>
             </property>
             <property name="sizeAdjustPolicy">
              <enum>QAbstractScrollArea::AdjustToContents</enum>
+            </property>
+            <property name="dragEnabled">
+             <bool>true</bool>
+            </property>
+            <property name="dragDropMode">
+             <enum>QAbstractItemView::InternalMove</enum>
+            </property>
+            <property name="defaultDropAction">
+             <enum>Qt::MoveAction</enum>
             </property>
             <property name="alternatingRowColors">
              <bool>true</bool>

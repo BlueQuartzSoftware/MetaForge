@@ -249,6 +249,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="acceptDrops">
+          <bool>true</bool>
+         </property>
          <property name="toolTip">
           <string>The metadata chosen to be included in the new template file.</string>
          </property>
@@ -265,7 +268,7 @@
           <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
          </property>
          <property name="showDropIndicator" stdset="0">
-          <bool>false</bool>
+          <bool>true</bool>
          </property>
          <property name="dragEnabled">
           <bool>true</bool>

@@ -1,6 +1,9 @@
 from PySide2.QtCore import QSortFilterProxyModel, Qt
 from PySide2.QtGui import QColor
 
+from typing import List
+import json
+
 from metaforge.models.metadataentry import MetadataEntry
 from metaforge.qt_models.qeztablemodel import QEzTableModel
 
@@ -20,11 +23,12 @@ class QCreateEzTableModel(QSortFilterProxyModel):
         if src_model is None:
             return None
 
+        src_index = self.mapToSource(index)
+
         if role == Qt.DisplayRole:
             if index.column() == src_model.K_SORT_COL_INDEX:
-                return index.row() + 1
+                return src_index.row() + 1
         if role == Qt.BackgroundRole:
-            src_index = self.mapToSource(index)
             metadata_entry: MetadataEntry = src_model.metadata_model.entry(src_index.row())
             return self._get_background_color_data(metadata_entry)
 
@@ -51,7 +55,8 @@ class QCreateEzTableModel(QSortFilterProxyModel):
             return False
     
     def _get_background_color_data(self, metadata_entry: MetadataEntry) -> QColor:
-        if metadata_entry.source_type is MetadataEntry.SourceType.FILE and metadata_entry.loaded is False:
-            return self.K_NOT_LOADED_BG_COLOR
+        if metadata_entry is not None:
+            if metadata_entry.source_type is MetadataEntry.SourceType.FILE and metadata_entry.loaded is False:
+                return self.K_NOT_LOADED_BG_COLOR
 
         return None

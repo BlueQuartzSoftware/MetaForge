@@ -1,5 +1,8 @@
-from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex, QPersistentModelIndex, QMimeData, QByteArray, QDataStream, QIODevice
 from PySide2.QtGui import QFont, QColor
+
+from typing import List
+import json
 
 from metaforge.models.metadataentry import MetadataEntry
 from metaforge.models.metadatamodel import MetadataModel
@@ -14,6 +17,9 @@ class QEzTableModel(QAbstractTableModel):
     # Row colors
     K_RED_BG_COLOR = QColor(255, 190, 194)
     K_YELLOW_BG_COLOR = QColor(253, 255, 190)
+
+    # Mime Type
+    K_METADATAENTRY_MIMETYPE = "application/metadataentry"
 
     # Total Number of Columns
     K_COL_COUNT = 10
@@ -135,8 +141,18 @@ class QEzTableModel(QAbstractTableModel):
             
         if role == Qt.EditRole:
             if index.column() == self.K_SORT_COL_INDEX:
-                # Move row to a different location!
-                pass
+                if value < 1 or value > self.rowCount():
+                    return False
+                
+                mime_data = self.mimeData([index])
+                return self.dropMimeData(mime_data, Qt.MoveAction, value, 0, QModelIndex())
+                
+                # result = self.metadata_model.remove_by_index(index.row())
+                # if not result:
+                #     return False
+                
+                # self.metadata_model.insert(metadata_entry, value - 1)
+                # return True
             elif index.column() == self.K_HTNAME_COL_INDEX:
                 metadata_entry.ht_name = value
                 self.dataChanged.emit(index, index)
@@ -204,44 +220,101 @@ class QEzTableModel(QAbstractTableModel):
     
     def flags(self, index):
         if not index.isValid():
-            return Qt.NoItemFlags
+            return Qt.ItemIsDropEnabled
 
         metadata_entry: MetadataEntry = self.metadata_model.entry(index.row())
 
         if index.column() == self.K_SORT_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         elif index.column() == self.K_SOURCE_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
         elif index.column() == self.K_SOURCEVAL_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
         elif index.column() == self.K_HTNAME_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         elif index.column() == self.K_HTVALUE_COL_INDEX:
             if metadata_entry.source_type == MetadataEntry.SourceType.CUSTOM:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
             else:
                 if metadata_entry.override_source_value is True:
-                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
                 else:
-                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
         elif index.column() == self.K_HTANNOTATION_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         elif index.column() == self.K_HTUNITS_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
             if metadata_entry.source_type is MetadataEntry.SourceType.FILE:
-                return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable
+                return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
             elif metadata_entry.source_type is MetadataEntry.SourceType.CUSTOM:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
             else:
-                return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+                return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
         elif index.column() == self.K_EDITABLE_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable
+            return Qt.ItemIsEnabled | Qt.ItemIsUserCheckable | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
         elif index.column() == self.K_REMOVE_COL_INDEX:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         else:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled | Qt.ItemIsDropEnabled
 
+    def canDropMimeData(self, data: QMimeData, action: Qt.DropAction, row: int, column: int, parent: QModelIndex) -> bool:
+        if not data.hasFormat(self.K_METADATAENTRY_MIMETYPE):
+            return False
+
+        if action != Qt.MoveAction:
+            return False
+
+        return True
+    
+    def mimeTypes(self):
+        return [self.K_METADATAENTRY_MIMETYPE]
+
+    def mimeData(self, idxs: List[QModelIndex]):
+        mime_data = QMimeData()
+        encoded_data = QByteArray()
+        stream = QDataStream(encoded_data, QIODevice.WriteOnly)
+
+        metadata_entries: List[MetadataEntry] = []
+        rows: List[int] = []
+        for idx in idxs:
+            if idx.isValid():
+                metadata_entry: MetadataEntry = self.metadata_model.entry(idx.row())
+                if metadata_entry not in metadata_entries:
+                    metadata_entries.append(metadata_entry)
+                    rows.append(idx)
+
+        metadata_dict = [metadata_entry.to_dict() for metadata_entry in metadata_entries]
+        stream.writeQString(json.dumps(metadata_dict))
+        mime_data.setData(self.K_METADATAENTRY_MIMETYPE, encoded_data)
+
+        return mime_data
+
+    def dropMimeData(self, data, action, row, column, parent):
+        encoded_data = data.data(self.K_METADATAENTRY_MIMETYPE)
+        stream = QDataStream(encoded_data, QIODevice.ReadOnly)
+        json_string = stream.readQString()
+        metadata_dict = json.loads(json_string)
+        metadata_entries: List[MetadataEntry] = [MetadataEntry.from_dict(mc_dict) for mc_dict in metadata_dict]
+
+        row_index = QPersistentModelIndex(self.index(row, 0))
+
+        if action == Qt.MoveAction:
+            for metadata_entry in metadata_entries:
+                source_row = self.metadata_model.index_from_source(metadata_entry.source_path)
+                self.beginRemoveRows(QModelIndex(), source_row, source_row)
+                self.metadata_model.remove_by_index(source_row)
+                self.endRemoveRows()
+
+        self.beginInsertRows(QModelIndex(), row_index.row(), row_index.row() + len(metadata_entries) - 1)
+        for i, metadata_entry in enumerate(metadata_entries):
+            self.metadata_model.insert(metadata_entry, row_index.row() + i)
+        self.endInsertRows()
+        return True
+
+    def supportedDropActions(self):
+        return Qt.MoveAction
+    
     def addCustomRow(self, numCustom):
         self.beginInsertRows(self.index(len(self.metadata_model.entries), 0), len(
             self.metadata_model.entries), len(self.metadata_model.entries))
