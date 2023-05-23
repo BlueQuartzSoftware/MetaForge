@@ -1,21 +1,31 @@
 import configparser
 
-from requests.api import head
-from typing import List
+from typing import List, Final, Dict
 from pathlib import Path
 from uuid import UUID
 from flatten_dict import flatten
 
-from metaforge.parsers.metaforgeparser import MetaForgeParser
+from metaforge.common.parser_units import PIXELS_UNITS
+from metaforge.parsers.metaforgeparser import MetaForgeParser, MetaForgeMetadata
 
 from PIL import Image
 from PIL.TiffTags import TAGS
+
+FEI_TIFF_IMG_WIDTH: Final[str] = 'ImageWidth'
+FEI_TIFF_IMG_LENGTH: Final[str] = 'ImageLength'
+
+FEI_TIFF_HEADER_UNITS_MAP: Final[Dict[str, str]] = {
+  FEI_TIFF_IMG_WIDTH : PIXELS_UNITS,
+  FEI_TIFF_IMG_LENGTH : PIXELS_UNITS,
+}
 
 class FeiTiffParser(MetaForgeParser):
   K_FEI_TAGS = [34681, 34682, 50431]
 
   def __init__(self) -> None:
     self.ext_list: list = ['.tif', '.tiff']
+    self.annotations = ''
+    self.units = 'microns'
 
   def human_label(self) -> str:
     return "FEI Tiff Parser"
@@ -149,7 +159,7 @@ class FeiTiffParser(MetaForgeParser):
       return meta_dict
 
 
-  def parse_header_as_dict(self, filepath: Path) -> dict:
+  def parse_header(self, filepath: Path) -> List[MetaForgeMetadata]:
     """
     Description:
 
@@ -161,7 +171,7 @@ class FeiTiffParser(MetaForgeParser):
     Returns
     -------
     Dictionary
-        A dictionary containing the header information
+        A list containing the header metadata
     
     Example
     -------
@@ -176,25 +186,24 @@ class FeiTiffParser(MetaForgeParser):
     """
 
     file_dict = {}
+    annotations = ''
+    units = 'microns'
 
     header = self.parse_tiff_tag_34681(filepath)
     if len(header) > 0:
       file_dict["FEI Tag #34681"] = header
-      file_dict = flatten(file_dict, reducer="path")
 
     header = self.parse_tiff_tag_34682(filepath)
     if len(header) > 0:
       file_dict["FEI Tag #34682"] = header
-      file_dict = flatten(file_dict, reducer="path")
 
     header = self.parse_tiff_tag_50431(filepath)
     if len(header) > 0:
       file_dict["FEI Tag #50431"] = header
-      file_dict = flatten(file_dict, reducer="path")
 
     header = self.parse_standard_tags(filepath)
     if len(header) > 0:
       file_dict["Standard"] = header
-      file_dict = flatten(file_dict, reducer="path")
 
-    return file_dict
+    file_dict = flatten(file_dict, reducer="path")
+    return [MetaForgeMetadata(source_path, value, '', FEI_TIFF_HEADER_UNITS_MAP.get(Path(source_path).stem, '')) for source_path, value in file_dict.items()]

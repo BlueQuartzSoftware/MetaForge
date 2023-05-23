@@ -5,7 +5,7 @@ from uuid import UUID
 import os
 import json
 
-from metaforge.parsers.metaforgeparser import MetaForgeParser
+from metaforge.parsers.metaforgeparser import MetaForgeParser, MetaForgeMetadata
 
 class JsonParser(MetaForgeParser):
   def __init__(self) -> None:
@@ -43,7 +43,7 @@ class JsonParser(MetaForgeParser):
       if len(data) <= 16:
         self.file_dict[prefix] = str(data)
 
-  def parse_header_as_dict(self, filepath: Path) -> dict:
+  def parse_header(self, filepath: Path) -> List[MetaForgeMetadata]:
     """
     Description:
 
@@ -61,7 +61,7 @@ class JsonParser(MetaForgeParser):
     -------
     ```
     parser = JsonParser()
-    parser.parse_header_as_dict('/some/path/to/a/file.json')
+    parser.parse_header('/some/path/to/a/file.json')
     ```
     """
     # Check our file exists before trying to open it!
@@ -74,5 +74,4 @@ class JsonParser(MetaForgeParser):
         self.current_path = v
         self.visit_entry(v, data[v])
 
-    return self.file_dict
-
+    return [MetaForgeMetadata(source_path, value) for source_path, value in self.file_dict.items()]

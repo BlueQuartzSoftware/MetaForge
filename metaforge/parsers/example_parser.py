@@ -25,7 +25,7 @@ class ExampleParser(MetaForgeParser):
       return True
     return False
 
-  def parse_header_as_dict(self, filepath: str) -> dict:
+  def parse_header(self, filepath: str) -> dict:
     """
     Description:
 
@@ -43,7 +43,7 @@ class ExampleParser(MetaForgeParser):
     -------
     ```
     parser = ExampleParser()
-    parser.parse_header_as_dict('/some/path/to/a/file.ini')
+    parser.parse_header('/some/path/to/a/file.ini')
     ```
     This code returns:
     ```

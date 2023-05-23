@@ -6,6 +6,7 @@ from pathlib import Path
 from typing import List, Tuple
 from uuid import UUID
 
+from metaforge.parsers.metaforgeparser import MetaForgeMetadata
 from metaforge.models.metadataentry import MetadataEntry
 
 @dataclass_json
@@ -70,23 +71,19 @@ class MetadataModel:
     entries: List[MetadataEntry] = field(default_factory=list)
 
     @staticmethod
-    def create_model_from_dict(model_dict: dict, source_type: MetadataEntry.SourceType) -> MetadataModel:
+    def create_model(model_list: List[MetaForgeMetadata], source_type: MetadataEntry.SourceType) -> MetadataModel:
         model = MetadataModel()
-        if model_dict is not None:
-            for key, value in model_dict.items():
-                if value is None:
-                    value = ''
-                ht_name = key
-                tokens: List[str] = key.split('/')
-                if len(tokens) > 0:
-                    ht_name = tokens.pop()
-                metadata_entry = MetadataEntry(source_path=key,
-                                                    source_value=value,
+        if model_list is not None:
+            for metadata in model_list:
+                if metadata.value is None:
+                    metadata.value = ''
+                metadata_entry = MetadataEntry(source_path=metadata.source_path,
+                                                    source_value=metadata.value,
                                                     source_type=source_type,
-                                                    ht_name=ht_name,
-                                                    ht_value=value,
-                                                    ht_annotation='',
-                                                    ht_units='')
+                                                    ht_name=Path(metadata.source_path).stem,
+                                                    ht_value=metadata.value,
+                                                    ht_annotation=metadata.annotations,
+                                                    ht_units=metadata.units)
                 model.entries.append(metadata_entry)
         return model
 

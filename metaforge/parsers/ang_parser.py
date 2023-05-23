@@ -1,13 +1,14 @@
-import os
 from dataclasses import dataclass
-from typing import Any, Dict, Final, Generator, List, Optional, Type
+from typing import Dict, Final, Generator, List, Optional, Type, Tuple
 from pathlib import Path
 from uuid import UUID
 
-from metaforge.parsers.metaforgeparser import MetaForgeParser
+from metaforge.common.parser_units import MICRONS_UNITS, DEGREES_UNITS, ANGSTROM_UNITS, NANOMETERS_UNITS
+from metaforge.common.tsl_constants import ANG_LAUE_CLASS_MAP
+from metaforge.parsers.metaforgeparser import MetaForgeParser, MetaForgeMetadata
 from metaforge.utilities.path_utilities import file_line_generator
 
-__all__ = ['HKLFamily', 'AngPhase', 'AngHeader', 'parse_header', 'parse_header_as_dict']
+__all__ = ['HKLFamily', 'AngPhase', 'AngHeader', '_parse_header', 'parse_header']
 
 ANG_HEADER_CHAR: Final[str] = '#'
 ANG_PROPERTY_SEP: Final[str] = ':'
@@ -79,6 +80,14 @@ ANG_HEADER_PARSE_MAP: Final[Dict[str, Type]] = {
   ANG_COLUMN_UNITS : str,
 }
 
+ANG_DYNAMIC_LENGTH_UNIT_REP = '@LENGTH_UNIT@'
+
+ANG_HEADER_UNITS_MAP: Final[Dict[str, str]] = {
+  ANG_TEM_PIX_PER_UM : f'{ANG_DYNAMIC_LENGTH_UNIT_REP}/pixel',
+  ANG_XSTEP : ANG_DYNAMIC_LENGTH_UNIT_REP,
+  ANG_YSTEP : ANG_DYNAMIC_LENGTH_UNIT_REP,
+}
+
 @dataclass
 class HKLFamily:
   h: int = 0
@@ -102,10 +111,10 @@ class AngPhase:
 class AngHeader:
   def __init__(self) -> None:
     self.phases: Dict[int, AngPhase] = {}
-    self.entries: Dict[str, Any] = {}
+    self.entries: List[MetaForgeMetadata] = []
     self.notes: str = ''
     self.col_notes: str = ''
-    self.unknown_entries: Dict[str, str] = {}
+    self.unknown_entries: List[MetaForgeMetadata] = []
 
 class AngParser(MetaForgeParser):
 
@@ -163,9 +172,15 @@ class AngParser(MetaForgeParser):
   def parse_column_notes(self, file: Generator[str, None, None]) -> str:
     return self.join_lines_until(file, ANG_END_COLUMN_NOTES)
 
-  def parse_header(self, filepath: Path) -> AngHeader:
+  def _parse_header(self, filepath: Path) -> Tuple[AngHeader, str, str]:
     file_gen = file_line_generator(filepath)
+    data_units = MICRONS_UNITS
+    for line in file_gen:
+      # Check for units-specific lines
+      if line.strip() in ['# TEM data', '# File Created from ACOM RES results']:
+          data_units = NANOMETERS_UNITS
 
+    file_gen = file_line_generator(filepath)
     ang_header = AngHeader()
     current_phase: Optional[AngPhase] = None
     for line in file_gen:
@@ -210,24 +225,28 @@ class AngParser(MetaForgeParser):
           value = None
           if len(tokens) > 1:
             value = ANG_HEADER_PARSE_MAP[keyword](' '.join(tokens[1:]))
-          ang_header.entries[f'SOURCE/{keyword}'] = value
+            units = ANG_HEADER_UNITS_MAP.get(keyword, '')
+            if ANG_DYNAMIC_LENGTH_UNIT_REP in units:
+              units = units.replace(ANG_DYNAMIC_LENGTH_UNIT_REP, data_units)
+            ang_header.entries.append(MetaForgeMetadata(f'SOURCE/{keyword}', value, '', units))
         else:
-          ang_header.unknown_entries[f'SOURCE/{keyword}'] = ' '.join(tokens[1:])
+          ang_header.unknown_entries.append(MetaForgeMetadata(f'SOURCE/{keyword}', ' '.join(tokens[1:])))
     return ang_header
 
-  def parse_header_as_dict(self, filepath: Path) -> dict:
-    header = self.parse_header(filepath)
+  def parse_header(self, filepath: Path) -> List[MetaForgeMetadata]:
+    header = self._parse_header(filepath)
     entries = header.entries
     phases = header.phases
 
     for x in phases:
       phase = phases[x]
-      entries[f'SOURCE/Phases/Phase {x}/MaterialName'] = phase.material_name
-      entries[f'SOURCE/Phases/Phase {x}/Formula'] = phase.formula
-      entries[f'SOURCE/Phases/Phase {x}/Symmetry'] = phase.symmetry
-      entries[f'SOURCE/Phases/Phase {x}/PointGroupID'] = phase.point_group_id
-      entries[f'SOURCE/Phases/Phase {x}/LatticeConstants (ABC)'] = [phase.lattice_constants[0], phase.lattice_constants[1], phase.lattice_constants[2]]
-      entries[f'SOURCE/Phases/Phase {x}/LatticeConstants (Alpha, Beta, Gamma)'] = [phase.lattice_constants[3], phase.lattice_constants[4], phase.lattice_constants[5]]
-      entries[f'SOURCE/Phases/Phase {x}/NumberFamilies'] = len(phase.hkl_families)
+      annotations = f'Phase {x}, {ANG_LAUE_CLASS_MAP.get(phase.symmetry, "Unknown")}'
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {x}/MaterialName', phase.material_name, annotations))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {x}/Formula', phase.formula, annotations))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {x}/Symmetry', phase.symmetry, annotations))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {x}/PointGroupID', phase.point_group_id, annotations))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {x}/LatticeConstants (ABC)', [phase.lattice_constants[0], phase.lattice_constants[1], phase.lattice_constants[2]], annotations, ANGSTROM_UNITS))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {x}/LatticeConstants (Alpha, Beta, Gamma)', [phase.lattice_constants[3], phase.lattice_constants[4], phase.lattice_constants[5]], annotations, DEGREES_UNITS))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {x}/NumberFamilies', len(phase.hkl_families), annotations))
 
     return entries

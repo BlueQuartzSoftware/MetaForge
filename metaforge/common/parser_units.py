@@ -1,0 +1,5 @@
+MICRONS_UNITS = 'microns'
+PIXELS_UNITS = 'pixels'
+ANGSTROM_UNITS = 'angstrom'
+DEGREES_UNITS = 'degrees'
+NANOMETERS_UNITS = 'nanometers'

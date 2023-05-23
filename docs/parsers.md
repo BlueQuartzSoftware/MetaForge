@@ -30,8 +30,8 @@ interface to choose the parser, the `version` and `uuid` are used internally.
 The functions `supported_file_extensions` and `accepts_extension` are used to
 see if a given file can be loaded.
 
-The main method in the parser is the `parse_header_as_dict`. The primary role
-of this method is to read the file and create a Python dict that will be passed
+The main method in the parser is the `parse_header`. The primary role
+of this method is to read the file and create a Python list that will be passed
 to the user interface so that templates can be developed to ingest metadata.
 This is the primary entrypoint to the parser and what it returns should be
 consistent given the same inputs.
@@ -55,7 +55,7 @@ like a visitor pattern to walk a tree. Once you are done parsing the metadata
 the dict should be returned.
 
 ```python
-def parse_header_as_dict(self, filepath: Path) -> dict:
+def parse_header(self, filepath: Path) -> dict:
   # Do some thing to create your dict here...
   return self.file_dict
 ```

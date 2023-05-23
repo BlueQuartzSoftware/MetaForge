@@ -4,7 +4,7 @@ from pathlib import Path
 from uuid import UUID
 from flatten_dict import flatten
 
-from metaforge.parsers.metaforgeparser import MetaForgeParser
+from metaforge.parsers.metaforgeparser import MetaForgeParser, MetaForgeMetadata
 
 from PIL import Image
 from PIL.TiffTags import TAGS
@@ -30,7 +30,7 @@ class IniParser(MetaForgeParser):
       return True
     return False
 
-  def parse_header_as_dict(self, filepath: Path) -> dict:
+  def parse_header(self, filepath: Path) -> List[MetaForgeMetadata]:
     """
     Description:
 
@@ -48,7 +48,7 @@ class IniParser(MetaForgeParser):
     -------
     ```
     parser = IniParser()
-    parser.parse_header_as_dict('/some/path/to/a/file.ini')
+    parser.parse_header('/some/path/to/a/file.ini')
     ```
     This code returns:
     ```
@@ -67,5 +67,4 @@ class IniParser(MetaForgeParser):
       file_dict = {"SOURCE": header}
       file_dict = flatten(file_dict, reducer="path")
 
-    return file_dict
-
+    return [MetaForgeMetadata(source_path, value) for source_path, value in file_dict.items()]

@@ -1,7 +1,14 @@
 from abc import ABC, abstractmethod
-from typing import List, Tuple, Union
+from typing import List, Tuple, Union, Any
 from pathlib import Path
 from uuid import UUID
+
+class MetaForgeMetadata:
+  def __init__(self, source_path: str, value: Any, annotations: str = '', units: str = '') -> None:
+      self.source_path = source_path
+      self.value = value
+      self.annotations = annotations
+      self.units = units
 
 class MetaForgeParser(ABC):
   @abstractmethod
@@ -46,9 +53,9 @@ class MetaForgeParser(ABC):
     raise NotImplementedError
 
   @abstractmethod
-  def parse_header_as_dict(self, filepath: Path) -> dict:
+  def parse_header(self, filepath: Path) -> List[MetaForgeMetadata]:
     """
-    This function returns a dictionary of the 'header' information, i.e., the metadata from the file
+    This function returns a list of the 'header' information, i.e., the metadata from the file
 
     Parameters
     ----------

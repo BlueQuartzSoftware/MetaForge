@@ -6,7 +6,7 @@ import os
 import xml.etree.ElementTree as ET
 from xml.etree.ElementTree import Element
 
-from metaforge.parsers.metaforgeparser import MetaForgeParser
+from metaforge.parsers.metaforgeparser import MetaForgeParser, MetaForgeMetadata
 
 class XmlParser(MetaForgeParser):
   def __init__(self) -> None:
@@ -63,7 +63,7 @@ class XmlParser(MetaForgeParser):
     if len(data.attrib) > 0:
       self.visit_dict(f'{prefix}.attrs', data.attrib)
 
-  def parse_header_as_dict(self, filepath: Path) -> dict:
+  def parse_header(self, filepath: Path) -> List[MetaForgeMetadata]:
     """
     Description:
 
@@ -81,7 +81,7 @@ class XmlParser(MetaForgeParser):
     -------
     ```
     parser = XmlParser()
-    parser.parse_header_as_dict('/some/path/to/a/file.xml')
+    parser.parse_header('/some/path/to/a/file.xml')
     ```
     """
     # Check our file exists before trying to open it!
@@ -92,5 +92,4 @@ class XmlParser(MetaForgeParser):
     root = tree.getroot()
     self.visit_entry(root.tag, root)
 
-    return self.file_dict
-
+    return [MetaForgeMetadata(source_path, value) for source_path, value in self.file_dict.items()]

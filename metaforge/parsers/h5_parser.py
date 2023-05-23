@@ -6,11 +6,11 @@ import os
 import h5py
 import numpy
 
-from metaforge.parsers.metaforgeparser import MetaForgeParser
+from metaforge.parsers.metaforgeparser import MetaForgeParser, MetaForgeMetadata
 
 class H5Parser(MetaForgeParser):
   def __init__(self) -> None:
-    self.ext_list: list = ['.h5', '.oh5', '.emd']
+    self.ext_list: list = ['.h5', '.hdf5', '.oh5', '.emd', '.dream3d']
     self.count: int = 0
     self.file_dict: object = {}
 
@@ -84,7 +84,7 @@ class H5Parser(MetaForgeParser):
     if isinstance(data, h5py.Dataset):
       if data.len() == 1:
         # Handle the simple cases.
-        value = self.type_dispatch(data[0])
+        value = self.type_dispatch(data[0]) 
         if value is not None:
           self.file_dict[name] = value
       elif data.len() <= 16:
@@ -98,7 +98,7 @@ class H5Parser(MetaForgeParser):
           self.file_dict[name] = f'Large Dataset ({data.len()} elements)'
       self.count += 1
 
-  def parse_header_as_dict(self, filepath: Path) -> dict:
+  def parse_header(self, filepath: Path) -> List[MetaForgeMetadata]:
     """
     Description:
 
@@ -116,7 +116,7 @@ class H5Parser(MetaForgeParser):
     -------
     ```
     parser = H5Parser()
-    parser.parse_header_as_dict('/some/path/to/a/file.h5')
+    parser.parse_header('/some/path/to/a/file.h5')
     ```
     """
     # Check our file exists before trying to open it!
@@ -124,5 +124,4 @@ class H5Parser(MetaForgeParser):
       self.file = h5py.File(filepath, 'r')
       self.file.visit(self.visit_entry)
 
-    return self.file_dict
-
+    return [MetaForgeMetadata(source_path, value) for source_path, value in self.file_dict.items()]

@@ -1,15 +1,15 @@
-import os
-
 from dataclasses import dataclass
 from enum import IntEnum
 from typing import Any, Callable, Dict, Final, Generator, List, Tuple
 from pathlib import Path
 from uuid import UUID
 
-from metaforge.parsers.metaforgeparser import MetaForgeParser
+from metaforge.common.parser_units import MICRONS_UNITS, DEGREES_UNITS, ANGSTROM_UNITS
+from metaforge.common.hkl_constants import CTF_LAUE_CLASS_MAP
+from metaforge.parsers.metaforgeparser import MetaForgeParser, MetaForgeMetadata
 from metaforge.utilities.path_utilities import file_line_generator
 
-__all__ = ['CtfPhase', 'CtfHeader', 'parse_header', 'parse_header_as_dict']
+__all__ = ['CtfPhase', 'CtfHeader', 'parse_header', 'parse_header']
 
 CTF_DELIMITER: Final[str] = '\t'
 
@@ -60,6 +60,12 @@ CTF_HEADER_PARSE_MAP: Final[Dict[str, Callable[[str], Any]]] = {
   CTF_EULER : str,
 }
 
+CTF_HEADER_UNITS_MAP: Final[Dict[str, str]] = {
+  CTF_X_STEP : MICRONS_UNITS,
+  CTF_Y_STEP : MICRONS_UNITS,
+  CTF_Z_STEP : MICRONS_UNITS,
+}
+
 @dataclass
 class CtfPhase:
   index: int = 0
@@ -89,8 +95,8 @@ class LaueGroup(IntEnum):
 class CtfHeader:
   def __init__(self) -> None:
     self.phases: Dict[int, CtfPhase] = {}
-    self.entries: Dict[str, Any] = {}
-    self.unknown_entries: Dict[str, str] = {}
+    self.entries: List[MetaForgeMetadata] = []
+    self.unknown_entries: List[MetaForgeMetadata] = []
 
 class CtfParser(MetaForgeParser):
 
@@ -125,9 +131,9 @@ class CtfParser(MetaForgeParser):
     for i in range(num_phases):
       line = next(file).strip()
       tokens = line.split('\t')
-      lattice_constants = self.parse_float_triplet(tokens[0])
-      lattice_angles = self.parse_float_triplet(tokens[1])
-      name = tokens[2]
+      lattice_constants = self.parse_float_triplet(tokens[0].strip())
+      lattice_angles = self.parse_float_triplet(tokens[1].strip())
+      name = tokens[2].strip()
       group = LaueGroup(int(tokens[3]))
 
       comment = ''
@@ -136,12 +142,12 @@ class CtfParser(MetaForgeParser):
       internal2 = ''
 
       if len(tokens) == 5:
-        comment = tokens[4]
+        comment = tokens[4].strip()
       elif len(tokens) == 8:
-        space_group = int(tokens[4])
-        internal1 = tokens[5]
-        internal2 = tokens[6]
-        comment = tokens[7]
+        space_group = int(tokens[4].strip())
+        internal1 = tokens[5].strip()
+        internal2 = tokens[6].strip()
+        comment = tokens[7].strip()
 
       phase = CtfPhase(i+1, lattice_constants, lattice_angles, name, group, space_group, comment, internal1, internal2)
       phases.append(phase)
@@ -149,24 +155,25 @@ class CtfParser(MetaForgeParser):
     return phases
 
   def parse_ctf_long_text(self, tokens: List[str]) -> Dict[str, Any]:
-    mag = int(tokens[2])
-    coverage = int(tokens[4])
-    device = int(tokens[6])
-    kv = int(tokens[8])
-    tilt_angle = float(tokens[10])
-    tilt_axis = float(tokens[12])
-    entries = {
-      f'SOURCE/{CTF_MAG}' : mag,
-      f'SOURCE/{CTF_COVERAGE}' : coverage,
-      f'SOURCE/{CTF_DEVICE}' : device,
-      f'SOURCE/{CTF_KV}' : kv,
-      f'SOURCE/{CTF_TILT_ANGLE}' : tilt_angle,
-      f'SOURCE/{CTF_TILT_AXIS}' : tilt_axis,
-    }
+    mag = int(tokens[2].strip())
+    coverage = int(tokens[4].strip())
+    device = int(tokens[6].strip())
+    kv = int(float(tokens[8].strip()))
+    tilt_angle = float(tokens[10].strip())
+    tilt_axis = float(tokens[12].strip())
+    entries = [
+      MetaForgeMetadata(f'SOURCE/{CTF_MAG}', mag),
+      MetaForgeMetadata(f'SOURCE/{CTF_COVERAGE}', coverage),
+      MetaForgeMetadata(f'SOURCE/{CTF_DEVICE}', device),
+      MetaForgeMetadata(f'SOURCE/{CTF_KV}', kv),
+      MetaForgeMetadata(f'SOURCE/{CTF_TILT_ANGLE}', tilt_angle),
+      MetaForgeMetadata(f'SOURCE/{CTF_TILT_AXIS}', tilt_axis),
+    ]
     return entries
 
-  def parse_header(self, filepath: Path) -> CtfHeader:
+  def _parse_header(self, filepath: Path) -> CtfHeader:
     file_gen = file_line_generator(filepath)
+
     ctf_header = CtfHeader()
     for line in file_gen:
       line = line.strip()
@@ -175,10 +182,10 @@ class CtfParser(MetaForgeParser):
       if line.startswith(CTF_CHANNEL_TEXT_FILE) or line.startswith(CTF_COLON_CHANNEL_TEXT_FILE):
         continue
       elif line.startswith(CTF_PRJ):
-        ctf_header.entries[f'SOURCE/{CTF_PRJ}'] = line[len(CTF_PRJ) + 1:]
+        ctf_header.entries.append(MetaForgeMetadata(f'SOURCE/{CTF_PRJ}', line[len(CTF_PRJ) + 1:]))
       elif line.startswith(CTF_LONG_TEXT):
         entries = self.parse_ctf_long_text(tokens)
-        ctf_header.entries.update(entries)
+        ctf_header.entries += entries
       elif line.startswith(CTF_PHASES):
         phase_num = int(tokens[1])
         ctf_header.phases = self.parse_phases(file_gen, phase_num)
@@ -187,24 +194,26 @@ class CtfParser(MetaForgeParser):
         value = None
         if len(tokens) > 1:
           value = CTF_HEADER_PARSE_MAP[keyword](CTF_DELIMITER.join(tokens[1:]))
-        ctf_header.entries[f'SOURCE/{keyword}'] = value
+        units = CTF_HEADER_UNITS_MAP.get(keyword, '')
+        ctf_header.entries.append(MetaForgeMetadata(f'SOURCE/{keyword}', value, '', units))
       else:
-        ctf_header.unknown_entries[f'SOURCE/{keyword}'] = CTF_DELIMITER.join(tokens[1:])
+        ctf_header.unknown_entries.append(MetaForgeMetadata(f'SOURCE/{keyword}', CTF_DELIMITER.join(tokens[1:])))
     return ctf_header
 
-  def parse_header_as_dict(self, filepath: Path) -> dict:
-    header = self.parse_header(filepath)
+  def parse_header(self, filepath: Path) -> List[MetaForgeMetadata]:
+    header = self._parse_header(filepath)
     entries = header.entries
     phases = header.phases
         
     for phase in phases:
-      entries[f'SOURCE/Phases/Phase {phase.index}/LaueGroup'] = str(phase.group.name)
-      entries[f'SOURCE/Phases/Phase {phase.index}/Internal1'] = phase.internal1
-      entries[f'SOURCE/Phases/Phase {phase.index}/Internal2'] = phase.internal2
-      entries[f'SOURCE/Phases/Phase {phase.index}/LatticeAngles'] = phase.lattice_angles
-      entries[f'SOURCE/Phases/Phase {phase.index}/LatticeConstants'] = phase.lattice_constants
-      entries[f'SOURCE/Phases/Phase {phase.index}/Name'] = phase.name
-      entries[f'SOURCE/Phases/Phase {phase.index}/SpaceGroup'] = phase.space_group
-      entries[f'SOURCE/Phases/Phase {phase.index}/Comment'] = phase.comment
+      annotations = f'Phase {phase.index}, {CTF_LAUE_CLASS_MAP.get(phase.index, "Unknown")}'
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {phase.index}/LaueGroup', str(phase.group.name), annotations))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {phase.index}/Internal1', phase.internal1, annotations))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {phase.index}/Internal2', phase.internal2, annotations))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {phase.index}/LatticeAngles', phase.lattice_angles, annotations, DEGREES_UNITS))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {phase.index}/LatticeConstants', phase.lattice_constants, annotations, ANGSTROM_UNITS))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {phase.index}/Name', phase.name, annotations))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {phase.index}/SpaceGroup', phase.space_group, annotations))
+      entries.append(MetaForgeMetadata(f'SOURCE/Phases/Phase {phase.index}/Comment', phase.comment, annotations))
 
     return entries

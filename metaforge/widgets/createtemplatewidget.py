@@ -42,6 +42,7 @@ class CreateTemplateWidget(QWidget):
         self.style_sheet_helper: MetaForgeStyleDataHelper = MetaForgeStyleDataHelper(self)
         self.ui = Ui_CreateTemplateWidget()
         self.ui.setupUi(self)
+        self.dialog_start_location = QStandardPaths.displayName(QStandardPaths.HomeLocation)
         self.qparsers_cb_model: QParserComboBoxModel = None
         self.proxy_parsers_model = QProxyParserComboBoxModel(self)
         self.metadata_model: MetadataModel = MetadataModel()
@@ -269,10 +270,10 @@ class CreateTemplateWidget(QWidget):
             return False
 
         # Parse the metadata dictionary from the input data file
-        headerDict = parser.parse_header_as_dict(file_path)
+        metadata_list = parser.parse_header(file_path)
         
         # Create an MetadataModel from the metadata dictionary
-        metadata_model = MetadataModel.create_model_from_dict(model_dict=headerDict, source_type=MetadataEntry.SourceType.FILE)
+        metadata_model = MetadataModel.create_model(metadata_list, source_type=MetadataEntry.SourceType.FILE)
 
         # Merge the new MetadataModel with the existing MetadataModel
         self._merge_metadata_model(metadata_model=metadata_model)
@@ -314,8 +315,7 @@ class CreateTemplateWidget(QWidget):
     def select_input_data_file(self, fileLink=None):
         notify_no_errors(self.ui.error_label)
         if fileLink == False:
-            file_path = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(
-                QStandardPaths.HomeLocation), self.tr("Files (*.*)"))[0]
+            file_path = QFileDialog.getOpenFileName(self, self.tr("Select File"), self.dialog_start_location, self.tr("Files (*.*)"))[0]
         else:
             file_path = fileLink
 
@@ -324,6 +324,7 @@ class CreateTemplateWidget(QWidget):
             self.ui.dataFileLineEdit.setText(file_path)
 
             file_path = Path(file_path)
+            self.dialog_start_location = str(file_path.parent)
 
             if self.ui.fileParserCombo.currentIndex() == -1:
                 parser, err_msg = self.qparsers_cb_model.find_parser_from_data_path(file_path)
