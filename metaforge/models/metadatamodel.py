@@ -87,9 +87,9 @@ class MetadataModel:
                 model.entries.append(metadata_entry)
         return model
 
-    def update_model_values_from_dict(self, item: dict, parent_path: str = "") -> List[MetadataEntry]:
+    def update_model_values(self, metadata_list: List[MetaForgeMetadata]) -> List[MetadataEntry]:
         visited = [False for _ in range (self.size())]
-        self._update_model_values_from_dict(item, parent_path, visited)
+        self._update_model_values(metadata_list, visited)
 
         missing_entries: List[MetadataEntry] = []
         for i in range(len(visited)):
@@ -99,21 +99,18 @@ class MetadataModel:
             
         return missing_entries
     
-    def _update_model_values_from_dict(self, item: dict, parent_path: str = "", visited: list = []):
-        for key, value in item.items():
-            if type(value) is dict:
-                new_parent_path = parent_path + key + '/'
-                self._update_model_values_from_dict(value, new_parent_path, visited)
-            else:
-                item_path = parent_path + key
-                entry = self.entry_by_source(item_path)
-                
-                idx = self.index_from_source(item_path)
-                if idx >= 0:
-                    visited[idx] = True
+    def _update_model_values(self, metadata_list: List[MetaForgeMetadata], visited: list = []):
+        for metadata in metadata_list:            
+            idx = self.index_from_source(metadata.source_path)
+            if idx >= 0:
+                visited[idx] = True
 
-                if entry is not None and entry.override_source_value is False:
-                    entry.ht_value = value
+            entry = self.entry_by_source(metadata.source_path)
+            if entry is not None:
+                if entry.override_source_value is False:
+                    entry.ht_value = metadata.value
+                    entry.ht_annotation = metadata.annotations
+                    entry.ht_units = metadata.units
 
 
     def append(self, entry: MetadataEntry):

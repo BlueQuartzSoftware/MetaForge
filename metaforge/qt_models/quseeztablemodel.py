@@ -18,7 +18,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_OVERRIDDEN_MSG = 'Data file value overridden'
     K_MISSING_MSG = "Missing from data file"
     K_FROMTEMPLATE_MSG = "Using value from template file"
-    K_FROMFILE_MSG = "Using data file value"
+    K_FROMFILE_MSG = "Using data file values"
     K_CUSTOMENTRY_MSG = "Custom entry"
 
     # Row colors

@@ -414,9 +414,9 @@ class UseTemplateWidget(QWidget):
         parser, err_msg = self.parsers_model.find_parser_from_data_path(file_path)
         if parser is None:
             self._notify_error_message(err_msg)
-        headerDict = parser.parse_header(file_path)
+        metadata_list = parser.parse_header(file_path)
 
-        self.use_ez_table_model_proxy.missing_entries = self.use_ez_table_model.metadata_model.update_model_values_from_dict(headerDict)
+        self.use_ez_table_model_proxy.missing_entries = self.use_ez_table_model.metadata_model.update_model_values(metadata_list)
         self.use_ez_table_model_proxy.metadata_file_chosen = True
 
         index0 = self.use_ez_table_model_proxy.index(0, 0)
