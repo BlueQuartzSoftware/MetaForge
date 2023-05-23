@@ -228,7 +228,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
 
     def flags(self, index) -> Qt.ItemFlags:
         if not index.isValid():
-            return Qt.NoItemFlags
+            return Qt.ItemIsDropEnabled
 
         source_row = self.mapToSource(index).row()
         metadata_entry: MetadataEntry = self.sourceModel().metadata_model.entry(source_row)
@@ -251,39 +251,39 @@ class QUseEzTableModel(QSortFilterProxyModel):
             return self._get_default_flags()
 
     def _get_source_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
     
     def _get_htname_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
         if metadata_entry.source_type is MetadataEntry.SourceType.FILE:
             if metadata_entry not in self.missing_entries:
                 if metadata_entry.editable is True:
-                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+                    return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         elif metadata_entry.editable is True:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
     
     def _get_htvalue_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
         if metadata_entry.editable is True:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
 
     def _get_htannotation_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
         if metadata_entry.editable is True:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         else:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
     
     def _get_htunits_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
         if metadata_entry.editable is True:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         else:
-            return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+            return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
     
     def _get_parsingmessages_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
 
     def _get_removecolumn_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
-        return self._get_default_flags() | Qt.ItemIsEditable
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
     
     def _get_default_flags(self):
-        return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+        return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDropEnabled

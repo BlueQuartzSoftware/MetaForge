@@ -14,7 +14,6 @@ from metaforge.widgets.utilities.widget_utilities import notify_no_errors
 qt_version = PySide2.QtCore.__version_info__
 if qt_version[1] == 12:
     from metaforge.widgets.generated_5_12.ui_metaforge_preferences import Ui_MetaForgePreferences
-    from metaforge.widgets.generated_5_12.ui_metaforge_preferences import Ui_MetaForgePreferences
 elif qt_version[1] == 15:
     from metaforge.widgets.generated_5_15.ui_metaforge_preferences import Ui_MetaForgePreferences
 

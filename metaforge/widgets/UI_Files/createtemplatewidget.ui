@@ -249,6 +249,9 @@
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
+         <property name="acceptDrops">
+          <bool>true</bool>
+         </property>
          <property name="toolTip">
           <string>The metadata chosen to be included in the new template file.</string>
          </property>
@@ -265,10 +268,19 @@
           <set>QAbstractItemView::AnyKeyPressed|QAbstractItemView::DoubleClicked</set>
          </property>
          <property name="showDropIndicator" stdset="0">
-          <bool>false</bool>
+          <bool>true</bool>
+         </property>
+         <property name="dragEnabled">
+          <bool>true</bool>
          </property>
          <property name="dragDropOverwriteMode">
           <bool>false</bool>
+         </property>
+         <property name="dragDropMode">
+          <enum>QAbstractItemView::InternalMove</enum>
+         </property>
+         <property name="defaultDropAction">
+          <enum>Qt::MoveAction</enum>
          </property>
          <property name="alternatingRowColors">
           <bool>true</bool>
