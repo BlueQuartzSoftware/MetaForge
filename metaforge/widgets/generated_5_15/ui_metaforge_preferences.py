@@ -3,14 +3,14 @@
 ################################################################################
 ## Form generated from reading UI file 'metaforge_preferences.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.8
+## Created by: Qt User Interface Compiler version 5.15.2
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *  # type: ignore
-from PySide2.QtGui import *  # type: ignore
-from PySide2.QtWidgets import *  # type: ignore
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
 
 from  . import resources_rc
 
@@ -89,12 +89,7 @@ class Ui_MetaForgePreferences(object):
         self.buttonBox.setOrientation(Qt.Horizontal)
         self.buttonBox.setStandardButtons(QDialogButtonBox.Cancel|QDialogButtonBox.Ok)
 
-        self.gridLayout.addWidget(self.buttonBox, 2, 0, 1, 1)
-
-        self.error_string = QLabel(MetaForgePreferences)
-        self.error_string.setObjectName(u"error_string")
-
-        self.gridLayout.addWidget(self.error_string, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.buttonBox, 1, 0, 1, 1)
 
 
         self.retranslateUi(MetaForgePreferences)
@@ -116,6 +111,5 @@ class Ui_MetaForgePreferences(object):
         self.addBtn.setText("")
         self.label.setText(QCoreApplication.translate("MetaForgePreferences", u"Search", None))
         self.parser_directories_label.setText(QCoreApplication.translate("MetaForgePreferences", u"Parsers", None))
-        self.error_string.setText(QCoreApplication.translate("MetaForgePreferences", u"ERROR_STRING", None))
     # retranslateUi
 

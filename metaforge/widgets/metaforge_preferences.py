@@ -9,7 +9,6 @@ from metaforge.undo_stack_commands.load_parsers_command import LoadParsersComman
 from metaforge.undo_stack_commands.remove_parsers_command import RemoveParsersCommand
 from metaforge.qt_models.qparsertablemodel import QParserTableModel
 from metaforge.delegates.checkboxdelegate import CheckBoxDelegate
-from metaforge.widgets.utilities.widget_utilities import notify_no_errors
 
 qt_version = PySide2.QtCore.__version_info__
 if qt_version[1] == 12:
@@ -18,8 +17,6 @@ elif qt_version[1] == 15:
     from metaforge.widgets.generated_5_15.ui_metaforge_preferences import Ui_MetaForgePreferences
 
 class MetaForgePreferencesDialog(QDialog):
-    K_NO_ERRORS_STR = "No errors."
-
     def __init__(self, parent=None):
         super(MetaForgePreferencesDialog, self).__init__(parent)
         self.ui = Ui_MetaForgePreferences()
@@ -42,11 +39,14 @@ class MetaForgePreferencesDialog(QDialog):
 
         self.ui.buttonBox.button(QDialogButtonBox.Ok).pressed.connect(self.accept)
         self.ui.buttonBox.button(QDialogButtonBox.Cancel).pressed.connect(self.reject)
-
-        notify_no_errors(self.ui.error_string)
+        self.ui.removeBtn.setDisabled(True)
     
     def _handle_parser_directories_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
         proxy_indexes: List[QModelIndex] = self.ui.parser_directories_table.selectionModel().selectedRows()
+        if len(proxy_indexes) == 0:
+            self.ui.removeBtn.setDisabled(True)
+            return
+
         for proxy_index in proxy_indexes:
             is_default = self.qproxy_parser_table_model.data(proxy_index, QParserTableModel.Default)
             if is_default:
@@ -70,7 +70,6 @@ class MetaForgePreferencesDialog(QDialog):
         remove_parsers_command = RemoveParsersCommand(self.qparser_table_model, selected_rows)
         self.undo_stack.push(remove_parsers_command)
         
-        notify_no_errors(self.ui.error_string)
         self.ui.buttonBox.button(QDialogButtonBox.Ok).setEnabled(True)
 
     def _setup_parser_directories_table(self):
