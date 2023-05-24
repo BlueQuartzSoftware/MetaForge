@@ -92,7 +92,6 @@ class MetaForgePreferencesDialog(QDialog):
 
     def accept(self):
         self.undo_stack.clear()
-        self.qparser_table_model.update_watched_parsers()
         self.qparser_table_model.model_about_to_change.emit()
         self.qparser_table_model.model_changed.emit()
         super().accept()

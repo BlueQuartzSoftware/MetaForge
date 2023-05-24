@@ -21,9 +21,7 @@ class LoadParsersCommand(QUndoCommand):
             if index < 0:
                 # Parser is not loaded, so load it
                 self.indexes_loaded.append(self._parser_model.rowCount())
-                self._parser_model.beginInsertRows(QModelIndex(), self._parser_model.rowCount(), self._parser_model.rowCount())
-                self._parser_model._ez_parser_model.append(ParserModelItem(parser_file_path))
-                self._parser_model.endInsertRows()
+                self._parser_model.append(ParserModelItem(parser_file_path))
     
     def undo(self):
         if len(self.indexes_loaded) > 0:

@@ -26,6 +26,4 @@ class RemoveParsersCommand(QUndoCommand):
             parser_file_path = self.parser_paths_removed[idx]
             index = self.rows[idx]
 
-            self._parser_model.beginInsertRows(QModelIndex(), index, index)
-            self._parser_model._ez_parser_model.insert(index, ParserModelItem(parser_file_path))
-            self._parser_model.endInsertRows()
+            self._parser_model.insert(index, ParserModelItem(parser_file_path))

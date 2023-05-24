@@ -3,6 +3,7 @@ from PySide2.QtGui import QColor, QIcon, QPixmap
 
 from pathlib import Path
 
+from metaforge.models.parsermodelitem import ParserModelItem
 from metaforge.models.parsermodel import ParserModel
 from metaforge.parsers.metaforgeparser import MetaForgeParser
 
@@ -141,6 +142,8 @@ class QParserTableModel(QAbstractTableModel):
         self.beginRemoveRows(parent, row, row + count - 1)
         persistent_indexes = [QPersistentModelIndex(self.index(idx, 0, parent)) for idx in range(row, row + count)]
         for persistent_index in persistent_indexes:
+            parser_path = self._ez_parser_model.parser_path(persistent_index.row())
+            self._parser_watcher.removePath(str(parser_path))
             self._ez_parser_model.remove_by_index(persistent_index.row())
         self.endRemoveRows()
         return True
@@ -153,6 +156,18 @@ class QParserTableModel(QAbstractTableModel):
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsUserCheckable
         else:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable
+    
+    def append(self, parser_item: ParserModelItem):
+        self.beginInsertRows(QModelIndex(), self.rowCount(), self.rowCount())
+        self._ez_parser_model.append(parser_item)
+        self._parser_watcher.addPath(str(parser_item.parser_path))
+        self.endInsertRows()
+    
+    def insert(self, index: int, parser_item: ParserModelItem):
+        self.beginInsertRows(QModelIndex(), index, index)
+        self._ez_parser_model.insert(index, parser_item)
+        self._parser_watcher.addPath(str(parser_item.parser_path))
+        self.endInsertRows()
 
     def _update_parser(self, parser_file_path: str):
         self._reload_parser(Path(parser_file_path))
@@ -166,9 +181,4 @@ class QParserTableModel(QAbstractTableModel):
         top_left = self.index(index, self.K_PARSER_NAME_COL_INDEX)
         bottom_right = self.index(index, self.K_PARSER_MESSAGES_COL_INDEX)
         self.dataChanged.emit(top_left, bottom_right)
-    
-    def update_watched_parsers(self):
-        [self._parser_watcher.removePath(file_path) for file_path in self._parser_watcher.files() if self._ez_parser_model.index_from_parser_path(Path(file_path)) < 0]
-        [self._parser_watcher.addPath(str(ez_parser.parser_path)) for ez_parser in self._ez_parser_model.parser_metadata_list if str(ez_parser.parser_path) not in self._parser_watcher.files()]
-
 
