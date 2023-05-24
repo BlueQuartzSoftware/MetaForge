@@ -66,7 +66,7 @@ class MetaForgePreferencesDialog(QDialog):
 
     def _remove_selected_files(self):
         selected_rows: List[QModelIndex] = self.ui.parser_directories_table.selectionModel().selectedRows()
-        selected_rows = [index.row() for index in selected_rows]
+        selected_rows = [self.qproxy_parser_table_model.mapToSource(index).row() for index in selected_rows]
         remove_parsers_command = RemoveParsersCommand(self.qparser_table_model, selected_rows)
         self.undo_stack.push(remove_parsers_command)
         
