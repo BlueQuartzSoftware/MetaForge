@@ -3,7 +3,7 @@ from dataclasses import dataclass, field
 from dataclasses_json import dataclass_json
 import json
 from pathlib import Path
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 from uuid import UUID
 
 from metaforge.parsers.metaforgeparser import MetaForgeMetadata
@@ -33,7 +33,7 @@ class TemplateModel_V1:
 @dataclass
 class TemplateModel_V2:
     data_file_path: str
-    parser_uuid: str
+    parser_uuid: Optional[str]
     entries: List[MetadataEntry] = field(default_factory=list)
     template_version: str = '2.0'
 

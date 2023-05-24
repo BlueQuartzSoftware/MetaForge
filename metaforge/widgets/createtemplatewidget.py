@@ -48,7 +48,7 @@ class CreateTemplateWidget(QWidget):
         self.metadata_model: MetadataModel = MetadataModel()
         self.ui.dataFileSelect.clicked.connect(self.select_input_data_file)
         self.ui.clearCreateButton.clicked.connect(self.clear)
-        # self.setAcceptDrops(True)
+        self.last_valid_parser: MetaForgeParser = None
         self.numCustoms = 0
         self.cb_saved_parser_path = None
 
@@ -107,6 +107,7 @@ class CreateTemplateWidget(QWidget):
         self.ui.createTemplateListSearchBar.setText("")
         self.ui.createTemplateTreeSearchBar.setText("")
         self.clear_models()
+        self.last_valid_parser = None
     
     def clear_models(self):
         self.metadata_model = MetadataModel()
@@ -116,6 +117,10 @@ class CreateTemplateWidget(QWidget):
         self.metadata_table_model.addCustomRow(self.numCustoms)
         self.numCustoms += 1
         self.ui.metadata_table_view.scrollToBottom()
+
+        # Reload table view
+        self.filter_metadata_table()
+        self.polish_metadata_table()
 
     def eventFilter(self, object, event):
         if object == self.ui.dataFileLineEdit:
@@ -177,14 +182,16 @@ class CreateTemplateWidget(QWidget):
         self.load_metadata_entries(metadata_model=metadata_model)
 
         # Set the parser
-        parser, err_msg = self.qparsers_cb_model.find_parser_from_uuid(parser_uuid)
-        if parser is None:
-            parser, err_msg = self.qparsers_cb_model.find_parser_from_data_path(data_file_path)
-            if (parser is None):
-                self._notify_error_message(err_msg)
-                return
-        
-        parser_index = self.qparsers_cb_model.index_from_parser(parser)
+        parser_index = -1
+        if parser_uuid is not None:
+            parser, err_msg = self.qparsers_cb_model.find_parser_from_uuid(parser_uuid)
+            if parser is None:
+                parser, err_msg = self.qparsers_cb_model.find_parser_from_data_path(data_file_path)
+                if parser is None:
+                    self._notify_error_message(err_msg)
+                    return
+            parser_index = self.qparsers_cb_model.index_from_parser(parser)
+
         self.ui.fileParserCombo.blockSignals(True)
         self.ui.fileParserCombo.setCurrentIndex(parser_index)
         self.ui.fileParserCombo.blockSignals(False)
@@ -225,10 +232,10 @@ class CreateTemplateWidget(QWidget):
     def save_template(self, file_path: str):
         with open(file_path, 'w') as outfile:
             metadata_model = self.metadata_table_model.metadata_model
-            proxy_model_index = self.proxy_parsers_model.index(self.ui.fileParserCombo.currentIndex(), 0)
-            parser_model_index = self.proxy_parsers_model.mapToSource(proxy_model_index)
-            parser: MetaForgeParser = self.qparsers_cb_model.data(parser_model_index, QParserComboBoxModel.Parser)
-            template_model = TemplateModel.create_model(data_file_path=self.ui.dataFileLineEdit.text(), parser_uuid=parser.uuid(), entries=metadata_model.entries)
+            parser_uuid = None
+            if self.last_valid_parser:
+                parser_uuid = self.last_valid_parser.uuid()
+            template_model = TemplateModel.create_model(data_file_path=self.ui.dataFileLineEdit.text(), parser_uuid=parser_uuid, entries=metadata_model.entries)
             model_string = template_model.to_json(indent=4)
             outfile.write(model_string)
 
@@ -260,6 +267,8 @@ class CreateTemplateWidget(QWidget):
 
         if not self.parse_data_file(filePath, parser):
             return
+
+        self.last_valid_parser = parser
     
     def parse_data_file(self, file_path: Path, parser: MetaForgeParser) -> bool:
         if file_path == None:
@@ -340,6 +349,8 @@ class CreateTemplateWidget(QWidget):
                 parser = self.qparsers_cb_model.data(model_index, QParserComboBoxModel.Parser)
                 if not self.parse_data_file(file_path, parser):
                     return
+            
+            self.last_valid_parser = parser
     
     def set_parsers_model(self, qparsers_cb_model: QParserComboBoxModel):
         self.qparsers_cb_model = qparsers_cb_model
