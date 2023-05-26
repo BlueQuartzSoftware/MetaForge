@@ -18,9 +18,14 @@ class HyperThoughtUploader(QObject):
         self.total_bytes = 0.0
         self.bytes_uploaded = 0.0
         self.current_chunk_size = 0
+        self.uploading = False
+    
+    def is_uploading(self) -> bool:
+        return self.uploading
 
     def performUpload(self, upload_list: List[Path], authControl: ht.auth.Authorization, workspace_id, ht_id_path, metadata):
         self.interrupt = False
+        self.uploading = True
         files_api = ht.api.files.FilesAPI(auth=authControl)
 
         self.total_bytes = 0.0
@@ -61,6 +66,10 @@ class HyperThoughtUploader(QObject):
                     new_folder_id = files_api.create_folder(name=Path(root).name, space_id=workspace_id, path=parent_id_path)
                     new_folder_id_path = parent_id_path + new_folder_id + ','
                     for file in files:
+                        if self.interrupt:
+                            self._finish_upload(f"{self.files_uploaded}/{total_file_count} Files Uploaded - Upload Canceled")
+                            return
+
                         file_path = Path(root) / Path(file)
                         ht_file_path = Path(root.replace(str(upload_obj.parent), '')) / Path(file)
                         self.notify_file_progress_text.emit(f"Uploading Folder '{upload_obj.name}' - {str(ht_file_path)}")
@@ -101,3 +110,4 @@ class HyperThoughtUploader(QObject):
         self.notify_list_progress.emit(0)
         self.notify_list_progress_text.emit(msg)
         self.all_uploads_done.emit()
+        self.uploading = False

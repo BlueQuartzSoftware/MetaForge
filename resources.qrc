@@ -10,6 +10,9 @@
 
         <file>resources/Images/arrow-top@2x.png</file>
         <file>resources/Images/arrow-top.png</file>
+
+        <file>resources/Images/file@2x.png</file>
+        <file>resources/Images/file.png</file>
         
         <file>resources/Images/folder@2x.png</file>
         <file>resources/Images/folder.png</file>

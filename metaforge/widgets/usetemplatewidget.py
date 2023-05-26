@@ -5,13 +5,13 @@ import json
 from pathlib import Path
 import hyperthought as ht
 from uuid import UUID
+import shutil
 
 from PySide2.QtWidgets import QMainWindow, QFileDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit
 from PySide2.QtCore import QFile, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize
 from PySide2.QtGui import QCursor, QIcon
 import PySide2.QtCore
 
-from metaforge.parsers.metaforgeparser import MetaForgeParser
 from metaforge.ht_helpers.ht_uploader import HyperThoughtUploader
 from metaforge.models.metadatamodel import MetadataModel, load_template
 from metaforge.widgets.hyperthoughtdialogimpl import HyperthoughtDialogImpl
@@ -57,7 +57,7 @@ class UseTemplateWidget(QWidget):
         self.hyperthoughtui = HyperthoughtDialogImpl()
         self.ui.hyperthoughtTemplateSelect.clicked.connect(self.select_template)
         self.ui.otherDataFileSelect.clicked.connect(self.load_other_data_file)
-        self.ui.hyperthoughtUploadButton.clicked.connect(self.upload_to_hyperthought)
+        self.ui.hyperthoughtUploadButton.clicked.connect(self.handle_ht_upload_button_clicked)
         self.ui.clearUseButton.clicked.connect(self.clear)
         self.setAcceptDrops(True)
 
@@ -132,6 +132,14 @@ class UseTemplateWidget(QWidget):
         self.mThread.wait(250)
 
         super().closeEvent(event)
+    
+    def handle_ht_upload_button_clicked(self):
+        if not self.uploader.is_uploading():
+            self.upload_to_hyperthought()
+        else:
+            self.ui.hyperthoughtUploadButton.setDisabled(True)
+            self.ui.hyperthoughtUploadButton.setText('Canceling...')
+            self.uploader.interruptUpload()
 
     def clear(self):
         self.ui.hyperthoughtTemplateLineEdit.setText("")
@@ -319,51 +327,53 @@ class UseTemplateWidget(QWidget):
             # this is where to remove the row
             self.uselistmodel.removeRow(index.row())
 
-    def save_package(self, pkgpath: Path):
+    def save_package(self, pkg_path: Path):
         # Create package
-        if pkgpath.exists():
-            shutil.rmtree(str(pkgpath))
+        if pkg_path.exists():
+            shutil.rmtree(str(pkg_path))
             
-        pkgpath.mkdir(parents=True)
+        pkg_path.mkdir(parents=True)
 
         # Copy file list to package
-        newfilepaths: List[str] = []
-        for filepath in self.uselistmodel.metadataList:
-            filename = filepath.name
-            newfilepath = pkgpath / filename
-            newfilepaths.append(str(newfilepath))
-            QFile.copy(str(filepath), str(newfilepath))
+        new_paths: List[str] = []
+        for path in self.uselistmodel.metadataList:
+            path_name = path.name
+            new_path = pkg_path / path_name
+            new_paths.append(str(new_path))
+            if path.is_dir():
+                shutil.copytree(path, new_path)
+            else:
+                QFile.copy(str(path), str(new_path))
         
         # Copy template file to package
         template_file_path = self.ui.hyperthoughtTemplateLineEdit.text()
         if template_file_path != "":
-            template_file_path = Path(template_file_path)
-            template_file_name = template_file_path.name
-            new_template_file_path = pkgpath / template_file_name
-            QFile.copy(str(template_file_path), str(new_template_file_path))
+            template_file_name = Path(template_file_path).name
+            new_template_file_path = str(pkg_path / template_file_name)
+            QFile.copy(template_file_path, new_template_file_path)
 
         # Copy "file to extract metadata from" to package
         extraction_file_path = self.ui.otherDataFileLineEdit.text()
+        new_extraction_file_path = ""
         if extraction_file_path != "":
-            extraction_file_path = Path(extraction_file_path)
-            extraction_file_name = extraction_file_path.name
-            new_extraction_file_path = pkgpath / extraction_file_name
-            QFile.copy(str(extraction_file_path), str(new_extraction_file_path))
+            extraction_file_name = Path(extraction_file_path).name
+            new_extraction_file_path = str(pkg_path / extraction_file_name)
+            QFile.copy(extraction_file_path, new_extraction_file_path)
 
         # Save model, file list, template file, file_to_extract,
         # metadata_file_chosen, and missing_entries to json file
         model_dict = {}
         model_dict[self.K_MODEL_KEY_NAME] = self.use_ez_table_model.metadata_model.to_dict()
 
-        model_dict[self.K_FILELIST_KEY_NAME] = newfilepaths
-        model_dict[self.K_TEMPLATEFILE_KEY_NAME] = str(new_template_file_path)
-        model_dict[self.K_FILETOEXTRACT_KEY_NAME] = str(new_extraction_file_path)
+        model_dict[self.K_FILELIST_KEY_NAME] = new_paths
+        model_dict[self.K_TEMPLATEFILE_KEY_NAME] = new_template_file_path
+        model_dict[self.K_FILETOEXTRACT_KEY_NAME] = new_extraction_file_path
         model_dict[self.K_METADATAFILECHOSEN_KEY_NAME] = self.use_ez_table_model_proxy.metadata_file_chosen
         missing_entries: List[str] = []
         for missing_entry in self.use_ez_table_model_proxy.missing_entries:
             missing_entries.append(missing_entry.source_path)
         model_dict[self.K_MISSINGENTRIES_KEY_NAME] = missing_entries
-        paths_output_path = pkgpath / self.K_MODEL_JSON_FILE_NAME
+        paths_output_path = pkg_path / self.K_MODEL_JSON_FILE_NAME
         with paths_output_path.open('w') as outfile:
             json.dump(model_dict, outfile, indent=4)
 
@@ -490,8 +500,12 @@ class UseTemplateWidget(QWidget):
         self.uploader.notify_file_progress.connect(self._update_file_progress)
         self.uploader.notify_list_progress_text.connect(self._update_list_progress_label)
         self.uploader.notify_list_progress.connect(self._update_list_progress)
-        self.ui.hyperthoughtUploadButton.pressed.connect(self.uploader.interruptUpload)
-        self.uploader.all_uploads_done.connect(lambda: self.ui.hyperthoughtUploadButton.setText(original_btn_text))
+
+        def lambda_func(self: UseTemplateWidget, original_btn_text: str):
+            self.ui.hyperthoughtUploadButton.setText(original_btn_text)
+            self.ui.hyperthoughtUploadButton.setEnabled(True)
+
+        self.uploader.all_uploads_done.connect(lambda: lambda_func(self, original_btn_text))
         self.ui.hyperthoughtUploadButton.setText('Cancel Upload')
     
     def _update_file_progress(self, progress: int):

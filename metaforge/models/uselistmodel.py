@@ -1,4 +1,5 @@
 from PySide2.QtCore import QAbstractListModel, Qt, QModelIndex, QFileInfo, Signal
+from PySide2.QtGui import QIcon, QPixmap
 from typing import List
 from pathlib import Path
 
@@ -37,6 +38,12 @@ class ListModel(QAbstractListModel):
         if role == Qt.DisplayRole:
             if index.column() == 0:
                 return self.metadataList[index.row()].name
+        elif role == Qt.DecorationRole:
+            file_path = self.metadataList[index.row()]
+            if file_path.is_dir():
+                return QIcon(QPixmap(':/resources/Images/folder@2x.png'))
+            else:
+                return QIcon(QPixmap(':/resources/Images/file@2x.png'))
         return None
 
     def setData(self,index, value, role):

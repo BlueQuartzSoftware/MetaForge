@@ -295,7 +295,7 @@
           <item>
            <widget class="QLabel" name="label">
             <property name="text">
-             <string>Files to be Uploaded:</string>
+             <string>Files/Folders to be Uploaded:</string>
             </property>
            </widget>
           </item>
@@ -410,6 +410,9 @@
           <property name="toolTip">
            <string>This is the list of files that will be tagged with the metadata in the table on the right and uploaded to HyperThought.</string>
           </property>
+          <property name="lineWidth">
+           <number>1</number>
+          </property>
           <property name="verticalScrollBarPolicy">
            <enum>Qt::ScrollBarAlwaysOn</enum>
           </property>
@@ -418,6 +421,12 @@
           </property>
           <property name="alternatingRowColors">
            <bool>true</bool>
+          </property>
+          <property name="spacing">
+           <number>0</number>
+          </property>
+          <property name="viewMode">
+           <enum>QListView::ListMode</enum>
           </property>
           <property name="uniformItemSizes">
            <bool>true</bool>
