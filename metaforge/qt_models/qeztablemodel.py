@@ -78,7 +78,7 @@ class QEzTableModel(QAbstractTableModel):
 
         metadata_entry: MetadataEntry = self.metadata_model.entry(index.row())
 
-        if role == Qt.DisplayRole or role == Qt.EditRole or role == Qt.ToolTipRole:
+        if role == Qt.DisplayRole or role == Qt.EditRole:
             if index.column() == self.K_SORT_COL_INDEX:
                 return index.row() + 1
             elif index.column() == self.K_HTNAME_COL_INDEX:
@@ -108,6 +108,27 @@ class QEzTableModel(QAbstractTableModel):
                 return metadata_entry.ht_annotation
             elif index.column() == self.K_HTUNITS_COL_INDEX:
                 return metadata_entry.ht_units
+        elif role == Qt.ToolTipRole:
+            if index.column() == self.K_SORT_COL_INDEX:
+                return "The row number of the metadata item.  This number is editable, and the row will move once the row number has been changed."
+            elif index.column() == self.K_HTNAME_COL_INDEX:
+                return "This cell contains the name of the metadata item."
+            elif index.column() == self.K_SOURCEVAL_COL_INDEX:
+                return "This cell contains the metadata value that is extracted from the Data File above.  This is the default value for 'HT Value' when the 'Override Source Value' checkbox is checked."
+            elif index.column() == self.K_SOURCE_COL_INDEX:
+                return "This cell contains the path to the metadata item's location in the Data File.  The template, once created, will use this path to extract the metadata value from other similar data files."
+            elif index.column() == self.K_HTVALUE_COL_INDEX:
+                return "This cell contains a placeholder for the metadata value that will be extracted from other similar data files when someone uses the template.  If the 'Override Source Value' checkbox is checked, then this cell will contain a static, editable value (defaults to the 'Source Value' value)."
+            elif index.column() == self.K_HTANNOTATION_COL_INDEX:
+                return "This cell contains the annotations that are included with this metadata item.  This information will be automatically filled in for this metadata item when someone uses the template."
+            elif index.column() == self.K_HTUNITS_COL_INDEX:
+                return "This cell contains the units that describe this metadata item.  This information will be automatically filled in for this metadata item when someone uses the template."
+            elif index.column() == self.K_OVERRIDESOURCEVALUE_COL_INDEX:
+                return "This cell contains a checkbox that will override the value extracted from similar data files when the template is used. If this checkbox is checked, the 'HT Value' field will contain a static, editable value (defaults to the 'Source Value' value)."
+            elif index.column() == self.K_EDITABLE_COL_INDEX:
+                return "This cell contains a checkbox that determines whether or not users of the template are allowed to modify the cells of this metadata item."
+            elif index.column() == self.K_REMOVE_COL_INDEX:
+                return "This cell removes the metadata item from the table."
         elif role == Qt.CheckStateRole:
             if index.column() == self.K_EDITABLE_COL_INDEX:
                 if metadata_entry.editable is True:

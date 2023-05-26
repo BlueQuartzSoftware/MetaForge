@@ -59,11 +59,6 @@ class Ui_MetaForgePreferences(object):
 
         self.gridLayout_2.addWidget(self.addBtn, 2, 3, 2, 1)
 
-        self.label = QLabel(MetaForgePreferences)
-        self.label.setObjectName(u"label")
-
-        self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
-
         self.parser_directories_label = QLabel(MetaForgePreferences)
         self.parser_directories_label.setObjectName(u"parser_directories_label")
         font = QFont()
@@ -80,6 +75,11 @@ class Ui_MetaForgePreferences(object):
         self.parser_directories_table.verticalHeader().setVisible(False)
 
         self.gridLayout_2.addWidget(self.parser_directories_table, 2, 0, 4, 3)
+
+        self.label = QLabel(MetaForgePreferences)
+        self.label.setObjectName(u"label")
+
+        self.gridLayout_2.addWidget(self.label, 1, 0, 1, 1)
 
 
         self.gridLayout.addLayout(self.gridLayout_2, 0, 0, 1, 1)
@@ -106,10 +106,14 @@ class Ui_MetaForgePreferences(object):
 #endif // QT_CONFIG(tooltip)
         self.removeBtn.setText("")
 #if QT_CONFIG(tooltip)
+        self.searchLineEdit.setToolTip("")
+#endif // QT_CONFIG(tooltip)
+        self.searchLineEdit.setPlaceholderText(QCoreApplication.translate("MetaForgePreferences", u"Search for parsers by name here", None))
+#if QT_CONFIG(tooltip)
         self.addBtn.setToolTip(QCoreApplication.translate("MetaForgePreferences", u"Use this button to move an array up in the \"Selected Data Arrays\" column", None))
 #endif // QT_CONFIG(tooltip)
         self.addBtn.setText("")
-        self.label.setText(QCoreApplication.translate("MetaForgePreferences", u"Search", None))
         self.parser_directories_label.setText(QCoreApplication.translate("MetaForgePreferences", u"Parsers", None))
+        self.label.setText(QCoreApplication.translate("MetaForgePreferences", u"Search", None))
     # retranslateUi
 

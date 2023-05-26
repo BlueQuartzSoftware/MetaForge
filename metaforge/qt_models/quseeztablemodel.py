@@ -90,7 +90,7 @@ class QUseEzTableModel(QSortFilterProxyModel):
         src_index = self.mapToSource(index)
         metadata_entry: MetadataEntry = src_model.metadata_model.entry(src_index.row())
 
-        if role == Qt.DisplayRole or role == Qt.EditRole or role == Qt.ToolTipRole:
+        if role == Qt.DisplayRole or role == Qt.EditRole:
             if index.column() == self.K_HTNAME_COL_INDEX:
                 return self._get_htname_data(metadata_entry)
             elif index.column() == self.K_SOURCE_COL_INDEX:
@@ -103,6 +103,21 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 return self._get_htunits_data(metadata_entry)
             elif index.column() == self.K_PARSINGMESSAGES_COL_INDEX:
                 return self._get_parsingmessages_data(metadata_entry)
+        elif role == Qt.ToolTipRole:
+            if index.column() == self.K_HTNAME_COL_INDEX:
+                return "This cell contains the metadata name that will be uploaded to HyperThought."
+            elif index.column() == self.K_SOURCE_COL_INDEX:
+                return "This cell contains the path to the metadata item's location in the data file.  The chosen template file uses this path to extract the metadata value from the data file specified in the 'File To Extract Metadata From' field."
+            elif index.column() == self.K_HTVALUE_COL_INDEX:
+                return "This cell contains the metadata value, extracted from the data file specified in the 'File To Extract Metadata From' field.  If no data file has been chosen, the value defaults to the value found in the data file originally used to create the chosen template file."
+            elif index.column() == self.K_HTANNOTATION_COL_INDEX:
+                return "This cell contains the annotations that are included with this metadata item."
+            elif index.column() == self.K_HTUNITS_COL_INDEX:
+                return "This cell contains the units that describe this metadata item."
+            elif index.column() == self.K_PARSINGMESSAGES_COL_INDEX:
+                return "This cell contains any additional information about this metadata item, such as whether it's been overridden by the original template creator, the metadata item is unable to be found in the chosen data file, etc."
+            elif index.column() == self.K_REMOVE_COL_INDEX:
+                return "This cell removes the metadata item from the table."
         elif role == Qt.BackgroundRole:
             return self._get_background_color_data(metadata_entry)
         elif role == Qt.FontRole:

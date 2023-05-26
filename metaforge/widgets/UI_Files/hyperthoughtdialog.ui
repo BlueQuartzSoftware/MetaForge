@@ -173,6 +173,9 @@
        </item>
        <item>
         <widget class="QCheckBox" name="show_files">
+         <property name="toolTip">
+          <string>Show files in the viewer</string>
+         </property>
          <property name="text">
           <string>Show Files</string>
          </property>
@@ -239,15 +242,26 @@
         </widget>
        </item>
        <item>
-        <widget class="QLineEdit" name="selectedFolderLabel"/>
+        <widget class="QLineEdit" name="selectedFolderLabel">
+         <property name="toolTip">
+          <string>The name of the remote folder that you want to upload your files/folders to</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </item>
      <item row="1" column="0" rowspan="2">
-      <widget class="QListWidget" name="workspaceListView"/>
+      <widget class="QListWidget" name="workspaceListView">
+       <property name="toolTip">
+        <string>The list of available workspaces that your HyperThought account can access.</string>
+       </property>
+      </widget>
      </item>
      <item row="1" column="1">
       <widget class="DeselectableTableView" name="folderListView">
+       <property name="toolTip">
+        <string>Select the directory that you would like to upload your files/folders to</string>
+       </property>
        <property name="editTriggers">
         <set>QAbstractItemView::NoEditTriggers</set>
        </property>
@@ -305,6 +319,9 @@
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
+     </property>
+     <property name="toolTip">
+      <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Authenticates your API key with HyperThought and connects MetaForge to your HyperThought instance.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
      </property>
      <property name="text">
       <string>Authenticate</string>
@@ -369,6 +386,9 @@
        <width>0</width>
        <height>0</height>
       </size>
+     </property>
+     <property name="toolTip">
+      <string>Put your HyperThought API key here.  It can be found on the HyperThought website, under your account information.</string>
      </property>
     </widget>
    </item>

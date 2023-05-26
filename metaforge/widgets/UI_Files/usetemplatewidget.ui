@@ -163,7 +163,7 @@
         <bool>true</bool>
        </property>
        <property name="toolTip">
-        <string>Allows user to set their API key from HyperThought and set a remote location on the HyperThought server to upload the data files</string>
+        <string>Allows user to set their API key from HyperThought and set a remote location on the HyperThought server to upload the data files/folders</string>
        </property>
        <property name="text">
         <string>Select Remote Folder</string>
@@ -196,7 +196,7 @@
         <bool>false</bool>
        </property>
        <property name="toolTip">
-        <string>Upload all files to the HyperThought server</string>
+        <string>Upload all files/folders to the HyperThought server</string>
        </property>
        <property name="text">
         <string>Upload Files</string>
@@ -333,7 +333,7 @@
              </size>
             </property>
             <property name="toolTip">
-             <string>Add files to the upload list</string>
+             <string>Add files/folders to the upload list</string>
             </property>
             <property name="text">
              <string/>
@@ -408,7 +408,7 @@
            <bool>true</bool>
           </property>
           <property name="toolTip">
-           <string>This is the list of files that will be tagged with the metadata in the table on the right and uploaded to HyperThought.</string>
+           <string>This is the list of files/folders that will be tagged with the metadata in the table on the right and uploaded to HyperThought.</string>
           </property>
           <property name="lineWidth">
            <number>1</number>
@@ -577,7 +577,7 @@
              <bool>true</bool>
             </property>
             <property name="toolTip">
-             <string>This table contains the metadata that will be uploaded with each file in the file list on the left.</string>
+             <string/>
             </property>
             <property name="sizeAdjustPolicy">
              <enum>QAbstractScrollArea::AdjustToContents</enum>
@@ -741,7 +741,7 @@
      <item>
       <widget class="QPushButton" name="clearUseButton">
        <property name="toolTip">
-        <string>Reset all 'Create Template' input fields. All fields will be reset to an empty state.</string>
+        <string>Reset all 'Use Template' input fields. All fields will be reset to an empty state.</string>
        </property>
        <property name="text">
         <string>Reset All Fields</string>
