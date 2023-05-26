@@ -8,8 +8,8 @@ from uuid import UUID
 import shutil
 
 from PySide2.QtWidgets import QMainWindow, QFileDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit
-from PySide2.QtCore import QFile, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize
-from PySide2.QtGui import QCursor, QIcon
+from PySide2.QtCore import QFile, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize, QItemSelectionModel, QPersistentModelIndex, QItemSelection
+from PySide2.QtGui import QCursor, QIcon, QMouseEvent
 import PySide2.QtCore
 
 from metaforge.ht_helpers.ht_uploader import HyperThoughtUploader
@@ -73,7 +73,7 @@ class UseTemplateWidget(QWidget):
         self.setup_file_upload_list()
 
         self.ui.addUploadFilesBtn.clicked.connect(self.add_upload_files)
-        self.ui.clearUploadFilesBtn.clicked.connect(self.clear_upload_files)
+        self.ui.removeUploadFilesBtn.clicked.connect(self.remove_upload_files)
         self.ui.removeUseTableRowButton.clicked.connect(self.remove_model_entry)
         self.ui.appendUseTableRowButton.clicked.connect(self.add_metadata_table_row)
         self.ui.hyperthoughtLocationButton.clicked.connect(self.authenticate_to_hyperthought)
@@ -81,6 +81,7 @@ class UseTemplateWidget(QWidget):
         self.ui.useTemplateListSearchBar.textChanged.connect(self.filter_metadata_table)
         self.ui.addMetadataFileCheckBox.stateChanged.connect(self.check_file_list)
 
+        self.ui.removeUploadFilesBtn.setDisabled(True)
         self.fileType = ""
         self.folderuuid = ""
         self.uploader = HyperThoughtUploader()
@@ -91,12 +92,13 @@ class UseTemplateWidget(QWidget):
         self.createUpload.connect(self.uploader.performUpload)
         self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
         self.ui.otherDataFileLineEdit.installEventFilter(self)
+        self.ui.useTemplateListView.viewport().installEventFilter(self)
     
     def setup_icons(self):
         icon = QIcon()
         icon.addFile(u":/resources/Images/trash_can.png", QSize(), QIcon.Normal, QIcon.Off)
         # icon.addFile(u":/resources/Images/trash_can@2x.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.ui.clearUploadFilesBtn.setIcon(icon)
+        self.ui.removeUploadFilesBtn.setIcon(icon)
         self.ui.removeUseTableRowButton.setIcon(icon)
 
     def setup_metadata_table(self, metadata_model: MetadataModel = MetadataModel()):
@@ -126,6 +128,8 @@ class UseTemplateWidget(QWidget):
 
         self.ui.useTemplateListView.clicked.connect(
             self.removeRowfromUsefileType)
+        
+        self.ui.useTemplateListView.selectionModel().selectionChanged.connect(self.handle_file_upload_list_selection_changed)
     
     def closeEvent(self, event):
         self.mThread.quit()
@@ -140,6 +144,9 @@ class UseTemplateWidget(QWidget):
             self.ui.hyperthoughtUploadButton.setDisabled(True)
             self.ui.hyperthoughtUploadButton.setText('Canceling...')
             self.uploader.interruptUpload()
+    
+    def handle_file_upload_list_selection_changed(self, selected: QItemSelection, deselected: QItemSelection):
+        self.ui.removeUploadFilesBtn.setEnabled(len(selected.indexes()) > 0)
 
     def clear(self):
         self.ui.hyperthoughtTemplateLineEdit.setText("")
@@ -147,7 +154,7 @@ class UseTemplateWidget(QWidget):
         self.ui.useTemplateListSearchBar.setText("")
         self.ui.addMetadataFileCheckBox.setChecked(True)
         self.setup_metadata_table()
-        self.clear_upload_files()
+        self.uselistmodel.removeAllRows()
         self.template_specified_parser_uuid = None
         self.ui.otherDataFileLineEdit.setPlaceholderText("")
         notify_no_errors(self.ui.error_label)
@@ -197,8 +204,12 @@ class UseTemplateWidget(QWidget):
         dialog.exec_()
         return dialog.selectedFiles()
 
-    def clear_upload_files(self):
-        self.uselistmodel.removeAllRows()
+    def remove_upload_files(self):
+        selection_model: QItemSelectionModel = self.ui.useTemplateListView.selectionModel()
+        if selection_model:
+            selected_rows = selection_model.selectedRows()
+            selected_rows = [QPersistentModelIndex(selected_row) for selected_row in selected_rows]
+            [self.uselistmodel.removeRow(selected_row.row()) for selected_row in selected_rows]
 
     def add_metadata_table_row(self):
         self.use_ez_table_model.addCustomRow(1)
@@ -236,6 +247,13 @@ class UseTemplateWidget(QWidget):
                         event.acceptProposedAction()
                         self.ui.otherDataFileLineEdit.setText(str(file_path))
                         self.import_metadata_from_data_file()
+        if object == self.ui.useTemplateListView.viewport():
+            if event.type() == QEvent.MouseButtonRelease:
+                if event.button() == Qt.LeftButton:
+                    index: QModelIndex = self.ui.useTemplateListView.indexAt(event.pos())
+                    if not index.isValid():
+                        self.ui.useTemplateListView.clearSelection()
+
 
         return QMainWindow.eventFilter(self, object,  event)
 

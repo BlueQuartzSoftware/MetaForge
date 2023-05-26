@@ -15,10 +15,6 @@ class ListModel(QAbstractListModel):
         return Qt.ItemIsDropEnabled | defaultFlags
 
     def canDropMimeData(self, data, action, row, column, parent):
-        for file in data.urls():
-            aFile = QFileInfo(file.path())
-            if not aFile.isFile():
-                return False
         return data.hasUrls()
 
     def dropMimeData(self, data, action, row, column, parent):

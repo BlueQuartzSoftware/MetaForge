@@ -348,7 +348,7 @@
            </widget>
           </item>
           <item>
-           <widget class="QPushButton" name="clearUploadFilesBtn">
+           <widget class="QPushButton" name="removeUploadFilesBtn">
             <property name="sizePolicy">
              <sizepolicy hsizetype="Fixed" vsizetype="Preferred">
               <horstretch>0</horstretch>
@@ -421,6 +421,9 @@
           </property>
           <property name="alternatingRowColors">
            <bool>true</bool>
+          </property>
+          <property name="selectionMode">
+           <enum>QAbstractItemView::ExtendedSelection</enum>
           </property>
           <property name="spacing">
            <number>0</number>
