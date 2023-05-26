@@ -138,7 +138,7 @@ class UseTemplateWidget(QWidget):
 
     def add_upload_files(self):
         linetexts = self._getOpenFilesAndDirs(self, self.tr("Select File"), QStandardPaths.displayName(
-            QStandardPaths.HomeLocation), self.tr("Files (*.ctf *.xml *.ang *.tif *.tiff *.ini)"))
+            QStandardPaths.HomeLocation), self.tr("Files (*.ctf *.xml *.ang *.tif *.tiff *.ini);;All Files (*.*)"))
         for line in linetexts:
             self.uselistmodel.addRow(Path(line))
         self.toggle_buttons()
