@@ -45,9 +45,13 @@ class MainWindow(QMainWindow):
         self.ui.actionAbout.triggered.connect(self.display_about)
         self.ui.actionOpenPackage.triggered.connect(self.open_package)
         self.ui.actionSave_Package.triggered.connect(self.save_package)
+        self.ui.actionSave_Package_As_2.triggered.connect(self.save_package_as)
         self.ui.actionClose.triggered.connect(self.close)
         self.ui.actionSave_Template.triggered.connect(self.save_template)
+        self.ui.actionSave_Template_As.triggered.connect(self.save_template_as)
         self.ui.actionOpen_Template.triggered.connect(self.open_template)
+        self.saved_template_path: Path = None
+        self.saved_package_path: Path = None
 
         self.action_recent_templates_separator: QAction = self.ui.menu_recent_templates.addSeparator()
         self.action_recent_templates: QAction = self.ui.menu_recent_templates.addAction(self.K_CLEAR_RECENT_TEMPLATES_STR, self.clear_recent_templates)
@@ -164,6 +168,7 @@ class MainWindow(QMainWindow):
             QStandardPaths.HomeLocation), self.tr("Files (*.ez)"))[0]
         if template_file_path != "":
             self._open_template(template_file_path)
+            self.saved_template_path = Path(template_file_path)
 
     @Slot(str, result=None)
     def _open_template(self, file_path: str):
@@ -187,22 +192,33 @@ class MainWindow(QMainWindow):
         # Change the tab to the "Create Template" section
         self.ui.tab_widget.setCurrentIndex(0)
 
+    def _save_template(self, file_path: Path):
+        self.ui.create_template_widget.save_template(str(file_path))
+        self.ui.statusbar.showMessage(f"Template saved successfully to '{str(file_path)}'.", 10000)
+
     def save_template(self):
-        dialog = QFileDialog(self, "Save File", "", "Templates (*.ez)")
+        if self.saved_template_path is None:
+            self.save_template_as()
+        else:
+            self._save_template(self.saved_template_path)
+    
+    def save_template_as(self):
+        dialog = QFileDialog(self, "Save Template", "", "Templates (*.ez)")
         dialog.setDefaultSuffix(".ez")
         dialog.setAcceptMode(QFileDialog.AcceptSave)
         file_path = ""
         if dialog.exec():
             file_path = dialog.selectedFiles()[0]
         if file_path != "":
-            self.ui.create_template_widget.save_template(file_path)
-            self.ui.statusbar.showMessage(f"Template saved successfully to '{file_path}'.", 10000)
+            self._save_template(self.saved_template_path)
+            self.saved_template_path = Path(file_path)
 
     def open_package(self):
         pkgpath = QFileDialog.getExistingDirectory(self, caption=self.tr("Select MetaForge Package"), dir=QStandardPaths.displayName(
             QStandardPaths.HomeLocation))
         if pkgpath != "":
             self._open_package(pkgpath)
+            self.saved_package_path = Path(pkgpath)
     
     @Slot(str, result=None)
     def _open_package(self, pkgpath: str):
@@ -227,11 +243,22 @@ class MainWindow(QMainWindow):
         # Change the tab to the "Use Template" section
         self.ui.tab_widget.setCurrentIndex(1)
 
+    def _save_package(self, file_path: Path):
+        self.ui.use_template_widget.save_package(file_path)
+        self.ui.statusbar.showMessage(f"Package saved successfully to '{str(file_path)}'.", 10000)
+
     def save_package(self):
+        if self.saved_package_path:
+            self._save_package(self.saved_package_path)
+        else:
+            self.save_package_as()
+    
+    def save_package_as(self):
         result = QFileDialog.getSaveFileName(self, "Save File",
                                                "/Packages/",
                                                "Packages (*.ezp)")
         pkgpath = result[0]
         if pkgpath != "":
-            self.ui.use_template_widget.save_package(Path(pkgpath))
+            self.saved_package_path = Path(pkgpath)
+            self._save_package(self.saved_package_path)
 
