@@ -3,14 +3,14 @@
 ################################################################################
 ## Form generated from reading UI file 'usetemplatewidget.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.2
+## Created by: Qt User Interface Compiler version 5.15.8
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
+from PySide2.QtCore import *  # type: ignore
+from PySide2.QtGui import *  # type: ignore
+from PySide2.QtWidgets import *  # type: ignore
 
 from  . import resources_rc
 
@@ -438,7 +438,7 @@ class Ui_UseTemplateWidget(object):
 #if QT_CONFIG(tooltip)
         self.otherDataFileLineEdit.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"This is the data file from which to extract metadata.  The extracted metadata will appear in the table below and will be uploaded with each file in the file list on the left.", None))
 #endif // QT_CONFIG(tooltip)
-        self.otherDataFileLineEdit.setPlaceholderText(QCoreApplication.translate("UseTemplateWidget", u"Drag a file here or select one using the 'Select' button to the right===>", None))
+        self.otherDataFileLineEdit.setPlaceholderText("")
 #if QT_CONFIG(tooltip)
         self.hyperthoughtTemplateSelect.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Select the template file for this upload(*.ez)", None))
 #endif // QT_CONFIG(tooltip)

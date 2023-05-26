@@ -4,14 +4,16 @@ from typing import List
 import json
 from pathlib import Path
 import hyperthought as ht
+from uuid import UUID
 
 from PySide2.QtWidgets import QMainWindow, QFileDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit
 from PySide2.QtCore import QFile, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize
 from PySide2.QtGui import QCursor, QIcon
 import PySide2.QtCore
 
+from metaforge.parsers.metaforgeparser import MetaForgeParser
 from metaforge.ht_helpers.ht_uploader import HyperThoughtUploader
-from metaforge.models.metadatamodel import MetadataModel
+from metaforge.models.metadatamodel import MetadataModel, load_template
 from metaforge.widgets.hyperthoughtdialogimpl import HyperthoughtDialogImpl
 from metaforge.qt_models.qeztablemodel import QEzTableModel
 from metaforge.models.uselistmodel import ListModel
@@ -39,6 +41,8 @@ class UseTemplateWidget(QWidget):
     K_MISSINGENTRIES_KEY_NAME = 'missing_entries'
     K_METADATAFILECHOSEN_KEY_NAME = 'metadata_file_chosen'
     K_NO_ERRORS = "No errors."
+    K_OTHER_DATA_FILE_PLACEHOLDER_REPLACE_SYMBOL = "@EXTENSION_LIST@"
+    K_OTHER_DATA_FILE_PLACEHOLDER = f"Drag a file ({K_OTHER_DATA_FILE_PLACEHOLDER_REPLACE_SYMBOL}) here or select one using the 'Select' button to the right ===>"
 
     createUpload = Signal(list, ht.auth.Authorization, str, str, list)
     
@@ -49,6 +53,7 @@ class UseTemplateWidget(QWidget):
         self.ui = Ui_UseTemplateWidget()
         self.ui.setupUi(self)
         self.parsers_model: ParserModel = None
+        self.template_specified_parser_uuid: UUID = None
         self.hyperthoughtui = HyperthoughtDialogImpl()
         self.ui.hyperthoughtTemplateSelect.clicked.connect(self.select_template)
         self.ui.otherDataFileSelect.clicked.connect(self.load_other_data_file)
@@ -135,6 +140,9 @@ class UseTemplateWidget(QWidget):
         self.ui.addMetadataFileCheckBox.setChecked(True)
         self.setup_metadata_table()
         self.clear_upload_files()
+        self.template_specified_parser_uuid = None
+        self.ui.otherDataFileLineEdit.setPlaceholderText("")
+        notify_no_errors(self.ui.error_label)
 
     def add_upload_files(self):
         linetexts = self._getOpenFilesAndDirs(self, self.tr("Select File"), QStandardPaths.displayName(
@@ -209,11 +217,17 @@ class UseTemplateWidget(QWidget):
                     self.load_template_file()
         if object == self.ui.otherDataFileLineEdit:
             if event.type() == QEvent.DragEnter:
-                event.acceptProposedAction()
+                file_path = Path(event.mimeData().urls()[0].toLocalFile())
+                if self.template_specified_parser:
+                    if file_path.suffix in self.template_specified_parser.supported_file_extensions():
+                        event.acceptProposedAction()
             if (event.type() == QEvent.Drop):
-                event.acceptProposedAction()
-                self.ui.otherDataFileLineEdit.setText(event.mimeData().urls()[0].toLocalFile())
-                self.import_metadata_from_data_file()          
+                file_path = Path(event.mimeData().urls()[0].toLocalFile())
+                if self.template_specified_parser:
+                    if file_path.suffix in self.template_specified_parser.supported_file_extensions():
+                        event.acceptProposedAction()
+                        self.ui.otherDataFileLineEdit.setText(str(file_path))
+                        self.import_metadata_from_data_file()
 
         return QMainWindow.eventFilter(self, object,  event)
 
@@ -372,20 +386,40 @@ class UseTemplateWidget(QWidget):
             return False
 
         # Load the MetadataModel from the json file (Template file)
-        metadata_model = MetadataModel.from_json_file(templateFilePath)
+        data_file_path, self.template_specified_parser_uuid, metadata_model, err_msg = load_template(Path(templateFilePath))
+
+        if err_msg is not None:
+            self._notify_error_message(err_msg)
+            return
+        
+        self.template_specified_parser, err_msg = self.parsers_model.find_parser_from_uuid(self.template_specified_parser_uuid)
+        if err_msg is not None:
+            self._notify_error_message(err_msg)
+            return
+        
+        placeholder_text = self.K_OTHER_DATA_FILE_PLACEHOLDER
+        placeholder_text = placeholder_text.replace(self.K_OTHER_DATA_FILE_PLACEHOLDER_REPLACE_SYMBOL, ', '.join(self.template_specified_parser.supported_file_extensions()))
+        self.ui.otherDataFileLineEdit.setPlaceholderText(placeholder_text)
+        
         self.setup_metadata_table(metadata_model)
-        self.currentTemplate = Path(templateFilePath).name
         self.update_metadata_table_model()
         self.polish_metadata_table()
 
     def load_other_data_file(self):
+        file_filter = "All Files(*.*)"
+        if self.template_specified_parser:
+            file_filter = f"Data Files ({'*' + ' *'.join(self.template_specified_parser.supported_file_extensions())});;" + file_filter
+
         datafile_input_path = QFileDialog.getOpenFileName(self, self.tr("Select File"), QStandardPaths.displayName(
-                QStandardPaths.HomeLocation), self.tr("Files (*"+self.fileType+")"))[0]
+                QStandardPaths.HomeLocation), file_filter)[0]
         if datafile_input_path != "":
             self.ui.otherDataFileLineEdit.setText(datafile_input_path)
             self.import_metadata_from_data_file()
 
     def import_metadata_from_data_file(self):
+        if not self.update_metadata_table_model():
+            return
+        
         filePath = Path(self.ui.otherDataFileLineEdit.text())
         self.setWindowTitle(str(filePath))
 
@@ -393,10 +427,9 @@ class UseTemplateWidget(QWidget):
             self.uselistmodel.removeAllRows()
             self.uselistmodel.addRow(filePath)
             self.toggle_buttons()
-        self.update_metadata_table_model()
 
 
-    def update_metadata_table_model(self):
+    def update_metadata_table_model(self) -> bool:
         templateFilePath = self.ui.hyperthoughtTemplateLineEdit.text()
         file_path = self.ui.otherDataFileLineEdit.text()
 
@@ -405,16 +438,22 @@ class UseTemplateWidget(QWidget):
             index0 = self.use_ez_table_model.index(0, 0)
             index1 = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_COL_COUNT)
             self.use_ez_table_model.dataChanged.emit(index0, index1)
-            return
+            return True
+        
+        self.template_specified_parser, err_msg = self.parsers_model.find_parser_from_uuid(self.template_specified_parser_uuid)
+        if err_msg is not None:
+            self._notify_error_message(err_msg)
+            return False
+
+        if Path(file_path).suffix not in self.template_specified_parser.supported_file_extensions():
+            self._notify_error_message(f"Unable to parse data file - Data file '{Path(file_path).name}' is not compatible with the parser used by the template!  The supported file extensions are: {self.template_specified_parser.supported_file_extensions()}")
+            return False
         
         file_path = Path(file_path)
         templateFilePath = Path(templateFilePath)
         
         # Load the dictionary from the newly inserted datafile
-        parser, err_msg = self.parsers_model.find_parser_from_data_path(file_path)
-        if parser is None:
-            self._notify_error_message(err_msg)
-        metadata_list = parser.parse_header(file_path)
+        metadata_list = self.template_specified_parser.parse_header(file_path)
 
         self.use_ez_table_model_proxy.missing_entries = self.use_ez_table_model.metadata_model.update_model_values(metadata_list)
         self.use_ez_table_model_proxy.metadata_file_chosen = True
@@ -422,6 +461,9 @@ class UseTemplateWidget(QWidget):
         index0 = self.use_ez_table_model_proxy.index(0, 0)
         index1 = self.use_ez_table_model_proxy.index(self.use_ez_table_model_proxy.rowCount() - 1, QUseEzTableModel.K_COL_COUNT)
         self.use_ez_table_model_proxy.dataChanged.emit(index0, index1)
+
+        notify_no_errors(self.ui.error_label)
+        return True
 
     def toggle_buttons(self):
         if (self.ui.hyperthoughtTemplateLineEdit.text() != "" and

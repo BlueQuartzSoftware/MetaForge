@@ -468,7 +468,7 @@
              <bool>true</bool>
             </property>
             <property name="placeholderText">
-             <string>Drag a file here or select one using the 'Select' button to the right===&gt;</string>
+             <string/>
             </property>
            </widget>
           </item>

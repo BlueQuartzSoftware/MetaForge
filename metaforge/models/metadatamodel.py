@@ -9,6 +9,8 @@ from uuid import UUID
 from metaforge.parsers.metaforgeparser import MetaForgeMetadata
 from metaforge.models.metadataentry import MetadataEntry
 
+K_TEMPLATE_VERSION_KEY = 'template_version'
+
 @dataclass_json
 @dataclass
 class TemplateModel_V1:
@@ -181,3 +183,24 @@ class MetadataModel:
         with open(file_path) as json_file:
             json_string = json.load(json_file)
             return MetadataModel.from_dict(json_string)
+
+def _load_template_v1(template_json: dict) -> Tuple[Path, UUID, MetadataModel]:
+    model: TemplateModel_V1 = TemplateModel_V1.from_dict(template_json)
+    data_file_path, metadata_model = model.extract_data()
+    return data_file_path, None, metadata_model, None
+
+def _load_template(template_json: dict) -> Tuple[Path, UUID, MetadataModel]:
+    template_model: TemplateModel = TemplateModel.from_dict(template_json)
+    data_file_path, parser_uuid, metadata_model = template_model.extract_data()
+    return data_file_path, parser_uuid, metadata_model, None
+
+def load_template(template_file_path: Path) -> Tuple[Path, UUID, MetadataModel, str]:
+        with template_file_path.open('r') as json_file:
+            template_json = json.load(json_file)
+            template_version: str = template_json[K_TEMPLATE_VERSION_KEY]
+            if template_version == '1.0':
+                return _load_template_v1(template_json)
+            elif template_version == '2.0':
+                return _load_template(template_json)
+            else:
+                return None, None, None, f"Unable to load template file '{str(template_file_path)}'. Unrecognizable template version."

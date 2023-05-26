@@ -167,7 +167,7 @@ class MainWindow(QMainWindow):
 
     @Slot(str, result=None)
     def _open_template(self, file_path: str):
-        self.ui.create_template_widget.load_template(template_file_path=Path(file_path))
+        self.ui.create_template_widget.load_template_file(template_file_path=Path(file_path))
 
         # Find action in the list and remove it (if it's there)
         for action in self.recent_template_list:

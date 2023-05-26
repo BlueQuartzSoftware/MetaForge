@@ -11,7 +11,7 @@ import PySide2.QtCore
 
 from metaforge.parsers.metaforgeparser import MetaForgeParser
 from metaforge.models.metadataentry import MetadataEntry
-from metaforge.models.metadatamodel import MetadataModel, TemplateModel_V1, TemplateModel
+from metaforge.models.metadatamodel import MetadataModel, TemplateModel_V1, TemplateModel, load_template
 from metaforge.qt_models.qeztablemodel import QEzTableModel
 from metaforge.models.treemodel import TreeModel
 from metaforge.delegates.trashdelegate import TrashDelegate
@@ -31,7 +31,6 @@ elif qt_version[1] == 15:
 
 class CreateTemplateWidget(QWidget):
     K_CREATE_TREE_HEADER = "Available File Metadata"
-    K_TEMPLATE_VERSION_KEY = 'template_version'
     K_DATA_FILE_KEY = 'data_file_path'
     K_PARSER_UUID_KEY = 'parser_uuid'
     K_MODEL_ENTRIES_KEY = 'entries'
@@ -152,27 +151,16 @@ class CreateTemplateWidget(QWidget):
         self.tree_search_filter_model.setFilterWildcard(
             "*"+self.ui.createTemplateTreeSearchBar.text()+"*")
     
-    def load_template(self, template_file_path: Path):
+    def load_template_file(self, template_file_path: Path):
         notify_no_errors(self.ui.error_label)
-        with template_file_path.open('r') as json_file:
-            template_json = json.load(json_file)
-            template_version: str = template_json[self.K_TEMPLATE_VERSION_KEY]
-            if template_version == '1.0':
-                self._load_template_v1(template_json)
-            elif template_version == '2.0':
-                self._load_template(template_json)
-            else:
-                self._notify_error_message(f"Unable to load template file '{str(template_file_path)}'. Unrecognizable template version.")
-    
-    def _load_template_v1(self, template_json: dict):
-        model: TemplateModel_V1 = TemplateModel_V1.from_dict(template_json)
-        data_file_path, self.metadata_model = model.extract_data()
-        self.load_template_data(data_file_path, None, self.metadata_model)
 
-    def _load_template(self, template_json: dict):
-        template_model: TemplateModel = TemplateModel.from_dict(template_json)
-        data_file_path, parser_uuid, self.metadata_model = template_model.extract_data()
-        self.load_template_data(data_file_path, parser_uuid, self.metadata_model)
+        data_file_path, parser_uuid, metadata_model, err_msg = load_template(template_file_path)
+
+        if err_msg is not None:
+            self._notify_error_message(err_msg)
+            return
+
+        self.load_template_data(data_file_path, parser_uuid, metadata_model)
     
     def load_template_data(self, data_file_path: Path, parser_uuid: UUID, metadata_model: MetadataModel):
         # Set the data file path
