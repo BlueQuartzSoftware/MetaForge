@@ -5,7 +5,7 @@ channels:
   - hyperthought
 dependencies:
   - python=3.8
-  - pyside2
+  - pyside6
   - requests
   - dataclasses-json
   - Pillow>=8.2.0

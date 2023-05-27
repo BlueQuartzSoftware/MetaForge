@@ -1,5 +1,5 @@
-from PySide2.QtCore import QSortFilterProxyModel, Qt
-from PySide2.QtGui import QColor
+from PySide6.QtCore import QSortFilterProxyModel, Qt
+from PySide6.QtGui import QColor
 
 from typing import List
 import json
@@ -41,15 +41,15 @@ class QCreateEzTableModel(QSortFilterProxyModel):
         metadata_model = self.sourceModel().metadata_model
         metadata_entry: MetadataEntry = metadata_model.entry(source_row)
 
-        regex = self.filterRegExp()
-        match = regex.exactMatch(metadata_entry.ht_name)
+        regex = self.filterRegularExpression()
+        result = regex.match(metadata_entry.ht_name)
 
         # Custom data use case
-        if metadata_entry.source_type is MetadataEntry.SourceType.CUSTOM and match:
+        if metadata_entry.source_type is MetadataEntry.SourceType.CUSTOM and result.hasMatch():
             return True
 
         # All other use cases
-        if metadata_entry.source_type is MetadataEntry.SourceType.FILE and match:
+        if metadata_entry.source_type is MetadataEntry.SourceType.FILE and result.hasMatch():
             return metadata_entry.enabled
         else:
             return False

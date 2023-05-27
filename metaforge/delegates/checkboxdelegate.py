@@ -1,17 +1,13 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import *
-from PySide2.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem, QUndoStack
-import PySide2.QtCore
-from PySide2.QtCore import Qt, QEvent
+from PySide6.QtCore import *
+from PySide6.QtWidgets import QStyle, QStyledItemDelegate, QStyleOptionViewItem
+from PySide6.QtGui import QUndoStack
+import PySide6.QtCore
+from PySide6.QtCore import Qt, QEvent
 
 from metaforge.undo_stack_commands.toggle_parser_command import ToggleParserCommand
 
-qt_version = PySide2.QtCore.__version_info__
-
-if qt_version[1] == 12:
-    from metaforge.widgets.generated_5_12.resources_rc import *
-elif qt_version[1] == 15:
-    from metaforge.widgets.generated_5_15.resources_rc import *
+from metaforge.widgets.generated_6_5.resources_rc import *
 
 
 class CheckBoxDelegate(QStyledItemDelegate):

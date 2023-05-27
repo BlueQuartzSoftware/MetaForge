@@ -17,7 +17,7 @@ requirements:
   run:
     - python
     - requests
-    - pyside2
+    - pyside6
     - dataclasses-json
     - pyyaml
     - Pillow>=8.2.0

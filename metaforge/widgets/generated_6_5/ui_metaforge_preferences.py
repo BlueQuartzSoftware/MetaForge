@@ -3,16 +3,23 @@
 ################################################################################
 ## Form generated from reading UI file 'metaforge_preferences.ui'
 ##
-## Created by: Qt User Interface Compiler version 5.15.8
+## Created by: Qt User Interface Compiler version 6.5.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide2.QtCore import *  # type: ignore
-from PySide2.QtGui import *  # type: ignore
-from PySide2.QtWidgets import *  # type: ignore
-
-from  . import resources_rc
+from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+    QMetaObject, QObject, QPoint, QRect,
+    QSize, QTime, QUrl, Qt)
+from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+    QFont, QFontDatabase, QGradient, QIcon,
+    QImage, QKeySequence, QLinearGradient, QPainter,
+    QPalette, QPixmap, QRadialGradient, QTransform)
+from PySide6.QtWidgets import (QAbstractButton, QAbstractItemView, QApplication, QDialog,
+    QDialogButtonBox, QGridLayout, QHeaderView, QLabel,
+    QLineEdit, QPushButton, QSizePolicy, QSpacerItem,
+    QTableView, QWidget)
+from . import resources_rc
 
 class Ui_MetaForgePreferences(object):
     def setupUi(self, MetaForgePreferences):
@@ -64,7 +71,6 @@ class Ui_MetaForgePreferences(object):
         font = QFont()
         font.setPointSize(14)
         font.setBold(True)
-        font.setWeight(75)
         self.parser_directories_label.setFont(font)
 
         self.gridLayout_2.addWidget(self.parser_directories_label, 0, 0, 1, 4)

@@ -1,6 +1,6 @@
 
-from PySide2.QtWidgets import QTableView
-from PySide2.QtCore import QObject, Signal   
+from PySide6.QtWidgets import QTableView
+from PySide6.QtCore import QObject, Signal   
 
 
 class DeselectableTableView(QTableView):

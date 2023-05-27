@@ -16,19 +16,19 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 project(MetaForge VERSION 1.0.0 LANGUAGES NONE)
 
-find_program(RCC_EXE NAMES pyside2-rcc DOC "Pyside2 RCC Executable")
-find_program(UIC_EXE NAMES pyside2-uic DOC "Pyside2 UIC Executable")
+find_program(RCC_EXE NAMES pyside6-rcc DOC "Pyside6 RCC Executable")
+find_program(UIC_EXE NAMES pyside6-uic DOC "Pyside6 UIC Executable")
 
 #--------------------------------------------------------------------------------------------------
-# This next sections extracts out the version of Qt5 that is being used
+# This next sections extracts out the version of Qt6 that is being used
 #--------------------------------------------------------------------------------------------------
 execute_process(
   COMMAND "${RCC_EXE}" -version
   OUTPUT_VARIABLE qt_version
-  ERROR_VARIABLE rcc_error
-  OUTPUT_STRIP_TRAILING_WHITESPACE 
-  ERROR_STRIP_TRAILING_WHITESPACE
+  OUTPUT_STRIP_TRAILING_WHITESPACE
 )
+
+message(STATUS "QT Version: ${qt_version}")
 
 # set(qt_version ${rcc_error}) # Because the output is in the error variable?
 string(REPLACE " " ";" qt_version "${qt_version}") # Make a list out of the output

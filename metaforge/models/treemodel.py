@@ -1,8 +1,8 @@
 # This Python file uses the following encoding: utf-8
 
 
-from PySide2.QtCore import QAbstractItemModel, QFile, QIODevice, QItemSelectionModel, QModelIndex, QObject, Qt, Signal, Slot
-from PySide2.QtWidgets import QApplication, QMainWindow
+from PySide6.QtCore import QAbstractItemModel, QFile, QIODevice, QItemSelectionModel, QModelIndex, QObject, Qt, Signal, Slot
+from PySide6.QtWidgets import QApplication, QMainWindow
 from metaforge.models.treeitem import TreeItem
 
 from metaforge.models.metadatamodel import MetadataModel
@@ -40,9 +40,14 @@ class TreeModel(QAbstractItemModel):
 
     def flags(self, index):
         if not index.isValid():
-            return 0
+            return Qt.NoItemFlags
 
-        return Qt.ItemIsUserCheckable | super(TreeModel, self).flags(index)
+        flags = Qt.ItemIsEnabled | Qt.ItemIsUserCheckable
+
+        if self.hasChildren(index):
+            flags = flags | Qt.ItemIsAutoTristate
+        
+        return flags
 
     def getItem(self, index):
         if index.isValid():
@@ -116,6 +121,7 @@ class TreeModel(QAbstractItemModel):
             self.dataChanged.emit(index, index)
             return True
         elif role == Qt.CheckStateRole:
+            value = Qt.CheckState(value)
             item = self.getItem(index)
             item.set_check_state(value)
             self._notify_data_changed(item)

@@ -1,10 +1,10 @@
 import math
 from datetime import datetime
 
-from PySide2.QtNetwork import QNetworkReply
-from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex
-from PySide2.QtGui import QIcon, QColor
-from PySide2.QtWidgets import QApplication, QStyle
+from PySide6.QtNetwork import QNetworkReply
+from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex
+from PySide6.QtGui import QIcon, QColor
+from PySide6.QtWidgets import QApplication, QStyle
 
 
 

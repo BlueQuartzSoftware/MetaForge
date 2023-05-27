@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import QUndoCommand
-from PySide2.QtCore import QModelIndex, QPersistentModelIndex
+from PySide6.QtGui import QUndoCommand
+from PySide6.QtCore import QModelIndex, QPersistentModelIndex
 
 from typing import List
 from pathlib import Path

@@ -1,5 +1,5 @@
-from PySide2.QtWidgets import QUndoCommand
-from PySide2.QtCore import QModelIndex, Qt
+from PySide6.QtGui import QUndoCommand
+from PySide6.QtCore import QModelIndex, Qt
 
 from metaforge.qt_models.qparsertablemodel import QParserTableModel
 

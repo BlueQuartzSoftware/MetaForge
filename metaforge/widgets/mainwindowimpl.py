@@ -1,10 +1,10 @@
 # This Python file uses the following encoding: utf-8
 from pathlib import Path
 
-from PySide2.QtWidgets import QApplication, QMainWindow, QFileDialog, QAction, QMenu
-from PySide2.QtCore import QStandardPaths, QSettings, Slot
-from PySide2.QtGui import QDesktopServices
-import PySide2.QtCore
+from PySide6.QtWidgets import QApplication, QMainWindow, QFileDialog, QMenu
+from PySide6.QtCore import QStandardPaths, QSettings, Slot
+from PySide6.QtGui import QDesktopServices, QAction
+import PySide6.QtCore
 from typing import List
 
 from metaforge.widgets.aboutdialogimpl import AboutDialogImpl
@@ -14,11 +14,7 @@ from metaforge.qt_models.qparsercomboboxmodel import QParserComboBoxModel
 from metaforge.qt_models.qparsertablemodel import QParserTableModel
 from metaforge.models.parsermodel import ParserModel
 
-qt_version = PySide2.QtCore.__version_info__
-if qt_version[1] == 12:
-    from metaforge.widgets.generated_5_12.ui_mainwindow import Ui_MainWindow
-elif qt_version[1] == 15:
-    from metaforge.widgets.generated_5_15.ui_mainwindow import Ui_MainWindow
+from metaforge.widgets.generated_6_5.ui_mainwindow import Ui_MainWindow
 
 
 class MainWindow(QMainWindow):

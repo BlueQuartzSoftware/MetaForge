@@ -7,10 +7,10 @@ import hyperthought as ht
 from uuid import UUID
 import shutil
 
-from PySide2.QtWidgets import QMainWindow, QFileDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit, QMessageBox, QApplication, QCheckBox
-from PySide2.QtCore import QFile, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize, QItemSelectionModel, QPersistentModelIndex, QItemSelection, QSettings
-from PySide2.QtGui import QCursor, QIcon, QPixmap
-import PySide2.QtCore
+from PySide6.QtWidgets import QMainWindow, QFileDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit, QMessageBox, QApplication, QCheckBox
+from PySide6.QtCore import QFile, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize, QItemSelectionModel, QPersistentModelIndex, QItemSelection, QSettings
+from PySide6.QtGui import QCursor, QIcon, QPixmap
+import PySide6.QtCore
 
 from metaforge.ht_helpers.ht_uploader import HyperThoughtUploader
 from metaforge.models.metadatamodel import MetadataModel, load_template
@@ -25,11 +25,7 @@ from metaforge.models.parsermodel import ParserModel
 from metaforge.widgets.utilities.widget_utilities import notify_error_message, notify_no_errors
 from metaforge.utilities.ht_utilities import ezmodel_to_ht_metadata
 
-qt_version = PySide2.QtCore.__version_info__
-if qt_version[1] == 12:
-    from metaforge.widgets.generated_5_12.ui_usetemplatewidget import Ui_UseTemplateWidget
-elif qt_version[1] == 15:
-    from metaforge.widgets.generated_5_15.ui_usetemplatewidget import Ui_UseTemplateWidget
+from metaforge.widgets.generated_6_5.ui_usetemplatewidget import Ui_UseTemplateWidget
 
 
 class UseTemplateWidget(QWidget):
@@ -98,7 +94,7 @@ class UseTemplateWidget(QWidget):
         self.ui.useTemplateListView.viewport().installEventFilter(self)
 
     def setup_unlock_metadata_table_dialog(self):
-        self.unlock_metadata_table_dialog = QMessageBox(QMessageBox.Warning, "Unlock Metadata Table", "You are about to unlock the metadata table and force all read-only metadata items to be editable.\n\nAre you sure that you want to do this?", QMessageBox.Cancel | QMessageBox.Yes, self)
+        self.unlock_metadata_table_dialog = QMessageBox(QMessageBox.Warning, "Unlock Metadata Table", "You are about to unlock the metadata table and force all read-only metadata items to be editable.\n\nAre you sure that you want to do this?", QMessageBox.Cancel | QMessageBox.Yes)
         self.unlock_metadata_table_dialog.setDefaultButton(QMessageBox.Cancel)
 
         settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
@@ -163,13 +159,13 @@ class UseTemplateWidget(QWidget):
             if self.use_ez_table_model.rowCount() == 0:
                 return
 
-            top_left = self.use_ez_table_model.index(0, QEzTableModel.K_HTNAME_COL_INDEX)
-            bottom_right = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_HTUNITS_COL_INDEX)
+            top_left = self.use_ez_table_model.index(0, QUseEzTableModel.K_LOCK_COL_INDEX)
+            bottom_right = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QUseEzTableModel.K_HTUNITS_COL_INDEX)
             self.use_ez_table_model.dataChanged.emit(top_left, bottom_right)
         else:
             # Unlock it
             if self.unlock_metadata_table_dialog_cb.checkState() == Qt.Unchecked:
-                self.unlock_metadata_table_dialog.exec_()
+                self.unlock_metadata_table_dialog.exec()
                 if self.unlock_metadata_table_dialog.clickedButton() == self.unlock_metadata_table_dialog.button(QMessageBox.Cancel):
                     self.unlock_metadata_table_dialog_cb.setCheckState(Qt.Unchecked)
                     return
@@ -180,8 +176,8 @@ class UseTemplateWidget(QWidget):
             if self.use_ez_table_model.rowCount() == 0:
                 return
 
-            top_left = self.use_ez_table_model.index(0, QEzTableModel.K_HTNAME_COL_INDEX)
-            bottom_right = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_HTUNITS_COL_INDEX)
+            top_left = self.use_ez_table_model.index(0, QUseEzTableModel.K_LOCK_COL_INDEX)
+            bottom_right = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QUseEzTableModel.K_HTUNITS_COL_INDEX)
             self.use_ez_table_model.dataChanged.emit(top_left, bottom_right)
     
     def handle_ht_upload_button_clicked(self):
@@ -208,7 +204,7 @@ class UseTemplateWidget(QWidget):
 
     def add_upload_files(self):
         linetexts = self._getOpenFilesAndDirs(self, self.tr("Select File"), QStandardPaths.displayName(
-            QStandardPaths.HomeLocation), self.tr("Files (*.ctf *.xml *.ang *.tif *.tiff *.ini);;All Files (*.*)"))
+            QStandardPaths.HomeLocation), self.tr("All Files (*.*)"))
         for line in linetexts:
             self.uselistmodel.addRow(Path(line))
         self.toggle_buttons()
@@ -222,10 +218,10 @@ class UseTemplateWidget(QWidget):
             lineEdit.setText(' '.join(selected))
 
         dialog = QFileDialog(parent, windowTitle=caption)
-        dialog.setFileMode(dialog.ExistingFiles)
+        dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
         if options:
             dialog.setOptions(options)
-        dialog.setOption(dialog.DontUseNativeDialog, True)
+        dialog.setOption(QFileDialog.Option.DontUseNativeDialog, True)
         if directory:
             dialog.setDirectory(directory)
         if filter:

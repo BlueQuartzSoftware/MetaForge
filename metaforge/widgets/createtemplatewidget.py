@@ -5,9 +5,9 @@ from uuid import UUID
 
 from pathlib import Path
 
-from PySide2.QtWidgets import QWidget, QFileDialog
-from PySide2.QtCore import Qt, QStandardPaths, QSortFilterProxyModel, QModelIndex, QEvent, QPersistentModelIndex
-import PySide2.QtCore
+from PySide6.QtWidgets import QWidget, QFileDialog
+from PySide6.QtCore import Qt, QStandardPaths, QSortFilterProxyModel, QModelIndex, QEvent, QPersistentModelIndex
+import PySide6.QtCore
 
 from metaforge.parsers.metaforgeparser import MetaForgeParser
 from metaforge.models.metadataentry import MetadataEntry
@@ -22,11 +22,7 @@ from metaforge.qt_models.qparsercomboboxmodel import QParserComboBoxModel
 from metaforge.qt_models.qproxyparsercomboboxmodel import QProxyParserComboBoxModel
 from metaforge.widgets.utilities.widget_utilities import notify_error_message, notify_no_errors
 
-qt_version = PySide2.QtCore.__version_info__
-if qt_version[1] == 12:
-    from metaforge.widgets.generated_5_12.ui_createtemplatewidget import Ui_CreateTemplateWidget
-elif qt_version[1] == 15:
-    from metaforge.widgets.generated_5_15.ui_createtemplatewidget import Ui_CreateTemplateWidget
+from metaforge.widgets.generated_6_5.ui_createtemplatewidget import Ui_CreateTemplateWidget
 
 
 class CreateTemplateWidget(QWidget):

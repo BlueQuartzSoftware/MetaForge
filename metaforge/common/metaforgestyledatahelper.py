@@ -4,9 +4,9 @@ import platform
 
 from typing import List
 
-from PySide2.QtWidgets import QApplication
-from PySide2.QtGui import QFontDatabase
-from PySide2.QtCore import QObject, QFileSystemWatcher, Qt, Signal, Slot
+from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QFontDatabase
+from PySide6.QtCore import QObject, QFileSystemWatcher, Qt, Signal, Slot
 
 class MetaForgeStyleDataHelper(QObject):
   

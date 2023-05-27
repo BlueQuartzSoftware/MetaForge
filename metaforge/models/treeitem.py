@@ -1,6 +1,6 @@
 from __future__ import annotations
 from typing import List
-from PySide2.QtCore import Qt
+from PySide6.QtCore import Qt
 
 from metaforge.models.metadataentry import MetadataEntry
 

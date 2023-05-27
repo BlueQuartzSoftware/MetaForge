@@ -1,6 +1,6 @@
 
-from PySide2.QtWidgets import QTreeView
-from PySide2.QtCore import QObject, Signal   
+from PySide6.QtWidgets import QTreeView
+from PySide6.QtCore import QObject, Signal   
 
 
 class DeselectableTreeView(QTreeView):

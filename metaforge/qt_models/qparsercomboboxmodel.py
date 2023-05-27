@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Tuple
 from uuid import UUID
 
-from PySide2.QtCore import QAbstractListModel, QModelIndex, Qt
+from PySide6.QtCore import QAbstractListModel, QModelIndex, Qt
 
 from metaforge.models.parsermodel import ParserModel
 from metaforge.parsers.metaforgeparser import MetaForgeParser

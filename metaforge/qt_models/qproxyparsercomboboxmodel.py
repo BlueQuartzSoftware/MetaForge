@@ -1,4 +1,4 @@
-from PySide2.QtCore import QSortFilterProxyModel, QModelIndex
+from PySide6.QtCore import QSortFilterProxyModel, QModelIndex
 
 from metaforge.qt_models.qparsercomboboxmodel import QParserComboBoxModel
 

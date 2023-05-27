@@ -1,15 +1,12 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import *
-from PySide2.QtGui import *
-from PySide2.QtWidgets import *
-import PySide2.QtCore
+from PySide6.QtCore import *
+from PySide6.QtGui import *
+from PySide6.QtWidgets import *
+import PySide6.QtCore
 
-qt_version = PySide2.QtCore.__version_info__
+qt_version = PySide6.QtCore.__version_info__
 
-if qt_version[1] == 12:
-    from metaforge.widgets.generated_5_12.resources_rc import *
-elif qt_version[1] == 15:
-    from metaforge.widgets.generated_5_15.resources_rc import *
+from metaforge.widgets.generated_6_5.resources_rc import *
 from metaforge.common.metaforgestyledatahelper import MetaForgeStyleDataHelper
 
 class TrashDelegate(QStyledItemDelegate):

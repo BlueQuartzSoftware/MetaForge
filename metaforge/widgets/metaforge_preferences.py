@@ -1,20 +1,17 @@
 from pathlib import Path
 from typing import List
 
-from PySide2.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QHeaderView, QUndoStack
-import PySide2.QtCore
-from PySide2.QtCore import QModelIndex, QItemSelection, QSortFilterProxyModel, Qt
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFileDialog, QHeaderView
+from PySide6.QtGui import QUndoStack
+import PySide6.QtCore
+from PySide6.QtCore import QModelIndex, QItemSelection, QSortFilterProxyModel, Qt
 
 from metaforge.undo_stack_commands.load_parsers_command import LoadParsersCommand
 from metaforge.undo_stack_commands.remove_parsers_command import RemoveParsersCommand
 from metaforge.qt_models.qparsertablemodel import QParserTableModel
 from metaforge.delegates.checkboxdelegate import CheckBoxDelegate
 
-qt_version = PySide2.QtCore.__version_info__
-if qt_version[1] == 12:
-    from metaforge.widgets.generated_5_12.ui_metaforge_preferences import Ui_MetaForgePreferences
-elif qt_version[1] == 15:
-    from metaforge.widgets.generated_5_15.ui_metaforge_preferences import Ui_MetaForgePreferences
+from metaforge.widgets.generated_6_5.ui_metaforge_preferences import Ui_MetaForgePreferences
 
 class MetaForgePreferencesDialog(QDialog):
     def __init__(self, parent=None):

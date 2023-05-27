@@ -1,5 +1,5 @@
 # This Python file uses the following encoding: utf-8
-from PySide2.QtCore import QDateTime, QTimer, QObject, Slot, Qt, Signal
+from PySide6.QtCore import QDateTime, QTimer, QObject, Slot, Qt, Signal
 
 class HyperThoughtTokenVerifier(QObject):
 

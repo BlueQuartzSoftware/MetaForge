@@ -1,6 +1,6 @@
 
-from PySide2.QtWidgets import QListView
-from PySide2.QtCore import QObject, Signal   
+from PySide6.QtWidgets import QListView
+from PySide6.QtCore import QObject, Signal   
 
 
 class DeselectableListView(QListView):

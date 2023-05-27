@@ -1,18 +1,14 @@
-from PySide2.QtWidgets import QDialog, QMessageBox, QApplication, QDialogButtonBox
-from PySide2.QtCore import Signal, Qt, Slot
-from PySide2.QtGui import QGuiApplication
-import PySide2.QtCore
+from PySide6.QtWidgets import QDialog, QMessageBox, QApplication, QDialogButtonBox
+from PySide6.QtCore import Signal, Qt, Slot
+from PySide6.QtGui import QGuiApplication
+import PySide6.QtCore
 
 import hyperthought as ht
 
 from metaforge.widgets.newfolderdialogimpl import NewFolderDialogImpl
 from metaforge.models.htremotefilelistmodel import HTRemoteFileListModel
 
-qt_version = PySide2.QtCore.__version_info__
-if qt_version[1] == 12:
-    from metaforge.widgets.generated_5_12.ui_hyperthoughtdialog import Ui_HyperthoughtDialog
-elif qt_version[1] == 15:
-    from metaforge.widgets.generated_5_15.ui_hyperthoughtdialog import Ui_HyperthoughtDialog
+from metaforge.widgets.generated_6_5.ui_hyperthoughtdialog import Ui_HyperthoughtDialog
 
 class HyperthoughtDialogImpl(QDialog):
     

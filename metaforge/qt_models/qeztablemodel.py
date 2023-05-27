@@ -1,5 +1,5 @@
-from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex, QPersistentModelIndex, QMimeData, QByteArray, QDataStream, QIODevice
-from PySide2.QtGui import QFont, QColor
+from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex, QPersistentModelIndex, QMimeData, QByteArray, QDataStream, QIODevice
+from PySide6.QtGui import QFont, QColor
 
 from typing import List
 import json
@@ -166,7 +166,7 @@ class QEzTableModel(QAbstractTableModel):
                     return False
                 
                 mime_data = self.mimeData([index])
-                return self.dropMimeData(mime_data, Qt.MoveAction, value, 0, QModelIndex())
+                return self.dropMimeData(mime_data, Qt.MoveAction, value - 1, 0, QModelIndex())
                 
                 # result = self.metadata_model.remove_by_index(index.row())
                 # if not result:
@@ -318,7 +318,7 @@ class QEzTableModel(QAbstractTableModel):
         metadata_dict = json.loads(json_string)
         metadata_entries: List[MetadataEntry] = [MetadataEntry.from_dict(mc_dict) for mc_dict in metadata_dict]
 
-        row_index = QPersistentModelIndex(self.index(row, 0))
+        row_index = self.index(row, 0)
 
         if action == Qt.MoveAction:
             for metadata_entry in metadata_entries:
@@ -326,6 +326,9 @@ class QEzTableModel(QAbstractTableModel):
                 self.beginRemoveRows(QModelIndex(), source_row, source_row)
                 self.metadata_model.remove_by_index(source_row)
                 self.endRemoveRows()
+
+                # if row > source_row:
+                #     row_index = self.index(row_index.row() + 1, 0)
 
         self.beginInsertRows(QModelIndex(), row_index.row(), row_index.row() + len(metadata_entries) - 1)
         for i, metadata_entry in enumerate(metadata_entries):

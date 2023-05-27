@@ -1,4 +1,4 @@
-from PySide2.QtWidgets import QLabel
+from PySide6.QtWidgets import QLabel
 
 def notify_error_message(error_label: QLabel, msg: str) -> None:
     error_label.setStyleSheet("QLabel { color: #b43431; }")

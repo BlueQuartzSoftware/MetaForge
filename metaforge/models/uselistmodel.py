@@ -1,5 +1,5 @@
-from PySide2.QtCore import QAbstractListModel, Qt, QModelIndex, QFileInfo, Signal
-from PySide2.QtGui import QIcon, QPixmap
+from PySide6.QtCore import QAbstractListModel, Qt, QModelIndex, QFileInfo, Signal
+from PySide6.QtGui import QIcon, QPixmap
 from typing import List
 from pathlib import Path
 

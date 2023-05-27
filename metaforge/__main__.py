@@ -5,15 +5,8 @@ import os
 import platform
 from pathlib import Path
 
-# This is necessary for MacOS 11.0 (10.16) and up to launch the application properly
-if platform.system() == 'Darwin':
-    v, _, _ = platform.mac_ver()
-    v = float('.'.join(v.split('.')[:2]))
-    if v >= 10.16:
-        os.environ["QT_MAC_WANTS_LAYER"] = "1"
-
-from PySide2.QtWidgets import QApplication
-from PySide2.QtGui import QIcon
+from PySide6.QtWidgets import QApplication
+from PySide6.QtGui import QIcon
 
 from metaforge.widgets.mainwindowimpl import MainWindow
 
@@ -40,7 +33,7 @@ def main():
     window = MainWindow(app)
     window.show()
 
-    app.exec_()
+    app.exec()
 
 if __name__ == "__main__":
     sys.exit(main())

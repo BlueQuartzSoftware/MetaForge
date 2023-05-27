@@ -1,5 +1,5 @@
-from PySide2.QtCore import QAbstractTableModel, Qt, QModelIndex, QFileSystemWatcher, QPersistentModelIndex, Signal
-from PySide2.QtGui import QColor, QIcon, QPixmap
+from PySide6.QtCore import QAbstractTableModel, Qt, QModelIndex, QFileSystemWatcher, QPersistentModelIndex, Signal
+from PySide6.QtGui import QColor, QIcon, QPixmap
 
 from pathlib import Path
 

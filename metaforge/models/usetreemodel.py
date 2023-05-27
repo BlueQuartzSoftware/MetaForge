@@ -1,8 +1,8 @@
 # This Python file uses the following encoding: utf-8
 
 
-from PySide2.QtCore import QAbstractItemModel, QFile, QIODevice, QItemSelectionModel, QModelIndex, QObject ,Qt, Signal, Slot
-from PySide2.QtWidgets import QApplication, QMainWindow, QMessageBox
+from PySide6.QtCore import QAbstractItemModel, QFile, QIODevice, QItemSelectionModel, QModelIndex, QObject ,Qt, Signal, Slot
+from PySide6.QtWidgets import QApplication, QMainWindow, QMessageBox
 from metaforge.models.treeitem import TreeItem
 from metaforge.models.treemodel import TreeModel
 

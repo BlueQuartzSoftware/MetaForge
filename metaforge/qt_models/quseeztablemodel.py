@@ -1,7 +1,7 @@
 from typing import List
 
-from PySide2.QtCore import QSortFilterProxyModel, Qt, QModelIndex
-from PySide2.QtGui import QColor, QIcon, QFont, QPixmap
+from PySide6.QtCore import QSortFilterProxyModel, Qt, QModelIndex
+from PySide6.QtGui import QColor, QIcon, QFont, QPixmap
 
 from metaforge.qt_models.qeztablemodel import QEzTableModel
 from metaforge.models.metadataentry import MetadataEntry
@@ -69,15 +69,15 @@ class QUseEzTableModel(QSortFilterProxyModel):
         metadata_model = self.sourceModel().metadata_model
         metadata_entry: MetadataEntry = metadata_model.entry(source_row)
 
-        regex = self.filterRegExp()
-        match = regex.exactMatch(metadata_entry.ht_name)
+        regex = self.filterRegularExpression()
+        result = regex.match(metadata_entry.ht_name)
 
         # Custom data use case
-        if metadata_entry.source_type is MetadataEntry.SourceType.CUSTOM and match:
+        if metadata_entry.source_type is MetadataEntry.SourceType.CUSTOM and result.hasMatch():
             return True
 
         # All other use cases
-        if metadata_entry.source_type is MetadataEntry.SourceType.FILE and match:
+        if metadata_entry.source_type is MetadataEntry.SourceType.FILE and result.hasMatch():
             return metadata_entry.enabled
         else:
             return False
