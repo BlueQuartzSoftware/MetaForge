@@ -107,6 +107,7 @@ class CreateTemplateWidget(QWidget):
         self.ui.createTemplateTreeSearchBar.setText("")
         self.clear_models()
         self.last_valid_parser = None
+        self.ui.fileParserCombo.setCurrentIndex(-1)
     
     def clear_models(self):
         self.metadata_model = MetadataModel()
@@ -183,6 +184,8 @@ class CreateTemplateWidget(QWidget):
         self.ui.fileParserCombo.blockSignals(True)
         self.ui.fileParserCombo.setCurrentIndex(parser_index)
         self.ui.fileParserCombo.blockSignals(False)
+
+        self.last_valid_parser = parser
     
     def load_metadata_entries(self, metadata_model: MetadataModel = MetadataModel()):        
         # Setup the Create Template table
@@ -223,7 +226,7 @@ class CreateTemplateWidget(QWidget):
             parser_uuid = None
             if self.last_valid_parser:
                 parser_uuid = self.last_valid_parser.uuid()
-            template_model = TemplateModel.create_model(data_file_path=self.ui.dataFileLineEdit.text(), parser_uuid=parser_uuid, entries=metadata_model.entries)
+            template_model = TemplateModel.create_model(data_file_path=self.ui.dataFileLineEdit.text(), parser_uuid=str(parser_uuid), entries=metadata_model.entries)
             model_string = template_model.to_json(indent=4)
             outfile.write(model_string)
 

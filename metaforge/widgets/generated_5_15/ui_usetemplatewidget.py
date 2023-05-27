@@ -325,6 +325,19 @@ class Ui_UseTemplateWidget(object):
 
         self.horizontalLayout_2.addWidget(self.useTemplateListSearchBar)
 
+        self.useTableLock = QPushButton(self.use_frame_2)
+        self.useTableLock.setObjectName(u"useTableLock")
+        sizePolicy.setHeightForWidth(self.useTableLock.sizePolicy().hasHeightForWidth())
+        self.useTableLock.setSizePolicy(sizePolicy)
+        self.useTableLock.setMinimumSize(QSize(40, 0))
+        self.useTableLock.setMaximumSize(QSize(40, 16777215))
+        icon2 = QIcon()
+        icon2.addFile(u":/resources/Images/lock_filled@2x.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.useTableLock.setIcon(icon2)
+        self.useTableLock.setFlat(True)
+
+        self.horizontalLayout_2.addWidget(self.useTableLock)
+
         self.appendUseTableRowButton = QPushButton(self.use_frame_2)
         self.appendUseTableRowButton.setObjectName(u"appendUseTableRowButton")
         sizePolicy.setHeightForWidth(self.appendUseTableRowButton.sizePolicy().hasHeightForWidth())
@@ -342,9 +355,9 @@ class Ui_UseTemplateWidget(object):
         self.removeUseTableRowButton.setSizePolicy(sizePolicy)
         self.removeUseTableRowButton.setMinimumSize(QSize(40, 0))
         self.removeUseTableRowButton.setMaximumSize(QSize(40, 16777215))
-        icon2 = QIcon()
-        icon2.addFile(u":/resources/Images/trash_can@2x.png", QSize(), QIcon.Normal, QIcon.Off)
-        self.removeUseTableRowButton.setIcon(icon2)
+        icon3 = QIcon()
+        icon3.addFile(u":/resources/Images/trash_can@2x.png", QSize(), QIcon.Normal, QIcon.Off)
+        self.removeUseTableRowButton.setIcon(icon3)
         self.removeUseTableRowButton.setIconSize(QSize(18, 18))
         self.removeUseTableRowButton.setFlat(True)
 
@@ -463,6 +476,10 @@ class Ui_UseTemplateWidget(object):
 #endif // QT_CONFIG(tooltip)
         self.use_label_3.setText(QCoreApplication.translate("UseTemplateWidget", u"Search Table", None))
         self.useTemplateListSearchBar.setPlaceholderText(QCoreApplication.translate("UseTemplateWidget", u"Search table using wildcard (*.*)", None))
+#if QT_CONFIG(tooltip)
+        self.useTableLock.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Locks/unlocks the metadata table.  This makes all read-only metadata items editable.", None))
+#endif // QT_CONFIG(tooltip)
+        self.useTableLock.setText("")
 #if QT_CONFIG(tooltip)
         self.appendUseTableRowButton.setToolTip(QCoreApplication.translate("UseTemplateWidget", u"Add a Custom Value that is only going to be used for this upload", None))
 #endif // QT_CONFIG(tooltip)

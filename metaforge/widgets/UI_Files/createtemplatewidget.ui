@@ -448,7 +448,7 @@
         <string>Save Values to a .ez template file. You can also use standard 'Save' Shortcut key</string>
        </property>
        <property name="text">
-        <string>Save Template as ...</string>
+        <string>Save Template</string>
        </property>
        <property name="default">
         <bool>false</bool>

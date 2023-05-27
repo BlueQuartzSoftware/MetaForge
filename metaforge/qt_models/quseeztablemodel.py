@@ -1,19 +1,17 @@
 from typing import List
 
-from PySide2.QtCore import QSortFilterProxyModel, Qt, QRegExp, QModelIndex
-from PySide2.QtGui import QColor, QIcon, QFont
+from PySide2.QtCore import QSortFilterProxyModel, Qt, QModelIndex
+from PySide2.QtGui import QColor, QIcon, QFont, QPixmap
 
 from metaforge.qt_models.qeztablemodel import QEzTableModel
 from metaforge.models.metadataentry import MetadataEntry
+from metaforge.models.metadatamodel import MetadataModel
 
 class QUseEzTableModel(QSortFilterProxyModel):
     """
     Define all of the column indices and column names in addition to any other strings
     in this section. This will make it easier to move columns around and rename items.
     """
-    # Total Number of Columns
-    K_COL_COUNT = 7
-
     # These are some misc strings that are used.
     K_OVERRIDDEN_MSG = 'Data file value overridden'
     K_MISSING_MSG = "Missing from data file"
@@ -27,26 +25,32 @@ class QUseEzTableModel(QSortFilterProxyModel):
     K_TEMPLATEFILE_ENTRY_COLOR = QEzTableModel.K_YELLOW_BG_COLOR
 
     # These are the user facing header and the index of each column in the table.
+    K_LOCK_COL_NAME = ""
+    K_LOCK_COL_INDEX = 0
+
     K_SOURCE_COL_NAME = "Source"
-    K_SOURCE_COL_INDEX = 0
+    K_SOURCE_COL_INDEX = 1
 
     K_HTNAME_COL_NAME = "HT Name"
-    K_HTNAME_COL_INDEX = 1
+    K_HTNAME_COL_INDEX = 2
 
     K_HTVALUE_COL_NAME = "HT Value"
-    K_HTVALUE_COL_INDEX = 2
+    K_HTVALUE_COL_INDEX = 3
 
     K_HTANNOTATION_COL_NAME = "HT Annotation"
     K_HTANNOTATION_COL_INDEX = 4
 
     K_HTUNITS_COL_NAME = "HT Units"
-    K_HTUNITS_COL_INDEX = 3
+    K_HTUNITS_COL_INDEX = 5
 
     K_PARSINGMESSAGES_COL_NAME = "Parsing Messages"
-    K_PARSINGMESSAGES_COL_INDEX = 5
+    K_PARSINGMESSAGES_COL_INDEX = 6
 
     K_REMOVE_COL_NAME = "Remove"
-    K_REMOVE_COL_INDEX = 6
+    K_REMOVE_COL_INDEX = 7
+
+    # Total Number of Columns
+    K_COL_COUNT = K_REMOVE_COL_INDEX + 1
 
     def __init__(self, data, parent=None):
         QSortFilterProxyModel.__init__(self, parent)
@@ -104,6 +108,8 @@ class QUseEzTableModel(QSortFilterProxyModel):
             elif index.column() == self.K_PARSINGMESSAGES_COL_INDEX:
                 return self._get_parsingmessages_data(metadata_entry)
         elif role == Qt.ToolTipRole:
+            if index.column() == self.K_LOCK_COL_INDEX:
+                return "This cell displays whether or not the metadata item is editable."
             if index.column() == self.K_HTNAME_COL_INDEX:
                 return "This cell contains the metadata name that will be uploaded to HyperThought."
             elif index.column() == self.K_SOURCE_COL_INDEX:
@@ -120,6 +126,11 @@ class QUseEzTableModel(QSortFilterProxyModel):
                 return "This cell removes the metadata item from the table."
         elif role == Qt.BackgroundRole:
             return self._get_background_color_data(metadata_entry)
+        elif role == Qt.DecorationRole:
+            if index.column() == self.K_LOCK_COL_INDEX:
+                metadata_model: MetadataModel = self.sourceModel().metadata_model
+                if not metadata_entry.editable and not metadata_model.is_unlocked():
+                    return QIcon(QPixmap(':/resources/Images/lock@2x.png'))
         elif role == Qt.FontRole:
             return self._get_font_data(index)
         return self._get_default_data()
@@ -269,27 +280,31 @@ class QUseEzTableModel(QSortFilterProxyModel):
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
     
     def _get_htname_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
+        metadata_model: MetadataModel = self.sourceModel().metadata_model
         if metadata_entry.source_type is MetadataEntry.SourceType.FILE:
             if metadata_entry not in self.missing_entries:
-                if metadata_entry.editable is True:
+                if metadata_entry.editable is True or metadata_model.is_unlocked():
                     return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
-        elif metadata_entry.editable is True:
+        elif metadata_entry.editable is True or metadata_model.is_unlocked():
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
     
     def _get_htvalue_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
-        if metadata_entry.editable is True:
+        metadata_model: MetadataModel = self.sourceModel().metadata_model
+        if metadata_entry.editable is True or metadata_model.is_unlocked():
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
 
     def _get_htannotation_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
-        if metadata_entry.editable is True:
+        metadata_model: MetadataModel = self.sourceModel().metadata_model
+        if metadata_entry.editable is True or metadata_model.is_unlocked():
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         else:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled
     
     def _get_htunits_flags(self, metadata_entry: MetadataEntry) -> Qt.ItemFlags:
-        if metadata_entry.editable is True:
+        metadata_model: MetadataModel = self.sourceModel().metadata_model
+        if metadata_entry.editable is True or metadata_model.is_unlocked():
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsEditable | Qt.ItemIsDragEnabled
         else:
             return Qt.ItemIsEnabled | Qt.ItemIsSelectable | Qt.ItemIsDragEnabled

@@ -210,8 +210,8 @@ class MainWindow(QMainWindow):
         if dialog.exec():
             file_path = dialog.selectedFiles()[0]
         if file_path != "":
-            self._save_template(self.saved_template_path)
             self.saved_template_path = Path(file_path)
+            self._save_template(self.saved_template_path)
 
     def open_package(self):
         pkgpath = QFileDialog.getExistingDirectory(self, caption=self.tr("Select MetaForge Package"), dir=QStandardPaths.displayName(

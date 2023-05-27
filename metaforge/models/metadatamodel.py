@@ -71,6 +71,7 @@ TemplateModel = TemplateModel_V2
 @dataclass
 class MetadataModel:
     entries: List[MetadataEntry] = field(default_factory=list)
+    force_editable: bool = False
 
     @staticmethod
     def create_model(model_list: List[MetaForgeMetadata], source_type: MetadataEntry.SourceType) -> MetadataModel:
@@ -144,6 +145,15 @@ class MetadataModel:
             del self.entries[0]
             return True
         return False
+    
+    def is_unlocked(self) -> bool:
+        return self.force_editable
+    
+    def lock(self):
+        self.force_editable = False
+    
+    def unlock(self):
+        self.force_editable = True
 
     def entry(self, index: int) -> MetadataEntry:
         if index < 0 or index >= len(self.entries):

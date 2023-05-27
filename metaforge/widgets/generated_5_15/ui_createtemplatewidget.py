@@ -296,7 +296,7 @@ class Ui_CreateTemplateWidget(object):
 #if QT_CONFIG(tooltip)
         self.saveTemplateButton.setToolTip(QCoreApplication.translate("CreateTemplateWidget", u"Save Values to a .ez template file. You can also use standard 'Save' Shortcut key", None))
 #endif // QT_CONFIG(tooltip)
-        self.saveTemplateButton.setText(QCoreApplication.translate("CreateTemplateWidget", u"Save Template as ...", None))
+        self.saveTemplateButton.setText(QCoreApplication.translate("CreateTemplateWidget", u"Save Template", None))
         self.error_label.setText(QCoreApplication.translate("CreateTemplateWidget", u"TextLabel", None))
     # retranslateUi
 

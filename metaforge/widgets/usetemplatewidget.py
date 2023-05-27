@@ -7,9 +7,9 @@ import hyperthought as ht
 from uuid import UUID
 import shutil
 
-from PySide2.QtWidgets import QMainWindow, QFileDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit
-from PySide2.QtCore import QFile, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize, QItemSelectionModel, QPersistentModelIndex, QItemSelection
-from PySide2.QtGui import QCursor, QIcon, QMouseEvent
+from PySide2.QtWidgets import QMainWindow, QFileDialog, QDialog, QWidget, QStackedWidget, QListView, QLineEdit, QMessageBox, QApplication, QCheckBox
+from PySide2.QtCore import QFile, Qt, QStandardPaths, QSortFilterProxyModel, Signal, QThread, QModelIndex, QEvent, QSize, QItemSelectionModel, QPersistentModelIndex, QItemSelection, QSettings
+from PySide2.QtGui import QCursor, QIcon, QPixmap
 import PySide2.QtCore
 
 from metaforge.ht_helpers.ht_uploader import HyperThoughtUploader
@@ -41,6 +41,7 @@ class UseTemplateWidget(QWidget):
     K_MISSINGENTRIES_KEY_NAME = 'missing_entries'
     K_METADATAFILECHOSEN_KEY_NAME = 'metadata_file_chosen'
     K_NO_ERRORS = "No errors."
+    K_SETTINGS_CHECKSTATE_KEY = "unlock_metadata_table_check_state"
     K_OTHER_DATA_FILE_PLACEHOLDER_REPLACE_SYMBOL = "@EXTENSION_LIST@"
     K_OTHER_DATA_FILE_PLACEHOLDER = f"Drag a file ({K_OTHER_DATA_FILE_PLACEHOLDER_REPLACE_SYMBOL}) here or select one using the 'Select' button to the right ===>"
 
@@ -55,6 +56,7 @@ class UseTemplateWidget(QWidget):
         self.parsers_model: ParserModel = None
         self.template_specified_parser_uuid: UUID = None
         self.hyperthoughtui = HyperthoughtDialogImpl()
+        self.setup_unlock_metadata_table_dialog()
         self.ui.hyperthoughtTemplateSelect.clicked.connect(self.select_template)
         self.ui.otherDataFileSelect.clicked.connect(self.load_other_data_file)
         self.ui.hyperthoughtUploadButton.clicked.connect(self.handle_ht_upload_button_clicked)
@@ -74,6 +76,7 @@ class UseTemplateWidget(QWidget):
 
         self.ui.addUploadFilesBtn.clicked.connect(self.add_upload_files)
         self.ui.removeUploadFilesBtn.clicked.connect(self.remove_upload_files)
+        self.ui.useTableLock.clicked.connect(self.toggle_table_lock)
         self.ui.removeUseTableRowButton.clicked.connect(self.remove_model_entry)
         self.ui.appendUseTableRowButton.clicked.connect(self.add_metadata_table_row)
         self.ui.hyperthoughtLocationButton.clicked.connect(self.authenticate_to_hyperthought)
@@ -93,6 +96,17 @@ class UseTemplateWidget(QWidget):
         self.ui.hyperthoughtTemplateLineEdit.installEventFilter(self)
         self.ui.otherDataFileLineEdit.installEventFilter(self)
         self.ui.useTemplateListView.viewport().installEventFilter(self)
+
+    def setup_unlock_metadata_table_dialog(self):
+        self.unlock_metadata_table_dialog = QMessageBox(QMessageBox.Warning, "Unlock Metadata Table", "You are about to unlock the metadata table and force all read-only metadata items to be editable.\n\nAre you sure that you want to do this?", QMessageBox.Cancel | QMessageBox.Yes, self)
+        self.unlock_metadata_table_dialog.setDefaultButton(QMessageBox.Cancel)
+
+        settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
+        check_state: Qt.CheckState = Qt.CheckState(settings.value(self.K_SETTINGS_CHECKSTATE_KEY, Qt.Unchecked))
+
+        self.unlock_metadata_table_dialog_cb = QCheckBox("Don't show this message again.")
+        self.unlock_metadata_table_dialog_cb.setCheckState(check_state)
+        self.unlock_metadata_table_dialog.setCheckBox(self.unlock_metadata_table_dialog_cb)
     
     def setup_icons(self):
         icon = QIcon()
@@ -135,7 +149,40 @@ class UseTemplateWidget(QWidget):
         self.mThread.quit()
         self.mThread.wait(250)
 
+        settings = QSettings(QApplication.organizationName(), QApplication.applicationName())
+        settings.setValue(self.K_SETTINGS_CHECKSTATE_KEY, self.unlock_metadata_table_dialog_cb.checkState())
+
         super().closeEvent(event)
+    
+    def toggle_table_lock(self):
+        if self.use_ez_table_model.metadata_model.is_unlocked():
+            # Lock it
+            self.use_ez_table_model.metadata_model.lock()
+            self.ui.useTableLock.setIcon(QIcon(QPixmap(':/resources/Images/lock_filled@2x.png')))
+
+            if self.use_ez_table_model.rowCount() == 0:
+                return
+
+            top_left = self.use_ez_table_model.index(0, QEzTableModel.K_HTNAME_COL_INDEX)
+            bottom_right = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_HTUNITS_COL_INDEX)
+            self.use_ez_table_model.dataChanged.emit(top_left, bottom_right)
+        else:
+            # Unlock it
+            if self.unlock_metadata_table_dialog_cb.checkState() == Qt.Unchecked:
+                self.unlock_metadata_table_dialog.exec_()
+                if self.unlock_metadata_table_dialog.clickedButton() == self.unlock_metadata_table_dialog.button(QMessageBox.Cancel):
+                    self.unlock_metadata_table_dialog_cb.setCheckState(Qt.Unchecked)
+                    return
+
+            self.use_ez_table_model.metadata_model.unlock()
+            self.ui.useTableLock.setIcon(QIcon(QPixmap(':/resources/Images/lock_open_filled@2x.png')))
+
+            if self.use_ez_table_model.rowCount() == 0:
+                return
+
+            top_left = self.use_ez_table_model.index(0, QEzTableModel.K_HTNAME_COL_INDEX)
+            bottom_right = self.use_ez_table_model.index(self.use_ez_table_model.rowCount() - 1, QEzTableModel.K_HTUNITS_COL_INDEX)
+            self.use_ez_table_model.dataChanged.emit(top_left, bottom_right)
     
     def handle_ht_upload_button_clicked(self):
         if not self.uploader.is_uploading():

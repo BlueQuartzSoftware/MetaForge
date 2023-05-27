@@ -17,6 +17,18 @@
         <file>resources/Images/folder@2x.png</file>
         <file>resources/Images/folder.png</file>
 
+        <file>resources/Images/lock@2x.png</file>
+        <file>resources/Images/lock.png</file>
+
+        <file>resources/Images/lock_open@2x.png</file>
+        <file>resources/Images/lock_open.png</file>
+
+        <file>resources/Images/lock_filled@2x.png</file>
+        <file>resources/Images/lock_filled.png</file>
+
+        <file>resources/Images/lock_open_filled@2x.png</file>
+        <file>resources/Images/lock_open_filled.png</file>
+
         <file>resources/Images/delete@2x.png</file>
         <file>resources/Images/delete.png</file>
 
