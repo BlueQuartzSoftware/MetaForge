@@ -44,7 +44,7 @@ Binaries are located at https://github.com/BlueQuartzSoftware/MetaForge/releases
 ```
 4. Launch the application:
 ```lang-console
-  python metaforge/__main__.py
+  metaforge
 ```
 
 *NOTE*: If you are using Visual Studio Code as your IDE, you can paste this into your `launch.json` file to be able to easily debug MetaForge:
@@ -56,12 +56,23 @@ Binaries are located at https://github.com/BlueQuartzSoftware/MetaForge/releases
             "name": "Python: MetaForge",
             "type": "python",
             "request": "launch",
-            "program": "metaforge/__main__.py",
+            "program": "metaforge",
             "console": "integratedTerminal"
         }
     ]
   }
 ```
+**Creating a Standalone App Package**:
+
+From within the **metaforge** virtual environment: `conda install pyinstaller`
+
+Navigate to the top level of the MetaForge repository, and then execute the following:
+
+For **MacOS**: `pyinstaller --clean packaging/macOS.spec`
+
+For **Windows**: `pyinstaller --clean packaging/win64.spec`
+
+The standalone package is located in the **dist** folder at the top level of the MetaForge repo.
 
 
 ## Current Bugs ##
