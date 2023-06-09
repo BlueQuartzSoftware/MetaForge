@@ -22,7 +22,7 @@ class HyperthoughtDialogImpl(QDialog):
         self.authcontrol = None
         self.files_api = None
         self.workspace_dict = {}
-        self.current_workspace = {}
+        self.current_workspace = None
         self.current_folder = {}
         self.bread_crumb_path = list()
         self.remote_file_list_model = HTRemoteFileListModel(self)
@@ -232,6 +232,9 @@ class HyperthoughtDialogImpl(QDialog):
         return self.current_workspace
 
     def get_chosen_folder(self):
+        if self.authcontrol is None:
+            return None
+
         if not self.ui.selectedFolderLabel.text():
             return self.current_folder
 

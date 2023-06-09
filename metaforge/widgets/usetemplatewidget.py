@@ -497,8 +497,6 @@ class UseTemplateWidget(QWidget):
         if self.ui.addMetadataFileCheckBox.checkState() == Qt.Checked:
             self.uselistmodel.removeAllRows()
             self.uselistmodel.addRow(filePath)
-            self.toggle_buttons()
-
 
     def update_metadata_table_model(self) -> bool:
         templateFilePath = self.ui.hyperthoughtTemplateLineEdit.text()
@@ -537,10 +535,7 @@ class UseTemplateWidget(QWidget):
         return True
 
     def toggle_buttons(self):
-        if (self.ui.hyperthoughtTemplateLineEdit.text() != "" and
-            self.ui.useTemplateListView.model().rowCount() > 0 and
-                self.ui.hyperThoughtUploadPath.text() != ""):
-
+        if self.hyperthoughtui.get_auth_control() is not None and self.uselistmodel.rowCount() > 0:
             self.ui.hyperthoughtUploadButton.setEnabled(True)
 
     def upload_to_hyperthought(self):
@@ -587,6 +582,9 @@ class UseTemplateWidget(QWidget):
         ret = self.hyperthoughtui.exec()
         if ret == int(QDialog.Accepted):
             self.chosen_ht_workspace = self.hyperthoughtui.get_workspace()
+            if self.chosen_ht_workspace is None:
+                return
+
             self.chosen_ht_folder = self.hyperthoughtui.get_chosen_folder()
             if self.chosen_ht_folder is None:
                 self.ui.hyperThoughtUploadPath.setText('/')

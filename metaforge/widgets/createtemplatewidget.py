@@ -221,8 +221,8 @@ class CreateTemplateWidget(QWidget):
             metadata_model = self.metadata_table_model.metadata_model
             parser_uuid = None
             if self.last_valid_parser:
-                parser_uuid = self.last_valid_parser.uuid()
-            template_model = TemplateModel.create_model(data_file_path=self.ui.dataFileLineEdit.text(), parser_uuid=str(parser_uuid), entries=metadata_model.entries)
+                parser_uuid = str(self.last_valid_parser.uuid())
+            template_model = TemplateModel.create_model(data_file_path=self.ui.dataFileLineEdit.text(), parser_uuid=parser_uuid, entries=metadata_model.entries)
             model_string = template_model.to_json(indent=4)
             outfile.write(model_string)
 
