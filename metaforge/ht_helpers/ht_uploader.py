@@ -61,8 +61,9 @@ class HyperThoughtUploader(QObject):
                         parent_id_path = ht_id_path
                     else:
                         root_parent = Path(root).parent
-                        parent_folder_path = str(root_parent).replace(str(upload_obj.parent), '')
+                        parent_folder_path = root_parent.as_posix().replace(upload_obj.parent.as_posix(), '')
                         parent_id_path = files_api.get_id_path(path=parent_folder_path, space_id=workspace_id)
+                        
                     new_folder_id = files_api.create_folder(name=Path(root).name, space_id=workspace_id, path=parent_id_path)
                     new_folder_id_path = parent_id_path + new_folder_id + ','
                     for file in files:

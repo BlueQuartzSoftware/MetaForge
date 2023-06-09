@@ -553,6 +553,11 @@ class UseTemplateWidget(QWidget):
                     self.chosen_ht_workspace["id"],
                     ht_upload_path,
                     metadataJson)
+        # self.uploader.performUpload(self.uselistmodel.metadataList, 
+        #             auth_control, 
+        #             self.chosen_ht_workspace["id"],
+        #             ht_upload_path,
+        #             metadataJson)
         self.uploader.notify_file_progress_text.connect(self._update_file_progress_label)
         self.uploader.notify_file_progress.connect(self._update_file_progress)
         self.uploader.notify_list_progress_text.connect(self._update_list_progress_label)
