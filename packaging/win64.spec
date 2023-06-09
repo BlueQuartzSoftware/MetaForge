@@ -5,8 +5,8 @@ from pathlib import Path
 hiddenimports = []
 hiddenimports += collect_submodules('metaforge')
 
-# parent_path = Path(__file__).resolve().parent
-version_filepath = Path('metaforge') / 'VERSION'
+parent_path = Path('metaforge').parent.parent
+version_filepath = parent_path / 'metaforge' / 'VERSION'
 version_filepath = version_filepath.absolute()
 with open(str(version_filepath)) as version_file:
     version = version_file.read().strip()
@@ -15,10 +15,10 @@ block_cipher = None
 
 
 a = Analysis(
-    ['metaforge/__main__.py'],
+    ['../metaforge/__main__.py'],
     pathex=[],
     binaries=[],
-    datas=[('metaforge/VERSION', '.'), ('metaforge', 'metaforge')],
+    datas=[('../metaforge/VERSION', '.'), ('../metaforge', 'metaforge')],
     hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
@@ -47,7 +47,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
-    icon=['resources/Images/MetaForge.ico'],
+    icon=['../resources/Images/MetaForge.ico'],
 )
 coll = COLLECT(
     exe,
@@ -62,7 +62,7 @@ coll = COLLECT(
 app = BUNDLE(
     coll,
     name='MetaForge.app',
-    icon='resources/Images/MetaForge.ico',
+    icon='../resources/Images/MetaForge.ico',
     bundle_identifier=None,
     version=version,
 )
