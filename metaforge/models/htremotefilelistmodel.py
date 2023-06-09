@@ -67,7 +67,7 @@ class HTRemoteFileListModel(QAbstractTableModel):
             if index.column() == self.K_MODDATE_COL_INDEX:
                 mod_on = ht_item['modifiedOn']
                 date_time: datetime = datetime.strptime(mod_on, "%Y-%m-%dT%H:%M:%S.%f%z")
-                mod_on = date_time.strftime("%b %d, %Y %-I:%M %p")
+                mod_on = date_time.strftime("%b %d, %Y %I:%M %p").lstrip("0").replace(" 0", " ")
                 return mod_on
             if index.column() == self.K_MODBY_COL_INDEX:
                 return ht_item['modifiedBy']
