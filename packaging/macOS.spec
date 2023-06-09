@@ -6,17 +6,18 @@ hiddenimports = []
 hiddenimports += collect_submodules('metaforge')
 hiddenimports += ['flatten_dict', 'h5py', 'PIL', 'PIL.Image']
 
-version_filepath = Path('metaforge') / 'VERSION'
+parent_path = Path('metaforge').parent.parent
+version_filepath = parent_path / 'metaforge' / 'VERSION'
 version_filepath = version_filepath.absolute()
 with open(str(version_filepath)) as version_file:
     version = version_file.read().strip()
 
 block_cipher = None
 
-a = Analysis(['metaforge/__main__.py'],
+a = Analysis(['../metaforge/__main__.py'],
              pathex=[],
              binaries=[],
-             datas=[('metaforge/VERSION', '.'), ('metaforge/', 'metaforge/')],
+             datas=[('../metaforge/VERSION', '.'), ('../metaforge/', 'metaforge/')],
              hiddenimports=hiddenimports,
              hookspath=[],
              hooksconfig={},
@@ -44,7 +45,7 @@ exe = EXE(pyz,
           target_arch=None,
           codesign_identity=None,
           entitlements_file=None,
-          icon=['resources/Images/MetaForge.ico'],
+          icon=['../resources/Images/MetaForge.ico'],
 )
 coll = COLLECT(exe,
                a.binaries,
@@ -57,7 +58,7 @@ coll = COLLECT(exe,
 )
 app = BUNDLE(coll,
              name='MetaForge.app',
-             icon='resources/Images/MetaForge.ico',
+             icon='../resources/Images/MetaForge.ico',
              bundle_identifier=None,
              version=version,
 )
