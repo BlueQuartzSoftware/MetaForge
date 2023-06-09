@@ -408,6 +408,7 @@ class UseTemplateWidget(QWidget):
         
         # Copy template file to package
         template_file_path = self.ui.hyperthoughtTemplateLineEdit.text()
+        new_template_file_path = ""
         if template_file_path != "":
             template_file_name = Path(template_file_path).name
             new_template_file_path = str(pkg_path / template_file_name)
